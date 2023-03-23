@@ -11,9 +11,9 @@ abstract class StackFileSystem {
     // todo: can merge and do same as regular linux home dir?
     if (Logging.isArmLinux) {
       appDirectory = await getApplicationDocumentsDirectory();
-      appDirectory = Directory("${appDirectory.path}/.stackwallet");
+      appDirectory = Directory("${appDirectory.path}/.stackduo");
     } else if (Platform.isLinux) {
-      appDirectory = Directory("${Platform.environment['HOME']}/.stackwallet");
+      appDirectory = Directory("${Platform.environment['HOME']}/.stackduo");
     } else if (Platform.isWindows) {
       appDirectory = await getApplicationSupportDirectory();
     } else if (Platform.isMacOS) {
