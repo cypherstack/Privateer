@@ -93,11 +93,12 @@ class _ExchangeCurrencySelectionViewState
     if (widget.pairedTicker == null) {
       return await _getCurrencies();
     }
-    List<Currency> currencies = await ExchangeDataLoadingService
-        .instance.isar.currencies
-        .where()
-        .exchangeNameEqualTo(MajesticBankExchange.exchangeName)
-        .findAll();
+    List<Currency> currencies = [];
+    // await ExchangeDataLoadingService
+    //     .instance.isar.currencies
+    //     .where()
+    //     .exchangeNameEqualTo(MajesticBankExchange.exchangeName)
+    //     .findAll();
 
     final cn = await ChangeNowExchange.instance.getPairedCurrencies(
       widget.pairedTicker!,
