@@ -80,19 +80,47 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
     if (widget.popOnSuccess) {
       Navigator.of(context).pop(widget.routeOnSuccessArguments);
     } else {
-      unawaited(Navigator.of(context).pushReplacementNamed(
-        widget.routeOnSuccess,
-        arguments: widget.routeOnSuccessArguments,
-      ));
-      if (widget.routeOnSuccess == HomeView.routeName &&
-          widget.routeOnSuccessArguments is String) {
+      final loadIntoWallet = widget.routeOnSuccess == HomeView.routeName &&
+          widget.routeOnSuccessArguments is String;
+
+      if (loadIntoWallet) {
         final walletId = widget.routeOnSuccessArguments as String;
-        unawaited(Navigator.of(context).pushNamed(WalletView.routeName,
-            arguments: Tuple2(
+
+        final manager =
+            ref.read(walletsChangeNotifierProvider).getManager(walletId);
+        if (manager.coin == Coin.monero || manager.coin == Coin.wownero) {
+          await showLoading(
+            opaqueBG: true,
+            whileFuture: manager.initializeExisting(),
+            context: context,
+            message: "Loading ${manager.coin.prettyName} wallet...",
+          );
+        }
+      }
+
+      if (mounted) {
+        unawaited(
+          Navigator.of(context).pushReplacementNamed(
+            widget.routeOnSuccess,
+            arguments: widget.routeOnSuccessArguments,
+          ),
+        );
+
+        if (loadIntoWallet) {
+          final walletId = widget.routeOnSuccessArguments as String;
+
+          unawaited(
+            Navigator.of(context).pushNamed(
+              WalletView.routeName,
+              arguments: Tuple2(
                 walletId,
                 ref
                     .read(walletsChangeNotifierProvider)
-                    .getManagerProvider(walletId))));
+                    .getManagerProvider(walletId),
+              ),
+            ),
+          );
+        }
       }
     }
   }
