@@ -117,15 +117,15 @@ class _StackPrivacyDialog extends ConsumerState<StackPrivacyDialog> {
                             ),
                           ]
                         : [
+                            if (Constants.enableExchange)
+                              const TextSpan(
+                                  text:
+                                      "Exchange data not preloaded (slower experience).\n\n"),
                             const TextSpan(
                                 text:
-                                    "Exchange data not preloaded (slower experience)."),
-                            const TextSpan(
-                                text:
-                                    "\n\nCoinGecko disabled (price changes not shown, no wallet value shown in other currencies)."),
+                                    "CoinGecko disabled (price changes not shown, no wallet value shown in other currencies).\n\n"),
                             TextSpan(
-                              text:
-                                  "\n\nRecommended for the privacy conscious.",
+                              text: "Recommended for the privacy conscious.",
                               style: isDesktop
                                   ? STextStyles.desktopTextExtraExtraSmall600(
                                       context)
