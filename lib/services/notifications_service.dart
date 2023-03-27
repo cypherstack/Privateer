@@ -6,15 +6,15 @@ import 'package:stackduo/exceptions/electrumx/no_such_transaction.dart';
 import 'package:stackduo/hive/db.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/notification_model.dart';
+import 'package:stackduo/services/exchange/exchange.dart';
 import 'package:stackduo/services/exchange/exchange_response.dart';
+import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/node_service.dart';
 import 'package:stackduo/services/notifications_api.dart';
 import 'package:stackduo/services/trade_service.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/prefs.dart';
-
-import 'exchange/exchange.dart';
 
 class NotificationsService extends ChangeNotifier {
   late NodeService nodeService;
