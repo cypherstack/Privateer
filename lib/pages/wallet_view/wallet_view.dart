@@ -255,11 +255,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
   void _onExchangePressed(BuildContext context) async {
     final coin = ref.read(managerProvider).coin;
 
-    final currency = ExchangeDataLoadingService.instance.isar.currencies
-        .where()
-        .tickerEqualToAnyExchangeNameName(coin.ticker)
-        .findFirstSync();
-
     if (coin.isTestNet) {
       await showDialog<void>(
         context: context,
@@ -268,6 +263,15 @@ class _WalletViewState extends ConsumerState<WalletView> {
         ),
       );
     } else {
+      final currency = await showLoading(
+        whileFuture: ExchangeDataLoadingService.instance.isar.currencies
+            .where()
+            .tickerEqualToAnyExchangeNameName(coin.ticker)
+            .findFirst(),
+        context: context,
+        message: "Loading...",
+      );
+
       if (mounted) {
         unawaited(
           Navigator.of(context).pushNamed(
