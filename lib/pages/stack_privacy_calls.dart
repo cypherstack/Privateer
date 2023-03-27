@@ -151,13 +151,13 @@ class _StackPrivacyCalls extends ConsumerState<StackPrivacyCalls> {
                                     if (Constants.enableExchange)
                                       const TextSpan(
                                           text:
-                                              "Exchange data preloaded for a seamless experience."),
+                                              "Exchange data preloaded for a seamless experience.\n\n"),
                                     const TextSpan(
                                         text:
-                                            "\n\nCoinGecko enabled: (24 hour price change shown in-app, total wallet value shown in USD or other currency)."),
+                                            "CoinGecko enabled: (24 hour price change shown in-app, total wallet value shown in USD or other currency).\n\n"),
                                     TextSpan(
                                       text:
-                                          "\n\nRecommended for most crypto users.",
+                                          "Recommended for most crypto users.",
                                       style: isDesktop
                                           ? STextStyles
                                               .desktopTextExtraExtraSmall600(
