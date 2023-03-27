@@ -148,7 +148,7 @@ class _StackPrivacyCalls extends ConsumerState<StackPrivacyCalls> {
                                   ),
                             children: infoToggle
                                 ? [
-                                    if (!Constants.enableExchange)
+                                    if (Constants.enableExchange)
                                       const TextSpan(
                                           text:
                                               "Exchange data preloaded for a seamless experience.\n\n"),
