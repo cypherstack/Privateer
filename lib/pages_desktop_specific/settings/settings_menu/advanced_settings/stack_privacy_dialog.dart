@@ -99,12 +99,12 @@ class _StackPrivacyDialog extends ConsumerState<StackPrivacyDialog> {
                             if (Constants.enableExchange)
                               const TextSpan(
                                   text:
-                                      "Exchange data preloaded for a seamless experience.\n\n"),
+                                      "Exchange data preloaded for a seamless experience."),
                             const TextSpan(
                                 text:
-                                    "CoinGecko enabled: (24 hour price change shown in-app, total wallet value shown in USD or other currency).\n\n"),
+                                    "\n\nCoinGecko enabled: (24 hour price change shown in-app, total wallet value shown in USD or other currency)."),
                             TextSpan(
-                              text: "Recommended for most crypto users.",
+                              text: "\n\nRecommended for most crypto users.",
                               style: isDesktop
                                   ? STextStyles.desktopTextExtraExtraSmall600(
                                       context)
