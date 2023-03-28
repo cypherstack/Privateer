@@ -38,15 +38,19 @@ class WalletSheetCard extends ConsumerWidget {
           if (manager.coin == Coin.monero) {
             await manager.initializeExisting();
           }
-          if (popPrevious) Navigator.of(context).pop();
-          Navigator.of(context).pushNamed(
-            WalletView.routeName,
-            arguments: Tuple2(
+          if (context.mounted) {
+            if (popPrevious && context.mounted) Navigator.of(context).pop();
+
+            await Navigator.of(context).pushNamed(
+              WalletView.routeName,
+              arguments: Tuple2(
                 walletId,
                 ref
                     .read(walletsChangeNotifierProvider)
-                    .getManagerProvider(walletId)),
-          );
+                    .getManagerProvider(walletId),
+              ),
+            );
+          }
         },
         child: WalletInfoRow(
           walletId: walletId,
