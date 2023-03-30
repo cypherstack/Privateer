@@ -14,7 +14,9 @@ import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/biometrics.dart';
 import 'package:stackduo/utilities/constants.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackduo/utilities/show_loading.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
@@ -88,7 +90,7 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
 
         final manager =
             ref.read(walletsChangeNotifierProvider).getManager(walletId);
-        if (manager.coin == Coin.monero || manager.coin == Coin.wownero) {
+        if (manager.coin == Coin.monero) {
           await showLoading(
             opaqueBG: true,
             whileFuture: manager.initializeExisting(),
