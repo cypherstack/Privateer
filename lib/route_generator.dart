@@ -95,6 +95,7 @@ import 'package:stackduo/pages/wallet_view/transaction_views/transaction_search_
 import 'package:stackduo/pages/wallet_view/wallet_view.dart';
 import 'package:stackduo/pages/wallets_view/wallets_view.dart';
 import 'package:stackduo/pages_desktop_specific/address_book_view/desktop_address_book.dart';
+import 'package:stackduo/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackduo/pages_desktop_specific/coin_control/desktop_coin_control_view.dart';
 // import 'package:stackduo/pages_desktop_specific/desktop_exchange/desktop_all_buys_view.dart';
 import 'package:stackduo/pages_desktop_specific/desktop_exchange/desktop_all_trades_view.dart';
@@ -1268,6 +1269,20 @@ class RouteGenerator {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => DesktopWalletView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case DesktopWalletAddressesView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => DesktopWalletAddressesView(
               walletId: args,
             ),
             settings: RouteSettings(
