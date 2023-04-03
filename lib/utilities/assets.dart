@@ -97,6 +97,7 @@ class _SVG {
       case ThemeType.light:
       case ThemeType.chan:
       case ThemeType.dark:
+      case ThemeType.orange:
       case ThemeType.oledBlack:
       case ThemeType.darkChans:
         return null;
@@ -145,6 +146,7 @@ class _SVG {
   String get themeForest => "assets/svg/forest-theme.svg";
   String get themeOledBlack => "assets/svg/oled-black-theme.svg";
   String get themeOcean => "assets/svg/ocean-breeze-theme.svg";
+  String get orange => "assets/svg/orange-theme.svg";
   String get themeLight => "assets/svg/light-mode.svg";
   String get themeDark => "assets/svg/dark-theme.svg";
   String get themeChan => "assets/svg/chanstheme.svg";
