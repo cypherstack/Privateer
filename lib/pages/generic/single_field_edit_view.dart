@@ -9,6 +9,7 @@ import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
+import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
 import 'package:stackduo/widgets/stack_text_field.dart';
 import 'package:stackduo/widgets/textfield_icon_button.dart';
@@ -186,10 +187,31 @@ class _SingleFieldEditViewState extends State<SingleFieldEditView> {
             condition: isDesktop,
             builder: (child) => Padding(
               padding: const EdgeInsets.all(32),
-              child: child,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SecondaryButton(
+                      label: "Cancel",
+                      buttonHeight: ButtonHeight.l,
+                      onPressed: () {
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: child,
+                  ),
+                ],
+              ),
             ),
             child: PrimaryButton(
               label: "Save",
+              buttonHeight: isDesktop ? ButtonHeight.l : null,
               onPressed: () {
                 if (mounted) {
                   Navigator.of(context).pop(_textController.text);
