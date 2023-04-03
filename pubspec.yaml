@@ -351,10 +351,6 @@ flutter:
     # orange theme specific
     - assets/svg/themed/orange/
 
-    # buy
-    - assets/svg/buy/
-
-
     # lottie animations
     # basic
     - assets/lottie/test2.json
