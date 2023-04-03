@@ -6,8 +6,6 @@ import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/receive_view/addresses/address_details_view.dart';
 import 'package:stackduo/pages_desktop_specific/addresses/sub_widgets/desktop_address_list.dart';
-import 'package:stackduo/providers/global/wallets_provider.dart';
-import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
@@ -61,9 +59,6 @@ class _DesktopWalletAddressesViewState
 
   @override
   Widget build(BuildContext context) {
-    final manager = ref.watch(walletsChangeNotifierProvider
-        .select((value) => value.getManager(widget.walletId)));
-
     return DesktopScaffold(
       appBar: DesktopAppBar(
         background: Theme.of(context).extension<StackColors>()!.popupBG,
