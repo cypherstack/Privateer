@@ -8,12 +8,14 @@ import 'package:stackduo/utilities/theme/light_colors.dart';
 import 'package:stackduo/utilities/theme/ocean_breeze_colors.dart';
 import 'package:stackduo/utilities/theme/oled_black_colors.dart';
 import 'package:stackduo/utilities/theme/oled_chans_colors.dart';
+import 'package:stackduo/utilities/theme/orange_colors.dart';
 
 enum ThemeType {
   light,
   dark,
   oceanBreeze,
   oledBlack,
+  orange,
   fruitSorbet,
   forest,
   chan,
@@ -34,6 +36,8 @@ extension ThemeTypeExt on ThemeType {
       case "oceanBreeze":
         return ThemeType.oceanBreeze;
       case "oledBlack":
+        return ThemeType.oledBlack;
+      case "orange":
         return ThemeType.oledBlack;
       case "fruitSorbet":
         return ThemeType.fruitSorbet;
@@ -58,6 +62,8 @@ extension ThemeTypeExt on ThemeType {
         return OceanBreezeColors();
       case ThemeType.oledBlack:
         return OledBlackColors();
+      case ThemeType.orange:
+        return OrangeColors();
       case ThemeType.fruitSorbet:
         return FruitSorbetColors();
       case ThemeType.forest:
@@ -79,6 +85,8 @@ extension ThemeTypeExt on ThemeType {
         return "Ocean Breeze";
       case ThemeType.oledBlack:
         return "OLED Black";
+      case ThemeType.orange:
+        return "Orange";
       case ThemeType.fruitSorbet:
         return "Fruit Sorbet";
       case ThemeType.forest:
@@ -286,6 +294,9 @@ class CoinThemeColor {
 
   Color get bitcoin => const Color(0xFFFCC17B);
   Color get monero => const Color(0xFFFF9E6B);
+  Color get namecoin => const Color(0xFF91B1E1);
+  Color get wownero => const Color(0xFFED80C1);
+  Color get particl => const Color(0xFF8175BD);
 
   Color forCoin(Coin coin) {
     switch (coin) {
