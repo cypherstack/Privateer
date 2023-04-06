@@ -38,7 +38,7 @@ extension ThemeTypeExt on ThemeType {
       case "oledBlack":
         return ThemeType.oledBlack;
       case "orange":
-        return ThemeType.oledBlack;
+        return ThemeType.orange;
       case "fruitSorbet":
         return ThemeType.fruitSorbet;
       case "forest":
