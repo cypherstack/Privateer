@@ -1,10 +1,14 @@
 import 'dart:async';
 
+import 'package:bip32/bip32.dart' as bip32;
+import 'package:bip39/bip39.dart' as bip39;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_delete_wallet_dialog.dart';
+import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_show_xpub_dialog.dart';
+import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
@@ -117,32 +121,40 @@ class _WalletOptionsButtonState extends ConsumerState<WalletOptionsButton> {
               }
               break;
             case _WalletOptions.showXpub:
-              print("TODO");
-            // final result = await showDialog<bool?>(
-            //   context: context,
-            //   barrierDismissible: false,
-            //   builder: (context) => Navigator(
-            //     initialRoute: DesktopShowXpubDialog.routeName,
-            //     onGenerateRoute: RouteGenerator.generateRoute,
-            //     onGenerateInitialRoutes: (_, __) {
-            //       return [
-            //         RouteGenerator.generateRoute(
-            //           RouteSettings(
-            //             name: DesktopShowXpubDialog.routeName,
-            //             arguments: walletId,
-            //           ),
-            //         ),
-            //       ];
-            //     },
-            //   ),
-            // );
-            //
-            // if (result == true) {
-            //   if (mounted) {
-            //     Navigator.of(context).pop();
-            //   }
-            // }
-            // break;
+              final List<String> mnemonic = await ref
+                  .read(walletsChangeNotifierProvider)
+                  .getManager(widget.walletId)
+                  .mnemonic;
+
+              final seed = bip39.mnemonicToSeed(mnemonic.join(' '));
+              final node = bip32.BIP32.fromSeed(seed);
+              final xpub = node.neutered().toBase58();
+
+              final result = await showDialog<bool?>(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => Navigator(
+                  initialRoute: DesktopShowXpubDialog.routeName,
+                  onGenerateRoute: RouteGenerator.generateRoute,
+                  onGenerateInitialRoutes: (_, __) {
+                    return [
+                      RouteGenerator.generateRoute(
+                        RouteSettings(
+                          name: DesktopShowXpubDialog.routeName,
+                          arguments: xpub,
+                        ),
+                      ),
+                    ];
+                  },
+                ),
+              );
+
+              if (result == true) {
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+              }
+              break;
           }
         }
       },
