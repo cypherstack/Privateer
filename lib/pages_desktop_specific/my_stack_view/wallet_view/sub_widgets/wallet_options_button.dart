@@ -200,8 +200,7 @@ class WalletOptionsPopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool xpubEnabled =
-        coin != Coin.monero && coin != Coin.epicCash && coin != Coin.wownero;
+    final bool xpubEnabled = coin != Coin.monero;
 
     return Stack(
       children: [
