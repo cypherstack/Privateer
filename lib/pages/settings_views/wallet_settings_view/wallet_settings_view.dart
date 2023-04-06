@@ -73,8 +73,7 @@ class _WalletSettingsViewState extends State<WalletSettingsView> {
   void initState() {
     walletId = widget.walletId;
     coin = widget.coin;
-    xPubEnabled =
-        coin != Coin.monero && coin != Coin.wownero && coin != Coin.epicCash;
+    xPubEnabled = coin != Coin.monero;
     xpub = "";
 
     _currentSyncStatus = widget.initialSyncStatus;
