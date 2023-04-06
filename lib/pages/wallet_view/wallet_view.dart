@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:bip32/bip32.dart' as bip32;
+import 'package:bip39/bip39.dart' as bip39;
 import 'package:decimal/decimal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
@@ -36,6 +39,7 @@ import 'package:stackduo/services/event_bus/global_event_bus.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/backup_frequency_type.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -52,6 +56,7 @@ import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
 import 'package:stackduo/widgets/loading_indicator.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
+import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/buy_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/exchange_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/paynym_nav_icon.dart';
@@ -69,6 +74,7 @@ class WalletView extends ConsumerStatefulWidget {
     required this.walletId,
     required this.managerProvider,
     this.eventBus,
+    this.clipboardInterface = const ClipboardWrapper(),
   }) : super(key: key);
 
   static const String routeName = "/wallet";
@@ -77,6 +83,8 @@ class WalletView extends ConsumerStatefulWidget {
   final String walletId;
   final ChangeNotifierProvider<Manager> managerProvider;
   final EventBus? eventBus;
+
+  final ClipboardInterface clipboardInterface;
 
   @override
   ConsumerState<WalletView> createState() => _WalletViewState();
@@ -97,10 +105,13 @@ class _WalletViewState extends ConsumerState<WalletView> {
 
   bool _rescanningOnOpen = false;
 
+  late ClipboardInterface _clipboardInterface;
+
   @override
   void initState() {
     walletId = widget.walletId;
     managerProvider = widget.managerProvider;
+    _clipboardInterface = widget.clipboardInterface;
 
     ref.read(managerProvider).isActiveWallet = true;
     if (!ref.read(managerProvider).shouldAutoSync) {
@@ -184,6 +195,16 @@ class _WalletViewState extends ConsumerState<WalletView> {
     _nodeStatusSubscription.cancel();
     _syncStatusSubscription.cancel();
     super.dispose();
+  }
+
+  Future<void> _copy(String xpub) async {
+    await _clipboardInterface.setData(ClipboardData(text: xpub));
+    unawaited(showFloatingFlushBar(
+      type: FlushBarType.info,
+      message: "Copied to clipboard",
+      iconAsset: Assets.svg.copy,
+      context: context,
+    ));
   }
 
   DateTime? _cachedTime;
@@ -766,7 +787,50 @@ class _WalletViewState extends ConsumerState<WalletView> {
                       label: "Show xPub",
                       icon: const XPubNavIcon(),
                       onTap: () async {
-                        print("TODO");
+                        final List<String> mnemonic = await ref
+                            .read(walletsChangeNotifierProvider)
+                            .getManager(walletId)
+                            .mnemonic;
+
+                        final seed = bip39.mnemonicToSeed(mnemonic.join(' '));
+                        final node = bip32.BIP32.fromSeed(seed);
+                        final xpub = node.neutered().toBase58();
+
+                        showDialog<dynamic>(
+                          barrierDismissible: true,
+                          context: context,
+                          builder: (_) => StackDialog(
+                            title: "Wallet xPub",
+                            message: xpub,
+                            leftButton: TextButton(
+                              style: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .getSecondaryEnabledButtonStyle(context),
+                              onPressed: () async {
+                                await _copy(xpub);
+                              },
+                              child: Text(
+                                "Copy to clipboard",
+                                style: STextStyles.button(context).copyWith(
+                                    color: Theme.of(context)
+                                        .extension<StackColors>()!
+                                        .accentColorDark),
+                              ),
+                            ),
+                            rightButton: TextButton(
+                              style: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .getPrimaryEnabledButtonStyle(context),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Continue",
+                                style: STextStyles.button(context),
+                              ),
+                            ),
+                          ),
+                        );
                       },
                     ),
                 ],
