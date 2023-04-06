@@ -5,7 +5,6 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/address_book_views/address_book_view.dart';
 import 'package:stackduo/pages/home_view/home_view.dart';
 import 'package:stackduo/pages/pinpad_views/lock_screen_view.dart';
@@ -26,7 +25,6 @@ import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
@@ -362,106 +360,6 @@ class _WalletSettingsViewState extends State<WalletSettingsView> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class EpicBoxInfoForm extends ConsumerStatefulWidget {
-  const EpicBoxInfoForm({
-    Key? key,
-    required this.walletId,
-  }) : super(key: key);
-
-  final String walletId;
-
-  @override
-  ConsumerState<EpicBoxInfoForm> createState() => _EpiBoxInfoFormState();
-}
-
-class _EpiBoxInfoFormState extends ConsumerState<EpicBoxInfoForm> {
-  final hostController = TextEditingController();
-  final portController = TextEditingController();
-
-  late EpicCashWallet wallet;
-
-  @override
-  void initState() {
-    wallet = ref
-        .read(walletsChangeNotifierProvider)
-        .getManager(widget.walletId)
-        .wallet as EpicCashWallet;
-
-    wallet.getEpicBoxConfig().then((EpicBoxConfigModel epicBoxConfig) {
-      hostController.text = epicBoxConfig.host;
-      portController.text = "${epicBoxConfig.port ?? 443}";
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    hostController.dispose();
-    portController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RoundedWhiteContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: hostController,
-            decoration: const InputDecoration(hintText: "Host"),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: portController,
-            decoration: const InputDecoration(hintText: "Port"),
-            keyboardType:
-                Util.isDesktop ? null : const TextInputType.numberWithOptions(),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextButton(
-            onPressed: () async {
-              try {
-                wallet.updateEpicboxConfig(
-                  hostController.text,
-                  int.parse(portController.text),
-                );
-                showFloatingFlushBar(
-                  context: context,
-                  message: "Epicbox info saved!",
-                  type: FlushBarType.success,
-                );
-                wallet.refresh();
-              } catch (e) {
-                showFloatingFlushBar(
-                  context: context,
-                  message: "Failed to save epicbox info: $e",
-                  type: FlushBarType.warning,
-                );
-              }
-            },
-            child: Text(
-              "Save",
-              style: STextStyles.button(context).copyWith(
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .accentColorDark),
-            ),
-          ),
-        ],
       ),
     );
   }
