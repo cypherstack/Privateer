@@ -1200,20 +1200,6 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
-      case BuyQuotePreviewView.routeName:
-        if (args is SimplexQuote) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => BuyQuotePreviewView(
-              quote: args,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
       // == Desktop specific routes ============================================
       case CreatePasswordView.routeName:
         if (args is bool) {
