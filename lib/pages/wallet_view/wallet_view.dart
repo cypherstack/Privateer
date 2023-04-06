@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:decimal/decimal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/models/isar/exchange_cache/currency.dart';
-import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/coin_control/coin_control_view.dart';
 import 'package:stackduo/pages/exchange_view/wallet_initiated_exchange_view.dart';
 import 'package:stackduo/pages/home_view/home_view.dart';
@@ -53,7 +51,6 @@ import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
 import 'package:stackduo/widgets/loading_indicator.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
-import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/buy_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/exchange_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/paynym_nav_icon.dart';
@@ -274,11 +271,26 @@ class _WalletViewState extends ConsumerState<WalletView> {
         ),
       );
     } else {
-      final currency = await showLoading(
-        whileFuture: ExchangeDataLoadingService.instance.isar.currencies
+      Future<Currency?> _future;
+      try {
+        _future = ExchangeDataLoadingService.instance.isar.currencies
             .where()
             .tickerEqualToAnyExchangeNameName(coin.ticker)
-            .findFirst(),
+            .findFirst();
+      } catch (_) {
+        _future = ExchangeDataLoadingService.instance
+            .init()
+            .then(
+              (_) => ExchangeDataLoadingService.instance.loadAll(),
+            )
+            .then((_) => ExchangeDataLoadingService.instance.isar.currencies
+                .where()
+                .tickerEqualToAnyExchangeNameName(coin.ticker)
+                .findFirst());
+      }
+
+      final currency = await showLoading(
+        whileFuture: _future,
         context: context,
         message: "Loading...",
       );
@@ -291,94 +303,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
               walletId,
               currency == null ? Coin.bitcoin : coin,
             ),
-          ),
-        );
-      }
-    }
-  }
-
-  void _onBuyPressed(BuildContext context) async {
-    final coin = ref.read(managerProvider).coin;
-
-    if (coin.isTestNet) {
-      await showDialog<void>(
-        context: context,
-        builder: (_) => const StackOkDialog(
-          title: "Buy not available for test net coins",
-        ),
-      );
-    } else {
-      if (mounted) {
-        unawaited(
-          Navigator.of(context).pushNamed(
-            BuyInWalletView.routeName,
-            arguments: coin.hasBuySupport ? coin : Coin.bitcoin,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> attemptAnonymize() async {
-    bool shouldPop = false;
-    unawaited(
-      showDialog(
-        context: context,
-        builder: (context) => WillPopScope(
-          child: const CustomLoadingOverlay(
-            message: "Anonymizing balance",
-            eventBus: null,
-          ),
-          onWillPop: () async => shouldPop,
-        ),
-      ),
-    );
-    final firoWallet = ref.read(managerProvider).wallet as FiroWallet;
-
-    final publicBalance = firoWallet.availablePublicBalance();
-    if (publicBalance <= Decimal.zero) {
-      shouldPop = true;
-      if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(WalletView.routeName),
-        );
-        unawaited(
-          showFloatingFlushBar(
-            type: FlushBarType.info,
-            message: "No funds available to anonymize!",
-            context: context,
-          ),
-        );
-      }
-      return;
-    }
-
-    try {
-      await firoWallet.anonymizeAllPublicFunds();
-      shouldPop = true;
-      if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(WalletView.routeName),
-        );
-        unawaited(
-          showFloatingFlushBar(
-            type: FlushBarType.success,
-            message: "Anonymize transaction submitted",
-            context: context,
-          ),
-        );
-      }
-    } catch (e) {
-      shouldPop = true;
-      if (mounted) {
-        Navigator.of(context).popUntil(
-          ModalRoute.withName(WalletView.routeName),
-        );
-        await showDialog<dynamic>(
-          context: context,
-          builder: (_) => StackOkDialog(
-            title: "Anonymize all failed",
-            message: "Reason: $e",
           ),
         );
       }
@@ -610,75 +534,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             ),
                           ),
                         ),
-                        if (coin == Coin.firo)
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        if (coin == Coin.firo)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextButton(
-                                    style: Theme.of(context)
-                                        .extension<StackColors>()!
-                                        .getSecondaryEnabledButtonStyle(
-                                            context),
-                                    onPressed: () async {
-                                      await showDialog<void>(
-                                        context: context,
-                                        builder: (context) => StackDialog(
-                                          title: "Attention!",
-                                          message:
-                                              "You're about to anonymize all of your public funds.",
-                                          leftButton: TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text(
-                                              "Cancel",
-                                              style: STextStyles.button(context)
-                                                  .copyWith(
-                                                color: Theme.of(context)
-                                                    .extension<StackColors>()!
-                                                    .accentColorDark,
-                                              ),
-                                            ),
-                                          ),
-                                          rightButton: TextButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-
-                                              unawaited(attemptAnonymize());
-                                            },
-                                            style: Theme.of(context)
-                                                .extension<StackColors>()!
-                                                .getPrimaryEnabledButtonStyle(
-                                                    context),
-                                            child: Text(
-                                              "Continue",
-                                              style:
-                                                  STextStyles.button(context),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Anonymize funds",
-                                      style:
-                                          STextStyles.button(context).copyWith(
-                                        color: Theme.of(context)
-                                            .extension<StackColors>()!
-                                            .buttonTextSecondary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -825,12 +680,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
                       label: "Swap",
                       icon: const ExchangeNavIcon(),
                       onTap: () => _onExchangePressed(context),
-                    ),
-                  if (Constants.enableExchange)
-                    WalletNavigationBarItemData(
-                      label: "Buy",
-                      icon: const BuyNavIcon(),
-                      onTap: () => _onBuyPressed(context),
                     ),
                 ],
                 moreItems: [
