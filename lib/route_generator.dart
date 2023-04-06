@@ -1276,30 +1276,6 @@ class RouteGenerator {
             builder: (_) => const DesktopExchangeView(),
             settings: RouteSettings(name: settings.name));
 
-      case BuyView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const BuyView(),
-            settings: RouteSettings(name: settings.name));
-
-      case BuyInWalletView.routeName:
-        if (args is Coin) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => BuyInWalletView(coin: args),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
-
-      case DesktopBuyView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const DesktopBuyView(),
-            settings: RouteSettings(name: settings.name));
-
       case DesktopAllTradesView.routeName:
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
