@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:stackduo/notifications/show_flush_bar.dart';
+import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
-import 'package:stackduo/notifications/show_flush_bar.dart';
-import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/clipboard_interface.dart';
+import 'package:stackduo/widgets/desktop/secondary_button.dart';
 
 class DesktopShowXpubDialog extends ConsumerStatefulWidget {
   const DesktopShowXpubDialog({
@@ -94,7 +95,7 @@ class _DesktopShowXpubDialog extends ConsumerState<DesktopShowXpubDialog> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    PrimaryButton(
+                    SecondaryButton(
                         width: 250,
                         buttonHeight: ButtonHeight.xl,
                         label: "Copy to clipboard",
