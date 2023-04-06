@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:decimal/decimal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/models/isar/exchange_cache/currency.dart';
+import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/coin_control/coin_control_view.dart';
 import 'package:stackduo/pages/exchange_view/wallet_initiated_exchange_view.dart';
 import 'package:stackduo/pages/home_view/home_view.dart';
@@ -55,6 +57,7 @@ import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/exchange
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/paynym_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/receive_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/send_nav_icon.dart';
+import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/xpub_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/wallet_navigation_bar_item.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/wallet_navigation_bar.dart';
 import 'package:tuple/tuple.dart';
@@ -254,7 +257,7 @@ class _WalletViewState extends ConsumerState<WalletView> {
   }
 
   void _onExchangePressed(BuildContext context) async {
-    final coin = ref.read(managerProvider).coin;
+    final Coin coin = ref.read(managerProvider).coin;
 
     if (coin.isTestNet) {
       await showDialog<void>(
@@ -306,7 +309,8 @@ class _WalletViewState extends ConsumerState<WalletView> {
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
 
-    final coin = ref.watch(managerProvider.select((value) => value.coin));
+    final Coin coin = ref.watch(managerProvider.select((value) => value.coin));
+    final bool xPubEnabled = coin != Coin.monero;
 
     return ConditionalParent(
       condition: _rescanningOnOpen,
@@ -755,6 +759,14 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             );
                           }
                         }
+                      },
+                    ),
+                  if (xPubEnabled)
+                    WalletNavigationBarItemData(
+                      label: "Show xPub",
+                      icon: const XPubNavIcon(),
+                      onTap: () async {
+                        print("TODO");
                       },
                     ),
                 ],
