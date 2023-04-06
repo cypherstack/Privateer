@@ -9,6 +9,7 @@ import 'package:stackduo/pages/home_view/home_view.dart';
 import 'package:stackduo/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/xpub_view.dart';
 import 'package:stackduo/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
@@ -55,6 +56,7 @@ class WalletSettingsView extends StatefulWidget {
 class _WalletSettingsViewState extends State<WalletSettingsView> {
   late final String walletId;
   late final Coin coin;
+  late final bool xPubEnabled;
 
   late final EventBus eventBus;
 
@@ -68,6 +70,8 @@ class _WalletSettingsViewState extends State<WalletSettingsView> {
   void initState() {
     walletId = widget.walletId;
     coin = widget.coin;
+    xPubEnabled =
+        coin != Coin.monero && coin != Coin.wownero && coin != Coin.epicCash;
 
     _currentSyncStatus = widget.initialSyncStatus;
     // _currentNodeStatus = widget.initialNodeStatus;
@@ -279,6 +283,19 @@ class _WalletSettingsViewState extends State<WalletSettingsView> {
                                         .pushNamed(DebugView.routeName);
                                   },
                                 ),
+                                if (xPubEnabled)
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                if (xPubEnabled)
+                                  SettingsListButton(
+                                    iconAssetName: Assets.svg.eye,
+                                    title: "Wallet xPub",
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pushNamed(XPubView.routeName);
+                                    },
+                                  ),
                               ],
                             ),
                           ),
@@ -345,8 +362,19 @@ class _EpiBoxInfoFormState extends ConsumerState<EpicBoxInfoForm> {
   final hostController = TextEditingController();
   final portController = TextEditingController();
 
+  late EpicCashWallet wallet;
+
   @override
   void initState() {
+    wallet = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .wallet as EpicCashWallet;
+
+    wallet.getEpicBoxConfig().then((EpicBoxConfigModel epicBoxConfig) {
+      hostController.text = epicBoxConfig.host;
+      portController.text = "${epicBoxConfig.port ?? 443}";
+    });
     super.initState();
   }
 
@@ -384,7 +412,26 @@ class _EpiBoxInfoFormState extends ConsumerState<EpicBoxInfoForm> {
             height: 8,
           ),
           TextButton(
-            onPressed: () async {},
+            onPressed: () async {
+              try {
+                wallet.updateEpicboxConfig(
+                  hostController.text,
+                  int.parse(portController.text),
+                );
+                showFloatingFlushBar(
+                  context: context,
+                  message: "Epicbox info saved!",
+                  type: FlushBarType.success,
+                );
+                wallet.refresh();
+              } catch (e) {
+                showFloatingFlushBar(
+                  context: context,
+                  message: "Failed to save epicbox info: $e",
+                  type: FlushBarType.warning,
+                );
+              }
+            },
             child: Text(
               "Save",
               style: STextStyles.button(context).copyWith(

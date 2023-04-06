@@ -80,6 +80,7 @@ import 'package:stackduo/pages/settings_views/global_settings_view/support_view.
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_options_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/wallet_syncing_options_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/xpub_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -390,6 +391,12 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const DebugView(),
+            settings: RouteSettings(name: settings.name));
+
+      case XPubView.routeName:
+        return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => const XPubView(),
             settings: RouteSettings(name: settings.name));
 
       case AppearanceSettingsView.routeName:
@@ -1185,6 +1192,20 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
+      case BuyQuotePreviewView.routeName:
+        if (args is SimplexQuote) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => BuyQuotePreviewView(
+              quote: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
       // == Desktop specific routes ============================================
       case CreatePasswordView.routeName:
         if (args is bool) {
@@ -1245,6 +1266,30 @@ class RouteGenerator {
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const DesktopExchangeView(),
+            settings: RouteSettings(name: settings.name));
+
+      case BuyView.routeName:
+        return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => const BuyView(),
+            settings: RouteSettings(name: settings.name));
+
+      case BuyInWalletView.routeName:
+        if (args is Coin) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => BuyInWalletView(coin: args),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case DesktopBuyView.routeName:
+        return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => const DesktopBuyView(),
             settings: RouteSettings(name: settings.name));
 
       case DesktopAllTradesView.routeName:
