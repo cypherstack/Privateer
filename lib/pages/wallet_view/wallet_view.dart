@@ -1,11 +1,8 @@
 import 'dart:async';
 
-import 'package:bip32/bip32.dart' as bip32;
-import 'package:bip39/bip39.dart' as bip39;
 import 'package:decimal/decimal.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
@@ -55,7 +52,6 @@ import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
 import 'package:stackduo/widgets/loading_indicator.dart';
-import 'package:stackduo/widgets/qr_dialog.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/buy_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';
@@ -63,7 +59,6 @@ import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/exchange
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/paynym_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/receive_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/send_nav_icon.dart';
-import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/xpub_nav_icon.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/wallet_navigation_bar_item.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/wallet_navigation_bar.dart';
 import 'package:tuple/tuple.dart';
@@ -198,16 +193,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
     super.dispose();
   }
 
-  Future<void> _copy(String xpub) async {
-    await _clipboardInterface.setData(ClipboardData(text: xpub));
-    unawaited(showFloatingFlushBar(
-      type: FlushBarType.info,
-      message: "Copied to clipboard",
-      iconAsset: Assets.svg.copy,
-      context: context,
-    ));
-  }
-
   DateTime? _cachedTime;
 
   Future<bool> _onWillPop() async {
@@ -289,26 +274,11 @@ class _WalletViewState extends ConsumerState<WalletView> {
         ),
       );
     } else {
-      Future<Currency?> _future;
-      try {
-        _future = ExchangeDataLoadingService.instance.isar.currencies
+      final currency = await showLoading(
+        whileFuture: ExchangeDataLoadingService.instance.isar.currencies
             .where()
             .tickerEqualToAnyExchangeNameName(coin.ticker)
-            .findFirst();
-      } catch (_) {
-        _future = ExchangeDataLoadingService.instance
-            .init()
-            .then(
-              (_) => ExchangeDataLoadingService.instance.loadAll(),
-            )
-            .then((_) => ExchangeDataLoadingService.instance.isar.currencies
-                .where()
-                .tickerEqualToAnyExchangeNameName(coin.ticker)
-                .findFirst());
-      }
-
-      final currency = await showLoading(
-        whileFuture: _future,
+            .findFirst(),
         context: context,
         message: "Loading...",
       );
@@ -327,12 +297,99 @@ class _WalletViewState extends ConsumerState<WalletView> {
     }
   }
 
+  void _onBuyPressed(BuildContext context) async {
+    final coin = ref.read(managerProvider).coin;
+
+    if (coin.isTestNet) {
+      await showDialog<void>(
+        context: context,
+        builder: (_) => const StackOkDialog(
+          title: "Buy not available for test net coins",
+        ),
+      );
+    } else {
+      if (mounted) {
+        unawaited(
+          Navigator.of(context).pushNamed(
+            BuyInWalletView.routeName,
+            arguments: coin.hasBuySupport ? coin : Coin.bitcoin,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> attemptAnonymize() async {
+    bool shouldPop = false;
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => WillPopScope(
+          child: const CustomLoadingOverlay(
+            message: "Anonymizing balance",
+            eventBus: null,
+          ),
+          onWillPop: () async => shouldPop,
+        ),
+      ),
+    );
+    final firoWallet = ref.read(managerProvider).wallet as FiroWallet;
+
+    final publicBalance = firoWallet.availablePublicBalance();
+    if (publicBalance <= Decimal.zero) {
+      shouldPop = true;
+      if (mounted) {
+        Navigator.of(context).popUntil(
+          ModalRoute.withName(WalletView.routeName),
+        );
+        unawaited(
+          showFloatingFlushBar(
+            type: FlushBarType.info,
+            message: "No funds available to anonymize!",
+            context: context,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      await firoWallet.anonymizeAllPublicFunds();
+      shouldPop = true;
+      if (mounted) {
+        Navigator.of(context).popUntil(
+          ModalRoute.withName(WalletView.routeName),
+        );
+        unawaited(
+          showFloatingFlushBar(
+            type: FlushBarType.success,
+            message: "Anonymize transaction submitted",
+            context: context,
+          ),
+        );
+      }
+    } catch (e) {
+      shouldPop = true;
+      if (mounted) {
+        Navigator.of(context).popUntil(
+          ModalRoute.withName(WalletView.routeName),
+        );
+        await showDialog<dynamic>(
+          context: context,
+          builder: (_) => StackOkDialog(
+            title: "Anonymize all failed",
+            message: "Reason: $e",
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
 
     final Coin coin = ref.watch(managerProvider.select((value) => value.coin));
-    final bool xPubEnabled = coin != Coin.monero;
 
     return ConditionalParent(
       condition: _rescanningOnOpen,
@@ -553,6 +610,75 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             ),
                           ),
                         ),
+                        if (coin == Coin.firo)
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        if (coin == Coin.firo)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    style: Theme.of(context)
+                                        .extension<StackColors>()!
+                                        .getSecondaryEnabledButtonStyle(
+                                            context),
+                                    onPressed: () async {
+                                      await showDialog<void>(
+                                        context: context,
+                                        builder: (context) => StackDialog(
+                                          title: "Attention!",
+                                          message:
+                                              "You're about to anonymize all of your public funds.",
+                                          leftButton: TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text(
+                                              "Cancel",
+                                              style: STextStyles.button(context)
+                                                  .copyWith(
+                                                color: Theme.of(context)
+                                                    .extension<StackColors>()!
+                                                    .accentColorDark,
+                                              ),
+                                            ),
+                                          ),
+                                          rightButton: TextButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+
+                                              unawaited(attemptAnonymize());
+                                            },
+                                            style: Theme.of(context)
+                                                .extension<StackColors>()!
+                                                .getPrimaryEnabledButtonStyle(
+                                                    context),
+                                            child: Text(
+                                              "Continue",
+                                              style:
+                                                  STextStyles.button(context),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "Anonymize funds",
+                                      style:
+                                          STextStyles.button(context).copyWith(
+                                        color: Theme.of(context)
+                                            .extension<StackColors>()!
+                                            .buttonTextSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -700,6 +826,12 @@ class _WalletViewState extends ConsumerState<WalletView> {
                       icon: const ExchangeNavIcon(),
                       onTap: () => _onExchangePressed(context),
                     ),
+                  if (Constants.enableExchange)
+                    WalletNavigationBarItemData(
+                      label: "Buy",
+                      icon: const BuyNavIcon(),
+                      onTap: () => _onBuyPressed(context),
+                    ),
                 ],
                 moreItems: [
                   if (ref.watch(
@@ -781,58 +913,6 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             );
                           }
                         }
-                      },
-                    ),
-                  if (xPubEnabled)
-                    WalletNavigationBarItemData(
-                      label: "Show xPub",
-                      icon: const XPubNavIcon(),
-                      onTap: () async {
-                        final List<String> mnemonic = await ref
-                            .read(walletsChangeNotifierProvider)
-                            .getManager(walletId)
-                            .mnemonic;
-
-                        final seed = bip39.mnemonicToSeed(mnemonic.join(' '));
-                        final node = bip32.BIP32.fromSeed(seed);
-                        final xpub = node.neutered().toBase58();
-
-                        showDialog<dynamic>(
-                          barrierDismissible: true,
-                          context: context,
-                          builder: (_) => QrDialog(
-                            title: "Wallet xPub",
-                            // message: xpub,
-                            qr: xpub,
-                            leftButton: TextButton(
-                              style: Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .getSecondaryEnabledButtonStyle(context),
-                              onPressed: () async {
-                                await _copy(xpub);
-                              },
-                              child: Text(
-                                "Copy",
-                                style: STextStyles.button(context).copyWith(
-                                    color: Theme.of(context)
-                                        .extension<StackColors>()!
-                                        .accentColorDark),
-                              ),
-                            ),
-                            rightButton: TextButton(
-                              style: Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .getPrimaryEnabledButtonStyle(context),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "Continue",
-                                style: STextStyles.button(context),
-                              ),
-                            ),
-                          ),
-                        );
                       },
                     ),
                 ],
