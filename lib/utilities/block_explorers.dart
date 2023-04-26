@@ -6,9 +6,9 @@ Uri getBlockExplorerTransactionUrlFor({
 }) {
   switch (coin) {
     case Coin.bitcoin:
-      return Uri.parse("https://chain.so/tx/BTC/$txid");
+      return Uri.parse("https://mempool.space/tx/$txid");
     case Coin.bitcoinTestNet:
-      return Uri.parse("https://chain.so/tx/BTCTEST/$txid");
+      return Uri.parse("mempool.space/testnet/tx/$txid");
     case Coin.monero:
       return Uri.parse("https://xmrchain.net/tx/$txid");
   }

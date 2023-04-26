@@ -1062,6 +1062,70 @@ class _TransactionDetailsViewState
                                         ),
                                         //   ),
                                         // ),
+                                        const SizedBox(
+                                          height: 8,
+                                        ),
+                                        CustomTextButton(
+                                          text: "Open in block explorer",
+                                          onTap: () async {
+                                            final uri =
+                                            getBlockExplorerTransactionUrlFor(
+                                              coin: coin,
+                                              txid: _transaction.txid,
+                                            );
+
+                                            if (ref
+                                                .read(
+                                                prefsChangeNotifierProvider)
+                                                .hideBlockExplorerWarning ==
+                                                false) {
+                                              final shouldContinue =
+                                              await showExplorerWarning(
+                                                  "${uri.scheme}://${uri.host}");
+
+                                              if (!shouldContinue) {
+                                                return;
+                                              }
+                                            }
+
+                                            // ref
+                                            //     .read(
+                                            //         shouldShowLockscreenOnResumeStateProvider
+                                            //             .state)
+                                            //     .state = false;
+                                            try {
+                                              await launchUrl(
+                                                uri,
+                                                mode: LaunchMode
+                                                    .externalApplication,
+                                              );
+                                            } catch (_) {
+                                              if (mounted) {
+                                                unawaited(
+                                                  showDialog<void>(
+                                                    context: context,
+                                                    builder: (_) =>
+                                                        StackOkDialog(
+                                                          title:
+                                                          "Could not open in block explorer",
+                                                          message:
+                                                          "Failed to open \"${uri.toString()}\"",
+                                                        ),
+                                                  ),
+                                                );
+                                              }
+                                            } finally {
+                                              // Future<void>.delayed(
+                                              //   const Duration(seconds: 1),
+                                              //   () => ref
+                                              //       .read(
+                                              //           shouldShowLockscreenOnResumeStateProvider
+                                              //               .state)
+                                              //       .state = true,
+                                              // );
+                                            }
+                                          },
+                                        ),
                                       ],
                                     ),
                                   ),
