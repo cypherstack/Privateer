@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,7 +21,6 @@ import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_pin_put/custom_pin_put.dart';
-import 'package:stackduo/widgets/custom_pin_put/pin_keyboard.dart';
 import 'package:stackduo/widgets/shake/shake.dart';
 import 'package:tuple/tuple.dart';
 
@@ -244,12 +242,12 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
                           height: 52,
                         ),
                         CustomPinPut(
-                          customKey: CustomKey(
-                            onPressed: _checkUseBiometrics,
-                            iconAssetName: Platform.isIOS
-                                ? Assets.svg.faceId
-                                : Assets.svg.fingerprint,
-                          ),
+                          // customKey: CustomKey(
+                          //   onPressed: _checkUseBiometrics,
+                          //   iconAssetName: Platform.isIOS
+                          //       ? Assets.svg.faceId
+                          //       : Assets.svg.fingerprint,
+                          // ),
                           fieldsCount: Constants.pinLength,
                           eachFieldHeight: 12,
                           eachFieldWidth: 12,

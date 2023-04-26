@@ -353,12 +353,15 @@ class PinKeyboard extends StatelessWidget {
           ),
           Row(
             children: [
-              customKey == null
-                  ? const SizedBox(
-                      height: 72,
-                      width: 72,
-                    )
-                  : customKey!,
+              // customKey == null
+              //     ? const SizedBox(
+              //         height: 72,
+              //         width: 72,
+              //       )
+              //     : customKey!,
+              BackspaceKey(
+                onPressed: _backHandler,
+              ),
               const SizedBox(
                 width: 24,
               ),
@@ -369,12 +372,12 @@ class PinKeyboard extends StatelessWidget {
               const SizedBox(
                 width: 24,
               ),
-              BackspaceKey(
-                onPressed: _backHandler,
-              ),
-              // SubmitKey(
-              //   onPressed: _submitHandler,
+              // BackspaceKey(
+              //   onPressed: _backHandler,
               // ),
+              SubmitKey(
+                onPressed: _submitHandler,
+              ),
             ],
           )
         ],
