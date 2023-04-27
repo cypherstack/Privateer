@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
-import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/wallet_view/sub_widgets/tx_icon.dart';
 import 'package:stackduo/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackduo/providers/providers.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/format.dart';
@@ -33,6 +33,9 @@ class TransactionCard extends ConsumerStatefulWidget {
 class _TransactionCardState extends ConsumerState<TransactionCard> {
   late final Transaction _transaction;
   late final String walletId;
+  late final String prefix;
+  late final String unit;
+  late final Coin coin;
 
   String whatIsIt(
     TransactionType type,
@@ -89,6 +92,23 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
   void initState() {
     walletId = widget.walletId;
     _transaction = widget.transaction;
+    if (Util.isDesktop) {
+      if (_transaction.type == TransactionType.outgoing) {
+        prefix = "-";
+      } else if (_transaction.type == TransactionType.incoming) {
+        prefix = "+";
+      } else {
+        prefix = "";
+      }
+    } else {
+      prefix = "";
+    }
+    coin = ref
+        .read(walletsChangeNotifierProvider)
+        .getManager(widget.walletId)
+        .coin;
+
+    unit = coin.ticker;
     super.initState();
   }
 
@@ -96,27 +116,14 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
   Widget build(BuildContext context) {
     final locale = ref.watch(
         localeServiceChangeNotifierProvider.select((value) => value.locale));
-    final manager = ref.watch(walletsChangeNotifierProvider
-        .select((value) => value.getManager(walletId)));
 
     final baseCurrency = ref
         .watch(prefsChangeNotifierProvider.select((value) => value.currency));
-
-    final coin = manager.coin;
 
     final price = ref
         .watch(priceAnd24hChangeNotifierProvider
             .select((value) => value.getPrice(coin)))
         .item1;
-
-    String prefix = "";
-    if (Util.isDesktop) {
-      if (_transaction.type == TransactionType.outgoing) {
-        prefix = "-";
-      } else if (_transaction.type == TransactionType.incoming) {
-        prefix = "+";
-      }
-    }
 
     final currentHeight = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(walletId).currentHeight));
@@ -169,8 +176,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
               children: [
                 TxIcon(
                   transaction: _transaction,
-                  coin: ref.watch(walletsChangeNotifierProvider.select(
-                      (value) => value.getManager(widget.walletId).coin)),
+                  coin: coin,
                   currentHeight: currentHeight,
                 ),
                 const SizedBox(
@@ -207,9 +213,12 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                               fit: BoxFit.scaleDown,
                               child: Builder(
                                 builder: (_) {
-                                  final amount = _transaction.amount;
+                                  final amount = _transaction.realAmount;
+
                                   return Text(
-                                    "$prefix${Format.satoshiAmountToPrettyString(amount, locale, coin)} ${coin.ticker}",
+                                    "$prefix${amount.localizedStringAsFixed(
+                                      locale: locale,
+                                    )} $unit",
                                     style: STextStyles.itemSubtitle12(context),
                                   );
                                 },
@@ -246,13 +255,13 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                                 fit: BoxFit.scaleDown,
                                 child: Builder(
                                   builder: (_) {
-                                    int value = _transaction.amount;
+                                    final amount = _transaction.realAmount;
 
                                     return Text(
-                                      "$prefix${Format.localizedStringAsFixed(
-                                        value: Format.satoshisToAmount(value,
-                                                coin: coin) *
-                                            price,
+                                      "$prefix${Amount.fromDecimal(
+                                        amount.decimal * price,
+                                        fractionDigits: 2,
+                                      ).localizedStringAsFixed(
                                         locale: locale,
                                         decimalPlaces: 2,
                                       )} $baseCurrency",

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_test/hive_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:stackwallet/electrumx_rpc/cached_electrumx.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackduo/electrumx_rpc/cached_electrumx.dart';
+import 'package:stackduo/electrumx_rpc/electrumx.dart';
+import 'package:stackduo/utilities/prefs.dart';
 
 import 'cached_electrumx_test.mocks.dart';
 // import 'sample_data/get_anonymity_set_sample_data.dart';

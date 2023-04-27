@@ -4,13 +4,13 @@
 // import 'package:mockingjay/mockingjay.dart' as mockingjay;
 import 'package:mockito/annotations.dart';
 // import 'package:mockito/mockito.dart';
-// import 'package:stackwallet/notifications/modal_popup_dialog.dart';
-// import 'package:stackwallet/pages/settings_view/settings_view.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-// import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-// import 'package:stackwallet/widgets/custom_buttons/gradient_button.dart';
-// import 'package:stackwallet/widgets/custom_buttons/simple_button.dart';
+// import 'package:stackduo/notifications/modal_popup_dialog.dart';
+// import 'package:stackduo/pages/settings_view/settings_view.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/services/wallets_service.dart';
+// import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
+// import 'package:stackduo/widgets/custom_buttons/gradient_button.dart';
+// import 'package:stackduo/widgets/custom_buttons/simple_button.dart';
 // import 'package:provider/provider.dart';
 //
 // import 'settings_view_screen_test.mocks.dart';

@@ -8,7 +8,9 @@ class LocaleService extends ChangeNotifier {
   String get locale => _locale;
 
   Future<void> loadLocale({bool notify = true}) async {
-    _locale =Platform.isWindows ? "en_US" :  await Devicelocale.currentLocale ?? "en_US";
+    _locale = Platform.isWindows
+        ? "en_US"
+        : await Devicelocale.currentLocale ?? "en_US";
     if (notify) {
       notifyListeners();
     }

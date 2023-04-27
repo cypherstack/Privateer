@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-// import 'package:stackwallet/pages/pinpad_views/lock_screen_view.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/wallets_service.dart';
+// import 'package:stackduo/pages/pinpad_views/lock_screen_view.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/services/node_service.dart';
+import 'package:stackduo/services/wallets_service.dart';
 
 @GenerateMocks([], customMocks: [
   MockSpec<WalletsService>(returnNullOnMissingStub: true),

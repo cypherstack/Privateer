@@ -8,12 +8,11 @@ import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/providers/global/price_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
-import 'package:stackduo/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
@@ -51,8 +50,6 @@ class _DesktopPaynymSendDialogState
         localeServiceChangeNotifierProvider.select((value) => value.locale));
 
     final coin = manager.coin;
-
-    const isFiro = false;
 
     return DesktopDialog(
       maxHeight: double.infinity,
@@ -101,9 +98,7 @@ class _DesktopPaynymSendDialogState
                         height: 2,
                       ),
                       Text(
-                        isFiro
-                            ? "${ref.watch(publicPrivateBalanceStateProvider.state).state} balance"
-                            : "Available balance",
+                        "Available balance",
                         style: STextStyles.baseXS(context).copyWith(
                           color: Theme.of(context)
                               .extension<StackColors>()!
@@ -119,10 +114,8 @@ class _DesktopPaynymSendDialogState
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "${Format.localizedStringAsFixed(
-                            value: manager.balance.getSpendable(),
+                          "${manager.balance.spendable.localizedStringAsFixed(
                             locale: locale,
-                            decimalPlaces: 8,
                           )} ${coin.ticker}",
                           style: STextStyles.titleBold12(context),
                           textAlign: TextAlign.right,
@@ -131,11 +124,19 @@ class _DesktopPaynymSendDialogState
                           height: 2,
                         ),
                         Text(
-                          "${Format.localizedStringAsFixed(
-                            value: manager.balance.getSpendable(),
-                            locale: locale,
-                            decimalPlaces: 2,
-                          )} ${ref.watch(prefsChangeNotifierProvider.select((value) => value.currency))}",
+                          "${(manager.balance.spendable.decimal * ref.watch(
+                                    priceAnd24hChangeNotifierProvider.select(
+                                      (value) => value.getPrice(coin).item1,
+                                    ),
+                                  )).toAmount(
+                                fractionDigits: 2,
+                              ).localizedStringAsFixed(
+                                locale: locale,
+                              )} ${ref.watch(
+                            prefsChangeNotifierProvider.select(
+                              (value) => value.currency,
+                            ),
+                          )}",
                           style: STextStyles.baseXS(context).copyWith(
                             color: Theme.of(context)
                                 .extension<StackColors>()!

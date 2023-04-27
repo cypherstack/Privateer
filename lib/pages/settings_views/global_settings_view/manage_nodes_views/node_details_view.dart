@@ -12,7 +12,6 @@ import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/logger.dart';
-import 'package:stackduo/utilities/test_epic_box_connection.dart';
 import 'package:stackduo/utilities/test_monero_node_connection.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';

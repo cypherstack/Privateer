@@ -3,14 +3,13 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackduo/services/event_bus/global_event_bus.dart';
-import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
+import 'package:stackduo/widgets/animated_widgets/rotating_arrows.dart';
 
 /// [eventBus] should only be set during testing
 class WalletRefreshButton extends ConsumerStatefulWidget {
@@ -20,41 +19,29 @@ class WalletRefreshButton extends ConsumerStatefulWidget {
     required this.initialSyncStatus,
     this.onPressed,
     this.eventBus,
+    this.overrideIconColor,
   }) : super(key: key);
 
   final String walletId;
   final WalletSyncStatus initialSyncStatus;
   final VoidCallback? onPressed;
   final EventBus? eventBus;
+  final Color? overrideIconColor;
 
   @override
   ConsumerState<WalletRefreshButton> createState() => _RefreshButtonState();
 }
 
-class _RefreshButtonState extends ConsumerState<WalletRefreshButton>
-    with TickerProviderStateMixin {
+class _RefreshButtonState extends ConsumerState<WalletRefreshButton> {
   late final EventBus eventBus;
 
-  late AnimationController? _spinController;
-  late Animation<double> _spinAnimation;
+  late RotatingArrowsController _spinController;
 
   late StreamSubscription<dynamic> _syncStatusSubscription;
 
   @override
   void initState() {
-    _spinController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-
-    _spinAnimation = CurvedAnimation(
-      parent: _spinController!,
-      curve: Curves.linear,
-    );
-
-    if (widget.initialSyncStatus == WalletSyncStatus.syncing) {
-      _spinController?.repeat();
-    }
+    _spinController = RotatingArrowsController();
 
     eventBus =
         widget.eventBus != null ? widget.eventBus! : GlobalEventBus.instance;
@@ -65,13 +52,13 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton>
         if (event.walletId == widget.walletId) {
           switch (event.newStatus) {
             case WalletSyncStatus.unableToSync:
-              _spinController?.stop();
+              _spinController.stop?.call();
               break;
             case WalletSyncStatus.synced:
-              _spinController?.stop();
+              _spinController.stop?.call();
               break;
             case WalletSyncStatus.syncing:
-              unawaited(_spinController?.repeat());
+              _spinController.repeat?.call();
               break;
           }
         }
@@ -83,9 +70,6 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton>
 
   @override
   void dispose() {
-    _spinController?.dispose();
-    _spinController = null;
-
     _syncStatusSubscription.cancel();
 
     super.dispose();
@@ -109,11 +93,11 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton>
               .getManagerProvider(widget.walletId);
           final isRefreshing = ref.read(managerProvider).isRefreshing;
           if (!isRefreshing) {
-            _spinController?.repeat();
+            _spinController.repeat?.call();
             ref
                 .read(managerProvider)
                 .refresh()
-                .then((_) => _spinController?.stop());
+                .then((_) => _spinController.stop?.call());
           }
         },
         elevation: 0,
@@ -126,18 +110,20 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton>
             Constants.size.circularBorderRadius,
           ),
         ),
-        child: RotationTransition(
-          turns: _spinAnimation,
-          child: SvgPicture.asset(
-            Assets.svg.arrowRotate,
-            width: isDesktop ? 12 : 24,
-            height: isDesktop ? 12 : 24,
-            color: isDesktop
-                ? Theme.of(context)
-                    .extension<StackColors>()!
-                    .textFieldDefaultSearchIconRight
-                : Theme.of(context).extension<StackColors>()!.textFavoriteCard,
-          ),
+        child: RotatingArrows(
+          spinByDefault: widget.initialSyncStatus == WalletSyncStatus.syncing,
+          width: isDesktop ? 12 : 24,
+          height: isDesktop ? 12 : 24,
+          controller: _spinController,
+          color: widget.overrideIconColor != null
+              ? widget.overrideIconColor!
+              : isDesktop
+                  ? Theme.of(context)
+                      .extension<StackColors>()!
+                      .textFieldDefaultSearchIconRight
+                  : Theme.of(context)
+                      .extension<StackColors>()!
+                      .textFavoriteCard,
         ),
       ),
     );

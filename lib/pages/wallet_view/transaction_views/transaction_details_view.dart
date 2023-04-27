@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,12 +7,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/models/isar/models/blockchain_data/transaction.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/wallet_view/sub_widgets/tx_icon.dart';
-import 'package:stackduo/pages/wallet_view/transaction_views/dialogs/cancelling_transaction_progress_dialog.dart';
 import 'package:stackduo/pages/wallet_view/transaction_views/edit_note_view.dart';
-import 'package:stackduo/pages/wallet_view/wallet_view.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/block_explorers.dart';
 import 'package:stackduo/utilities/constants.dart';
@@ -64,9 +61,11 @@ class _TransactionDetailsViewState
   late final String walletId;
 
   late final Coin coin;
-  late final Decimal amount;
-  late final Decimal fee;
+  late final Amount amount;
+  late final Amount fee;
   late final String amountPrefix;
+  late final String unit;
+  late final bool isTokenTx;
 
   bool showFeePending = false;
 
@@ -74,18 +73,17 @@ class _TransactionDetailsViewState
   void initState() {
     isDesktop = Util.isDesktop;
     _transaction = widget.transaction;
+    isTokenTx = false;
     walletId = widget.walletId;
 
     coin = widget.coin;
-    amount = Format.satoshisToAmount(_transaction.amount, coin: coin);
-    fee = Format.satoshisToAmount(_transaction.fee, coin: coin);
+    amount = _transaction.realAmount;
+    fee = _transaction.fee.toAmountAsRaw(fractionDigits: coin.decimals);
+
     amountPrefix = _transaction.type == TransactionType.outgoing ? "-" : "+";
 
-    // if (coin == Coin.firo || coin == Coin.firoTestNet) {
-    //   showFeePending = true;
-    // } else {
-    //   showFeePending = false;
-    // }
+    unit = coin.ticker;
+
     super.initState();
   }
 
@@ -415,16 +413,13 @@ class _TransactionDetailsViewState
                                             : CrossAxisAlignment.start,
                                         children: [
                                           SelectableText(
-                                            "$amountPrefix${Format.localizedStringAsFixed(
-                                              value: amount,
+                                            "$amountPrefix${amount.localizedStringAsFixed(
                                               locale: ref.watch(
                                                 localeServiceChangeNotifierProvider
                                                     .select((value) =>
                                                         value.locale),
                                               ),
-                                              decimalPlaces: Constants
-                                                  .decimalPlacesForCoin(coin),
-                                            )} ${coin.ticker}",
+                                            )} $unit",
                                             style: isDesktop
                                                 ? STextStyles
                                                         .desktopTextExtraExtraSmall(
@@ -446,23 +441,21 @@ class _TransactionDetailsViewState
                                                   .select((value) =>
                                                       value.externalCalls)))
                                             SelectableText(
-                                              "$amountPrefix${Format.localizedStringAsFixed(
-                                                value: amount *
-                                                    ref.watch(
-                                                      priceAnd24hChangeNotifierProvider
-                                                          .select((value) =>
-                                                              value
-                                                                  .getPrice(
-                                                                      coin)
-                                                                  .item1),
+                                              "$amountPrefix${(amount.decimal * ref.watch(
+                                                        priceAnd24hChangeNotifierProvider
+                                                            .select((value) =>
+                                                                value
+                                                                    .getPrice(
+                                                                        coin)
+                                                                    .item1),
+                                                      )).toAmount(fractionDigits: 2).localizedStringAsFixed(
+                                                    locale: ref.watch(
+                                                      localeServiceChangeNotifierProvider
+                                                          .select(
+                                                        (value) => value.locale,
+                                                      ),
                                                     ),
-                                                locale: ref.watch(
-                                                  localeServiceChangeNotifierProvider
-                                                      .select((value) =>
-                                                          value.locale),
-                                                ),
-                                                decimalPlaces: 2,
-                                              )} ${ref.watch(
+                                                  )} ${ref.watch(
                                                 prefsChangeNotifierProvider
                                                     .select(
                                                   (value) => value.currency,
@@ -850,29 +843,28 @@ class _TransactionDetailsViewState
                                   ? const EdgeInsets.all(16)
                                   : const EdgeInsets.all(12),
                               child: Builder(builder: (context) {
-                                final feeString = showFeePending
+                                String feeString = showFeePending
                                     ? _transaction.isConfirmed(
                                         currentHeight,
                                         coin.requiredConfirmations,
                                       )
-                                        ? Format.localizedStringAsFixed(
-                                            value: fee,
+                                        ? fee.localizedStringAsFixed(
                                             locale: ref.watch(
-                                                localeServiceChangeNotifierProvider
-                                                    .select((value) =>
-                                                        value.locale)),
-                                            decimalPlaces:
-                                                Constants.decimalPlacesForCoin(
-                                                    coin))
+                                              localeServiceChangeNotifierProvider
+                                                  .select(
+                                                      (value) => value.locale),
+                                            ),
+                                          )
                                         : "Pending"
-                                    : Format.localizedStringAsFixed(
-                                        value: fee,
+                                    : fee.localizedStringAsFixed(
                                         locale: ref.watch(
-                                            localeServiceChangeNotifierProvider
-                                                .select(
-                                                    (value) => value.locale)),
-                                        decimalPlaces:
-                                            Constants.decimalPlacesForCoin(coin));
+                                          localeServiceChangeNotifierProvider
+                                              .select((value) => value.locale),
+                                        ),
+                                      );
+                                if (isTokenTx) {
+                                  feeString += " ${coin.ticker}";
+                                }
 
                                 return Row(
                                   mainAxisAlignment:
@@ -945,11 +937,16 @@ class _TransactionDetailsViewState
                                   ? const EdgeInsets.all(16)
                                   : const EdgeInsets.all(12),
                               child: Builder(builder: (context) {
-                                final height = _transaction
-                                            .getConfirmations(currentHeight) >
-                                        0
-                                    ? "${_transaction.height}"
-                                    : "Pending";
+                                final height = _transaction.isConfirmed(
+                                  currentHeight,
+                                  coin.requiredConfirmations,
+                                )
+                                    ? "${_transaction.height == 0 ? "Unknown" : _transaction.height}"
+                                    : _transaction.getConfirmations(
+                                                currentHeight) >
+                                            0
+                                        ? "${_transaction.height}"
+                                        : "Pending";
 
                                 return Row(
                                   mainAxisAlignment:
@@ -1069,19 +1066,19 @@ class _TransactionDetailsViewState
                                           text: "Open in block explorer",
                                           onTap: () async {
                                             final uri =
-                                            getBlockExplorerTransactionUrlFor(
+                                                getBlockExplorerTransactionUrlFor(
                                               coin: coin,
                                               txid: _transaction.txid,
                                             );
 
                                             if (ref
-                                                .read(
-                                                prefsChangeNotifierProvider)
-                                                .hideBlockExplorerWarning ==
+                                                    .read(
+                                                        prefsChangeNotifierProvider)
+                                                    .hideBlockExplorerWarning ==
                                                 false) {
                                               final shouldContinue =
-                                              await showExplorerWarning(
-                                                  "${uri.scheme}://${uri.host}");
+                                                  await showExplorerWarning(
+                                                      "${uri.scheme}://${uri.host}");
 
                                               if (!shouldContinue) {
                                                 return;
@@ -1106,11 +1103,11 @@ class _TransactionDetailsViewState
                                                     context: context,
                                                     builder: (_) =>
                                                         StackOkDialog(
-                                                          title:
+                                                      title:
                                                           "Could not open in block explorer",
-                                                          message:
+                                                      message:
                                                           "Failed to open \"${uri.toString()}\"",
-                                                        ),
+                                                    ),
                                                   ),
                                                 );
                                               }
@@ -1273,13 +1270,15 @@ class IconCopyButton extends StatelessWidget {
         ),
         onPressed: () async {
           await Clipboard.setData(ClipboardData(text: data));
-          unawaited(
-            showFloatingFlushBar(
-              type: FlushBarType.info,
-              message: "Copied to clipboard",
-              context: context,
-            ),
-          );
+          if (context.mounted) {
+            unawaited(
+              showFloatingFlushBar(
+                type: FlushBarType.info,
+                message: "Copied to clipboard",
+                context: context,
+              ),
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(5),

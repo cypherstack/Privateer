@@ -1,8 +1,8 @@
 import 'package:mockito/annotations.dart';
-import 'package:stackwallet/services/exchange/change_now/change_now_api.dart';
-import 'package:stackwallet/services/trade_notes_service.dart';
-import 'package:stackwallet/services/trade_service.dart';
-import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackduo/services/exchange/change_now/change_now_api.dart';
+import 'package:stackduo/services/trade_notes_service.dart';
+import 'package:stackduo/services/trade_service.dart';
+import 'package:stackduo/utilities/prefs.dart';
 
 @GenerateMocks([Prefs, TradesService, TradeNotesService, ChangeNowAPI])
 void main() {

@@ -1,4 +1,4 @@
-import 'package:stackwallet/models/paymint/utxo_model.dart';
+import 'package:stackduo/models/paymint/utxo_model.dart';
 
 final Map<String, List<Map<String, dynamic>>> batchGetUTXOResponse0 = {
   "some id 0": [

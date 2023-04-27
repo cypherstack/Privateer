@@ -15,11 +15,11 @@ import 'package:stackduo/pages/send_view/sub_widgets/building_transaction_dialog
 import 'package:stackduo/pages/wallet_view/wallet_view.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/route_generator.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
@@ -27,6 +27,7 @@ import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/rounded_container.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
+import 'package:tuple/tuple.dart';
 
 class Step4View extends ConsumerStatefulWidget {
   const Step4View({
@@ -117,6 +118,127 @@ class _Step4ViewState extends ConsumerState<Step4View> {
           model.walletInitiated ? WalletView.routeName : HomeView.routeName,
         ),
       );
+    }
+  }
+
+  Future<void> _confirmSend(Tuple2<String, Coin> tuple) async {
+    final manager =
+        ref.read(walletsChangeNotifierProvider).getManager(tuple.item1);
+
+    final Amount amount = model.sendAmount.toAmount(
+      fractionDigits: manager.coin.decimals,
+    );
+    final address = model.trade!.payInAddress;
+
+    bool wasCancelled = false;
+    try {
+      if (!mounted) return;
+
+      unawaited(
+        showDialog<dynamic>(
+          context: context,
+          useSafeArea: false,
+          barrierDismissible: false,
+          builder: (context) {
+            return BuildingTransactionDialog(
+              coin: manager.coin,
+              onCancel: () {
+                wasCancelled = true;
+              },
+            );
+          },
+        ),
+      );
+
+      final time = Future<dynamic>.delayed(
+        const Duration(
+          milliseconds: 2500,
+        ),
+      );
+
+      Future<Map<String, dynamic>> txDataFuture;
+
+      txDataFuture = manager.prepareSend(
+        address: address,
+        amount: amount,
+        args: {
+          "feeRate": FeeRateType.average,
+          // ref.read(feeRateTypeStateProvider)
+        },
+      );
+
+      final results = await Future.wait([
+        txDataFuture,
+        time,
+      ]);
+
+      final txData = results.first as Map<String, dynamic>;
+
+      if (!wasCancelled) {
+        // pop building dialog
+
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+
+        txData["note"] =
+            "${model.trade!.payInCurrency.toUpperCase()}/${model.trade!.payOutCurrency.toUpperCase()} exchange";
+        txData["address"] = address;
+
+        if (mounted) {
+          unawaited(
+            Navigator.of(context).push(
+              RouteGenerator.getRoute(
+                shouldUseMaterialRoute: RouteGenerator.useMaterialPageRoute,
+                builder: (_) => ConfirmChangeNowSendView(
+                  transactionInfo: txData,
+                  walletId: tuple.item1,
+                  routeOnSuccessName: HomeView.routeName,
+                  trade: model.trade!,
+                ),
+                settings: const RouteSettings(
+                  name: ConfirmChangeNowSendView.routeName,
+                ),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted && !wasCancelled) {
+        // pop building dialog
+        Navigator.of(context).pop();
+
+        unawaited(
+          showDialog<dynamic>(
+            context: context,
+            useSafeArea: false,
+            barrierDismissible: true,
+            builder: (context) {
+              return StackDialog(
+                title: "Transaction failed",
+                message: e.toString(),
+                rightButton: TextButton(
+                  style: Theme.of(context)
+                      .extension<StackColors>()!
+                      .getSecondaryEnabledButtonStyle(context),
+                  child: Text(
+                    "Ok",
+                    style: STextStyles.button(context).copyWith(
+                      color: Theme.of(context)
+                          .extension<StackColors>()!
+                          .buttonTextSecondary,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              );
+            },
+          ),
+        );
+      }
     }
   }
 
@@ -244,11 +366,15 @@ class _Step4ViewState extends ConsumerState<Step4View> {
                                               text:
                                                   model.sendAmount.toString());
                                           await clipboard.setData(data);
-                                          unawaited(showFloatingFlushBar(
-                                            type: FlushBarType.info,
-                                            message: "Copied to clipboard",
-                                            context: context,
-                                          ));
+                                          if (mounted) {
+                                            unawaited(
+                                              showFloatingFlushBar(
+                                                type: FlushBarType.info,
+                                                message: "Copied to clipboard",
+                                                context: context,
+                                              ),
+                                            );
+                                          }
                                         },
                                         child: Row(
                                           children: [
@@ -302,11 +428,15 @@ class _Step4ViewState extends ConsumerState<Step4View> {
                                           final data = ClipboardData(
                                               text: model.trade!.payInAddress);
                                           await clipboard.setData(data);
-                                          unawaited(showFloatingFlushBar(
-                                            type: FlushBarType.info,
-                                            message: "Copied to clipboard",
-                                            context: context,
-                                          ));
+                                          if (mounted) {
+                                            unawaited(
+                                              showFloatingFlushBar(
+                                                type: FlushBarType.info,
+                                                message: "Copied to clipboard",
+                                                context: context,
+                                              ),
+                                            );
+                                          }
                                         },
                                         child: Row(
                                           children: [
@@ -365,11 +495,15 @@ class _Step4ViewState extends ConsumerState<Step4View> {
                                           final data = ClipboardData(
                                               text: model.trade!.tradeId);
                                           await clipboard.setData(data);
-                                          unawaited(showFloatingFlushBar(
-                                            type: FlushBarType.info,
-                                            message: "Copied to clipboard",
-                                            context: context,
-                                          ));
+                                          if (mounted) {
+                                            unawaited(
+                                              showFloatingFlushBar(
+                                                type: FlushBarType.info,
+                                                message: "Copied to clipboard",
+                                                context: context,
+                                              ),
+                                            );
+                                          }
                                         },
                                         child: SvgPicture.asset(
                                           Assets.svg.copy,
@@ -521,146 +655,7 @@ class _Step4ViewState extends ConsumerState<Step4View> {
                                             model.sendTicker.toLowerCase() ==
                                                 tuple.item2.ticker.toLowerCase()
                                         ? () async {
-                                            final manager = ref
-                                                .read(
-                                                    walletsChangeNotifierProvider)
-                                                .getManager(tuple.item1);
-
-                                            final amount =
-                                                Format.decimalAmountToSatoshis(
-                                                    model.sendAmount,
-                                                    manager.coin);
-                                            final address =
-                                                model.trade!.payInAddress;
-
-                                            try {
-                                              bool wasCancelled = false;
-
-                                              unawaited(
-                                                showDialog<dynamic>(
-                                                  context: context,
-                                                  useSafeArea: false,
-                                                  barrierDismissible: false,
-                                                  builder: (context) {
-                                                    return BuildingTransactionDialog(
-                                                      coin: manager.coin,
-                                                      onCancel: () {
-                                                        wasCancelled = true;
-
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                    );
-                                                  },
-                                                ),
-                                              );
-
-                                              final time =
-                                                  Future<dynamic>.delayed(
-                                                const Duration(
-                                                  milliseconds: 2500,
-                                                ),
-                                              );
-
-                                              final txDataFuture =
-                                                  manager.prepareSend(
-                                                address: address,
-                                                satoshiAmount: amount,
-                                                args: {
-                                                  "feeRate":
-                                                      FeeRateType.average,
-                                                  // ref.read(feeRateTypeStateProvider)
-                                                },
-                                              );
-
-                                              final results =
-                                                  await Future.wait([
-                                                txDataFuture,
-                                                time,
-                                              ]);
-
-                                              final txData = results.first
-                                                  as Map<String, dynamic>;
-
-                                              if (!wasCancelled) {
-                                                // pop building dialog
-
-                                                if (mounted) {
-                                                  Navigator.of(context).pop();
-                                                }
-
-                                                txData["note"] =
-                                                    "${model.trade!.payInCurrency.toUpperCase()}/${model.trade!.payOutCurrency.toUpperCase()} exchange";
-                                                txData["address"] = address;
-
-                                                if (mounted) {
-                                                  unawaited(
-                                                      Navigator.of(context)
-                                                          .push(
-                                                    RouteGenerator.getRoute(
-                                                      shouldUseMaterialRoute:
-                                                          RouteGenerator
-                                                              .useMaterialPageRoute,
-                                                      builder: (_) =>
-                                                          ConfirmChangeNowSendView(
-                                                        transactionInfo: txData,
-                                                        walletId: tuple.item1,
-                                                        routeOnSuccessName:
-                                                            HomeView.routeName,
-                                                        trade: model.trade!,
-                                                      ),
-                                                      settings:
-                                                          const RouteSettings(
-                                                        name:
-                                                            ConfirmChangeNowSendView
-                                                                .routeName,
-                                                      ),
-                                                    ),
-                                                  ));
-                                                }
-                                              }
-                                            } catch (e) {
-                                              // if (mounted) {
-                                              // pop building dialog
-                                              Navigator.of(context).pop();
-
-                                              unawaited(showDialog<dynamic>(
-                                                context: context,
-                                                useSafeArea: false,
-                                                barrierDismissible: true,
-                                                builder: (context) {
-                                                  return StackDialog(
-                                                    title: "Transaction failed",
-                                                    message: e.toString(),
-                                                    rightButton: TextButton(
-                                                      style: Theme.of(context)
-                                                          .extension<
-                                                              StackColors>()!
-                                                          .getSecondaryEnabledButtonStyle(
-                                                              context),
-                                                      child: Text(
-                                                        "Ok",
-                                                        style:
-                                                            STextStyles.button(
-                                                                    context)
-                                                                .copyWith(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .extension<
-                                                                  StackColors>()!
-                                                              .buttonTextSecondary,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                    ),
-                                                  );
-                                                },
-                                              ));
-                                              // }
-                                            }
+                                            await _confirmSend(tuple);
                                           }
                                         : () {
                                             Navigator.of(context).push(
@@ -670,12 +665,17 @@ class _Step4ViewState extends ConsumerState<Step4View> {
                                                         .useMaterialPageRoute,
                                                 builder:
                                                     (BuildContext context) {
+                                                  final coin =
+                                                      coinFromTickerCaseInsensitive(
+                                                          model.trade!
+                                                              .payInCurrency);
                                                   return SendFromView(
-                                                    coin:
-                                                        coinFromTickerCaseInsensitive(
-                                                            model.trade!
-                                                                .payInCurrency),
-                                                    amount: model.sendAmount,
+                                                    coin: coin,
+                                                    amount: model.sendAmount
+                                                        .toAmount(
+                                                      fractionDigits:
+                                                          coin.decimals,
+                                                    ),
                                                     address: model
                                                         .trade!.payInAddress,
                                                     trade: model.trade!,

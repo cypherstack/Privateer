@@ -6,8 +6,8 @@ import 'package:hive_test/hive_test.dart';
 import 'package:http/http.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackwallet/hive/db.dart';
-import 'package:stackwallet/services/price.dart';
+import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/services/price.dart';
 
 import 'price_test.mocks.dart';
 

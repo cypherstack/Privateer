@@ -9,11 +9,11 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/exchange_response.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/logger.dart';
+import 'package:stackduo/utilities/show_loading.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
@@ -71,12 +71,11 @@ class _ExchangeProviderOptionsState
       sendCurrency: sendCurrency,
       receiveCurrency: receivingCurrency,
     );
-    final showMajesticBank = false;
-    // exchangeSupported(
-    //   exchangeName: MajesticBankExchange.exchangeName,
-    //   sendCurrency: sendCurrency,
-    //   receiveCurrency: receivingCurrency,
-    // );
+    final showMajesticBank = exchangeSupported(
+      exchangeName: MajesticBankExchange.exchangeName,
+      sendCurrency: sendCurrency,
+      receiveCurrency: receivingCurrency,
+    );
 
     return RoundedWhiteContainer(
       padding: isDesktop ? const EdgeInsets.all(0) : const EdgeInsets.all(12),
@@ -96,11 +95,17 @@ class _ExchangeProviderOptionsState
                 onTap: () {
                   if (ref.read(exchangeFormStateProvider).exchange.name !=
                       ChangeNowExchange.exchangeName) {
-                    ref.read(exchangeFormStateProvider).updateExchange(
-                          exchange: ChangeNowExchange.instance,
-                          shouldUpdateData: true,
-                          shouldNotifyListeners: true,
-                        );
+                    showLoading(
+                      whileFuture:
+                          ref.read(exchangeFormStateProvider).updateExchange(
+                                exchange: ChangeNowExchange.instance,
+                                shouldUpdateData: true,
+                                shouldNotifyListeners: true,
+                              ),
+                      context: context,
+                      message: "Updating rates",
+                      isDesktop: isDesktop,
+                    );
                   }
                 },
                 child: Container(
@@ -199,18 +204,6 @@ class _ExchangeProviderOptionsState
                                         snapshot.hasData) {
                                       final estimate = snapshot.data?.value;
                                       if (estimate != null) {
-                                        Decimal rate;
-                                        if (estimate.reversed) {
-                                          rate = (toAmount /
-                                                  estimate.estimatedAmount)
-                                              .toDecimal(
-                                                  scaleOnInfinitePrecision: 12);
-                                        } else {
-                                          rate = (estimate.estimatedAmount /
-                                                  fromAmount)
-                                              .toDecimal(
-                                                  scaleOnInfinitePrecision: 12);
-                                        }
                                         Coin coin;
                                         try {
                                           coin = coinFromTickerCaseInsensitive(
@@ -218,18 +211,32 @@ class _ExchangeProviderOptionsState
                                         } catch (_) {
                                           coin = Coin.bitcoin;
                                         }
+                                        Amount rate;
+                                        if (estimate.reversed) {
+                                          rate = (toAmount /
+                                                  estimate.estimatedAmount)
+                                              .toDecimal(
+                                                  scaleOnInfinitePrecision: 12)
+                                              .toAmount(
+                                                  fractionDigits:
+                                                      coin.decimals);
+                                        } else {
+                                          rate = (estimate.estimatedAmount /
+                                                  fromAmount)
+                                              .toDecimal(
+                                                  scaleOnInfinitePrecision: 12)
+                                              .toAmount(
+                                                  fractionDigits:
+                                                      coin.decimals);
+                                        }
 
                                         return Text(
-                                          "1 ${sendCurrency.ticker.toUpperCase()} ~ ${Format.localizedStringAsFixed(
-                                            value: rate,
+                                          "1 ${sendCurrency.ticker.toUpperCase()} ~ ${rate.localizedStringAsFixed(
                                             locale: ref.watch(
                                               localeServiceChangeNotifierProvider
                                                   .select(
                                                       (value) => value.locale),
                                             ),
-                                            decimalPlaces:
-                                                Constants.decimalPlacesForCoin(
-                                                    coin),
                                           )} ${receivingCurrency.ticker.toUpperCase()}",
                                           style: STextStyles.itemSubtitle12(
                                                   context)
@@ -333,11 +340,17 @@ class _ExchangeProviderOptionsState
                 onTap: () {
                   if (ref.read(exchangeFormStateProvider).exchange.name !=
                       MajesticBankExchange.exchangeName) {
-                    ref.read(exchangeFormStateProvider).updateExchange(
-                          exchange: MajesticBankExchange.instance,
-                          shouldUpdateData: true,
-                          shouldNotifyListeners: true,
-                        );
+                    showLoading(
+                      whileFuture:
+                          ref.read(exchangeFormStateProvider).updateExchange(
+                                exchange: MajesticBankExchange.instance,
+                                shouldUpdateData: true,
+                                shouldNotifyListeners: true,
+                              ),
+                      context: context,
+                      isDesktop: isDesktop,
+                      message: "Updating rates",
+                    );
                   }
                 },
                 child: Container(
@@ -436,18 +449,6 @@ class _ExchangeProviderOptionsState
                                         snapshot.hasData) {
                                       final estimate = snapshot.data?.value;
                                       if (estimate != null) {
-                                        Decimal rate;
-                                        if (estimate.reversed) {
-                                          rate = (toAmount /
-                                                  estimate.estimatedAmount)
-                                              .toDecimal(
-                                                  scaleOnInfinitePrecision: 12);
-                                        } else {
-                                          rate = (estimate.estimatedAmount /
-                                                  fromAmount)
-                                              .toDecimal(
-                                                  scaleOnInfinitePrecision: 12);
-                                        }
                                         Coin coin;
                                         try {
                                           coin = coinFromTickerCaseInsensitive(
@@ -455,18 +456,32 @@ class _ExchangeProviderOptionsState
                                         } catch (_) {
                                           coin = Coin.bitcoin;
                                         }
+                                        Amount rate;
+                                        if (estimate.reversed) {
+                                          rate = (toAmount /
+                                                  estimate.estimatedAmount)
+                                              .toDecimal(
+                                                  scaleOnInfinitePrecision: 12)
+                                              .toAmount(
+                                                fractionDigits: coin.decimals,
+                                              );
+                                        } else {
+                                          rate = (estimate.estimatedAmount /
+                                                  fromAmount)
+                                              .toDecimal(
+                                                  scaleOnInfinitePrecision: 12)
+                                              .toAmount(
+                                                fractionDigits: coin.decimals,
+                                              );
+                                        }
 
                                         return Text(
-                                          "1 ${sendCurrency.ticker.toUpperCase()} ~ ${Format.localizedStringAsFixed(
-                                            value: rate,
+                                          "1 ${sendCurrency.ticker.toUpperCase()} ~ ${rate.localizedStringAsFixed(
                                             locale: ref.watch(
                                               localeServiceChangeNotifierProvider
                                                   .select(
                                                       (value) => value.locale),
                                             ),
-                                            decimalPlaces:
-                                                Constants.decimalPlacesForCoin(
-                                                    coin),
                                           )} ${receivingCurrency.ticker.toUpperCase()}",
                                           style: STextStyles.itemSubtitle12(
                                                   context)

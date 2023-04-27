@@ -1,19 +1,21 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/utilities/constants.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 
-class WalletInfoRowBalanceFuture extends ConsumerWidget {
-  const WalletInfoRowBalanceFuture({Key? key, required this.walletId})
-      : super(key: key);
+class WalletInfoRowBalance extends ConsumerWidget {
+  const WalletInfoRowBalance({
+    Key? key,
+    required this.walletId,
+    this.contractAddress,
+  }) : super(key: key);
 
   final String walletId;
+  final String? contractAddress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,14 +29,18 @@ class WalletInfoRowBalanceFuture extends ConsumerWidget {
       ),
     );
 
-    Decimal balance = manager.balance.getTotal();
+    Amount totalBalance;
+    int decimals;
+    String unit;
+    totalBalance = manager.balance.total;
+    unit = manager.coin.ticker;
+    decimals = manager.coin.decimals;
 
     return Text(
-      "${Format.localizedStringAsFixed(
-        value: balance,
+      "${totalBalance.localizedStringAsFixed(
         locale: locale,
-        decimalPlaces: Constants.decimalPlacesForCoin(manager.coin),
-      )} ${manager.coin.ticker}",
+        decimalPlaces: decimals,
+      )} $unit",
       style: Util.isDesktop
           ? STextStyles.desktopTextExtraSmall(context).copyWith(
               color: Theme.of(context).extension<StackColors>()!.textSubtitle1,

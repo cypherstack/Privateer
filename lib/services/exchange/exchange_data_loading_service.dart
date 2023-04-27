@@ -40,8 +40,9 @@ class ExchangeDataLoadingService {
     );
   }
 
-  Future<void> init() async {
-    if (_isar != null && isar.isOpen) return;
+  Future<void> initDB() async {
+    if (_isar != null) return;
+    await _isar?.close();
     _isar = await Isar.open(
       [
         CurrencySchema,
@@ -61,10 +62,12 @@ class ExchangeDataLoadingService {
         final sendCurrency = await getAggregateCurrency(
           "BTC",
           state.exchangeRateType,
+          null,
         );
         final receiveCurrency = await getAggregateCurrency(
           "XMR",
           state.exchangeRateType,
+          null,
         );
         state.setCurrencies(sendCurrency, receiveCurrency);
       }
@@ -72,7 +75,10 @@ class ExchangeDataLoadingService {
   }
 
   Future<AggregateCurrency?> getAggregateCurrency(
-      String ticker, ExchangeRateType rateType) async {
+    String ticker,
+    ExchangeRateType rateType,
+    String? contract,
+  ) async {
     final currencies = await ExchangeDataLoadingService.instance.isar.currencies
         .filter()
         .group((q) => rateType == ExchangeRateType.fixed
@@ -273,25 +279,25 @@ class ExchangeDataLoadingService {
   // }
 
   Future<void> loadMajesticBankCurrencies() async {
-    // final exchange = MajesticBankExchange.instance;
-    // final responseCurrencies = await exchange.getAllCurrencies(false);
-    //
-    // if (responseCurrencies.value != null) {
-    await isar.writeTxn(() async {
-      final idsToDelete = await isar.currencies
-          .where()
-          .exchangeNameEqualTo(MajesticBankExchange.exchangeName)
-          .idProperty()
-          .findAll();
-      await isar.currencies.deleteAll(idsToDelete);
-      // await isar.currencies.putAll(responseCurrencies.value!);
-    });
-    // } else {
-    //   Logging.instance.log(
-    //     "loadMajesticBankCurrencies: $responseCurrencies",
-    //     level: LogLevel.Warning,
-    //   );
-    // }
+    final exchange = MajesticBankExchange.instance;
+    final responseCurrencies = await exchange.getAllCurrencies(false);
+
+    if (responseCurrencies.value != null) {
+      await isar.writeTxn(() async {
+        final idsToDelete = await isar.currencies
+            .where()
+            .exchangeNameEqualTo(MajesticBankExchange.exchangeName)
+            .idProperty()
+            .findAll();
+        await isar.currencies.deleteAll(idsToDelete);
+        await isar.currencies.putAll(responseCurrencies.value!);
+      });
+    } else {
+      Logging.instance.log(
+        "loadMajesticBankCurrencies: $responseCurrencies",
+        level: LogLevel.Warning,
+      );
+    }
   }
 
   // Future<void> loadMajesticBankPairs() async {

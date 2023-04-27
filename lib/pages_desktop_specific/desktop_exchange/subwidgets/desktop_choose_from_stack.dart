@@ -1,15 +1,13 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/providers.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/widgets/animated_text.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
@@ -215,7 +213,7 @@ class _DesktopChooseFromStackState
                           ],
                         ),
                         const Spacer(),
-                        BalanceDisplay(
+                        _BalanceDisplay(
                           walletId: walletIds[index],
                         ),
                         const SizedBox(
@@ -268,8 +266,8 @@ class _DesktopChooseFromStackState
   }
 }
 
-class BalanceDisplay extends ConsumerStatefulWidget {
-  const BalanceDisplay({
+class _BalanceDisplay extends ConsumerWidget {
+  const _BalanceDisplay({
     Key? key,
     required this.walletId,
   }) : super(key: key);
@@ -277,65 +275,21 @@ class BalanceDisplay extends ConsumerStatefulWidget {
   final String walletId;
 
   @override
-  ConsumerState<BalanceDisplay> createState() => _BalanceDisplayState();
-}
-
-class _BalanceDisplayState extends ConsumerState<BalanceDisplay> {
-  late final String walletId;
-
-  Decimal? _cachedBalance;
-
-  static const loopedText = [
-    "Loading balance   ",
-    "Loading balance.  ",
-    "Loading balance.. ",
-    "Loading balance..."
-  ];
-
-  @override
-  void initState() {
-    walletId = widget.walletId;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final manager = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(walletId)));
     final locale = ref.watch(
         localeServiceChangeNotifierProvider.select((value) => value.locale));
 
-    // TODO redo this widget now that its not actually a future
-    return FutureBuilder(
-      future: Future(() => manager.balance.getSpendable()),
-      builder: (context, AsyncSnapshot<Decimal> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData &&
-            snapshot.data != null) {
-          _cachedBalance = snapshot.data;
-        }
+    final Amount total = manager.balance.total;
 
-        if (_cachedBalance == null) {
-          return AnimatedText(
-            stringsToLoopThrough: loopedText,
-            style: STextStyles.desktopTextExtraSmall(context).copyWith(
-              color: Theme.of(context).extension<StackColors>()!.textSubtitle1,
-            ),
-          );
-        } else {
-          return Text(
-            "${Format.localizedStringAsFixed(
-              value: _cachedBalance!,
-              locale: locale,
-              decimalPlaces: 8,
-            )} ${manager.coin.ticker}",
-            style: STextStyles.desktopTextExtraSmall(context).copyWith(
-              color: Theme.of(context).extension<StackColors>()!.textSubtitle1,
-            ),
-            textAlign: TextAlign.right,
-          );
-        }
-      },
+    return Text(
+      "${total.localizedStringAsFixed(locale: locale)} "
+      "${manager.coin.ticker}",
+      style: STextStyles.desktopTextExtraSmall(context).copyWith(
+        color: Theme.of(context).extension<StackColors>()!.textSubtitle1,
+      ),
+      textAlign: TextAlign.right,
     );
   }
 }

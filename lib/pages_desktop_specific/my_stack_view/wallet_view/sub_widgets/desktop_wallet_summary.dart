@@ -1,4 +1,3 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/models/balance.dart';
@@ -7,9 +6,9 @@ import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_wi
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/wallet/wallet_balance_toggle_state_provider.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/wallet_balance_toggle_state.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 
@@ -64,14 +63,18 @@ class _WDesktopWalletSummaryState extends ConsumerState<DesktopWalletSummary> {
         ref.watch(walletBalanceToggleStateProvider.state).state ==
             WalletBalanceToggleState.available;
 
+    final unit = coin.ticker;
+    final decimalPlaces = coin.decimals;
+
     Balance balance = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(walletId).balance));
 
-    Decimal balanceToShow;
+    Amount balanceToShow;
+
     if (_showAvailable) {
-      balanceToShow = balance.getSpendable();
+      balanceToShow = balance.spendable;
     } else {
-      balanceToShow = balance.getTotal();
+      balanceToShow = balance.total;
     }
 
     return Consumer(
@@ -85,18 +88,19 @@ class _WDesktopWalletSummaryState extends ConsumerState<DesktopWalletSummary> {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    "${Format.localizedStringAsFixed(
-                      value: balanceToShow,
+                    "${balanceToShow.localizedStringAsFixed(
                       locale: locale,
-                      decimalPlaces: 8,
-                    )} ${coin.ticker}",
+                      decimalPlaces: decimalPlaces,
+                    )} $unit",
                     style: STextStyles.desktopH3(context),
                   ),
                 ),
                 if (externalCalls)
                   Text(
-                    "${Format.localizedStringAsFixed(
-                      value: priceTuple.item1 * balanceToShow,
+                    "${Amount.fromDecimal(
+                      priceTuple.item1 * balanceToShow.decimal,
+                      fractionDigits: 2,
+                    ).localizedStringAsFixed(
                       locale: locale,
                       decimalPlaces: 2,
                     )} $baseCurrency",

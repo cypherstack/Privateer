@@ -5,21 +5,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockingjay/mockingjay.dart' as mockingjay;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/address.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/transaction.dart';
-import 'package:stackwallet/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/locale_service.dart';
-import 'package:stackwallet/services/notes_service.dart';
-import 'package:stackwallet/services/price_service.dart';
-import 'package:stackwallet/services/wallets.dart';
-import 'package:stackwallet/utilities/prefs.dart';
-import 'package:stackwallet/utilities/theme/light_colors.dart';
-import 'package:stackwallet/utilities/theme/stack_colors.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/transaction_card.dart';
+import 'package:stackduo/models/isar/models/blockchain_data/address.dart';
+import 'package:stackduo/models/isar/models/blockchain_data/transaction.dart';
+import 'package:stackduo/pages/wallet_view/transaction_views/transaction_details_view.dart';
+import 'package:stackduo/providers/providers.dart';
+import 'package:stackduo/services/coins/coin_service.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/services/locale_service.dart';
+import 'package:stackduo/services/notes_service.dart';
+import 'package:stackduo/services/price_service.dart';
+import 'package:stackduo/services/wallets.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/prefs.dart';
+import 'package:stackduo/utilities/theme/light_colors.dart';
+import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/utilities/util.dart';
+import 'package:stackduo/widgets/transaction_card.dart';
 
 import 'transaction_card_test.mocks.dart';
 
@@ -56,6 +57,8 @@ void main() {
       otherData: '',
       inputs: [],
       outputs: [],
+      amountString: Amount.zero.toJsonString(),
+      nonce: null,
     )..address.value = Address(
         walletId: "walletId",
         value: "",
@@ -144,6 +147,8 @@ void main() {
       otherData: '',
       inputs: [],
       outputs: [],
+      amountString: Amount.zero.toJsonString(),
+      nonce: null,
     )..address.value = Address(
         walletId: "walletId",
         value: "",
@@ -230,6 +235,8 @@ void main() {
       otherData: '',
       inputs: [],
       outputs: [],
+      amountString: Amount.zero.toJsonString(),
+      nonce: null,
     )..address.value = Address(
         walletId: "walletId",
         value: "",
@@ -308,6 +315,8 @@ void main() {
       otherData: '',
       inputs: [],
       outputs: [],
+      amountString: Amount.zero.toJsonString(),
+      nonce: null,
     )..address.value = Address(
         walletId: "walletId",
         value: "",

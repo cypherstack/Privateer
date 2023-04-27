@@ -104,12 +104,13 @@ class _ManagedFavoriteCardState extends ConsumerState<ManagedFavorite> {
                       ),
                       Expanded(
                         child: Text(
-                          "${Format.localizedStringAsFixed(
-                            value: manager.balance.getTotal(),
+                          "${manager.balance.total.localizedStringAsFixed(
                             locale: ref.watch(
-                                localeServiceChangeNotifierProvider
-                                    .select((value) => value.locale)),
-                            decimalPlaces: 8,
+                              localeServiceChangeNotifierProvider.select(
+                                (value) => value.locale,
+                              ),
+                            ),
+                            decimalPlaces: manager.coin.decimals,
                           )} ${manager.coin.ticker}",
                           style: STextStyles.itemSubtitle(context),
                         ),
@@ -146,11 +147,13 @@ class _ManagedFavoriteCardState extends ConsumerState<ManagedFavorite> {
                         height: 2,
                       ),
                       Text(
-                        "${Format.localizedStringAsFixed(
-                          value: manager.balance.getTotal(),
-                          locale: ref.watch(localeServiceChangeNotifierProvider
-                              .select((value) => value.locale)),
-                          decimalPlaces: 8,
+                        "${manager.balance.total.localizedStringAsFixed(
+                          locale: ref.watch(
+                            localeServiceChangeNotifierProvider.select(
+                              (value) => value.locale,
+                            ),
+                          ),
+                          decimalPlaces: manager.coin.decimals,
                         )} ${manager.coin.ticker}",
                         style: STextStyles.itemSubtitle(context),
                       ),
