@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_test/hive_test.dart';
-import 'package:stackwallet/hive/db.dart';
-import 'package:stackwallet/models/contact.dart';
-import 'package:stackwallet/models/contact_address_entry.dart';
-import 'package:stackwallet/services/address_book_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/models/contact.dart';
+import 'package:stackduo/models/contact_address_entry.dart';
+import 'package:stackduo/services/address_book_service.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 void main() {
   group("Empty DB tests", () {

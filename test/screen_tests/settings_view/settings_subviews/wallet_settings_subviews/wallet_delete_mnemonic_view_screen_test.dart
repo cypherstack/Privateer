@@ -6,14 +6,14 @@
 // import 'package:mockingjay/mockingjay.dart' as mockingjay;
 import 'package:mockito/annotations.dart';
 // import 'package:mockito/mockito.dart';
-// import 'package:stackwallet/notifications/modal_popup_dialog.dart';
-// import 'package:stackwallet/pages/settings_view/settings_subviews/wallet_settings_subviews/wallet_delete_mnemonic_view.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-// import 'package:stackwallet/utilities/clipboard_interface.dart';
-// import 'package:stackwallet/widgets/custom_buttons/app_bar_icon_button.dart';
-// import 'package:stackwallet/widgets/custom_buttons/gradient_button.dart';
-// import 'package:stackwallet/widgets/custom_buttons/simple_button.dart';
+// import 'package:stackduo/notifications/modal_popup_dialog.dart';
+// import 'package:stackduo/pages/settings_view/settings_subviews/wallet_settings_subviews/wallet_delete_mnemonic_view.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/services/wallets_service.dart';
+// import 'package:stackduo/utilities/clipboard_interface.dart';
+// import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
+// import 'package:stackduo/widgets/custom_buttons/gradient_button.dart';
+// import 'package:stackduo/widgets/custom_buttons/simple_button.dart';
 // import 'package:pretty_qr_code/pretty_qr_code.dart';
 // import 'package:provider/provider.dart';
 //

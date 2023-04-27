@@ -1,14 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackwallet/electrumx_rpc/electrumx.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/isar_models.dart';
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackduo/electrumx_rpc/electrumx.dart';
+import 'package:stackduo/models/balance.dart';
+import 'package:stackduo/models/isar/models/isar_models.dart';
+import 'package:stackduo/models/paymint/fee_object_model.dart';
+import 'package:stackduo/services/coins/bitcoin/bitcoin_wallet.dart';
+import 'package:stackduo/services/coins/coin_service.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 // import '../../pages/send_view/send_view_test.mocks.dart';
 import 'manager_test.mocks.dart';
@@ -77,21 +78,19 @@ void main() {
       final CoinServiceAPI wallet = MockBitcoinWallet();
       when(wallet.balance).thenAnswer(
         (_) => Balance(
-          coin: Coin.bitcoin,
-          total: 10,
-          spendable: 1,
-          blockedTotal: 0,
-          pendingSpendable: 9,
+          total: 10.toAmountAsRaw(fractionDigits: 8),
+          spendable: 1.toAmountAsRaw(fractionDigits: 8),
+          blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
+          pendingSpendable: 9.toAmountAsRaw(fractionDigits: 8),
         ),
       );
 
       final manager = Manager(wallet);
 
-      expect(manager.balance.coin, Coin.bitcoin);
-      expect(manager.balance.total, 10);
-      expect(manager.balance.spendable, 1);
-      expect(manager.balance.blockedTotal, 0);
-      expect(manager.balance.pendingSpendable, 9);
+      expect(manager.balance.total.raw.toInt(), 10);
+      expect(manager.balance.spendable.raw.toInt(), 1);
+      expect(manager.balance.blockedTotal.raw.toInt(), 0);
+      expect(manager.balance.pendingSpendable.raw.toInt(), 9);
     });
   });
 
@@ -112,6 +111,8 @@ void main() {
       otherData: null,
       inputs: [],
       outputs: [],
+      amountString: '',
+      nonce: null,
     );
     when(wallet.transactions).thenAnswer((_) async => [
           tx,

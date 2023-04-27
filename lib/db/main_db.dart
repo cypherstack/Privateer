@@ -3,8 +3,8 @@ import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/exceptions/main_db/main_db_exception.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/stack_file_system.dart';
 import 'package:tuple/tuple.dart';
 

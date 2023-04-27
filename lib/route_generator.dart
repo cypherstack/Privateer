@@ -1,4 +1,3 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,7 +53,8 @@ import 'package:stackduo/pages/send_view/send_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/about_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
-import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings/appearance_settings_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings/system_brightness_theme_selection_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/currency_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/delete_account_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/global_settings_view.dart';
@@ -80,6 +80,7 @@ import 'package:stackduo/pages/settings_views/global_settings_view/support_view.
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_options_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/wallet_syncing_options_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/xpub_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_settings_view.dart';
@@ -93,6 +94,7 @@ import 'package:stackduo/pages/wallet_view/transaction_views/edit_note_view.dart
 import 'package:stackduo/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackduo/pages/wallet_view/transaction_views/transaction_search_filter_view.dart';
 import 'package:stackduo/pages/wallet_view/wallet_view.dart';
+import 'package:stackduo/pages/wallets_view/wallets_overview.dart';
 import 'package:stackduo/pages/wallets_view/wallets_view.dart';
 import 'package:stackduo/pages_desktop_specific/address_book_view/desktop_address_book.dart';
 import 'package:stackduo/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
@@ -128,9 +130,9 @@ import 'package:stackduo/pages_desktop_specific/settings/settings_menu/syncing_p
 import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/services/event_bus/events/global/node_connection_status_changed_event.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/theme/color_theme.dart';
 import 'package:tuple/tuple.dart';
 
 class RouteGenerator {
@@ -201,6 +203,20 @@ class RouteGenerator {
             builder: (_) => const AddWalletView(),
             settings: RouteSettings(name: settings.name));
 
+      case WalletsOverview.routeName:
+        if (args is Coin) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => WalletsOverview(
+              coin: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
       case SingleFieldEditView.routeName:
         if (args is Tuple2<String, String>) {
           return getRoute(
@@ -229,7 +245,7 @@ class RouteGenerator {
             ),
           );
         } else if (args
-            is Tuple4<String, CoinControlViewType, int?, Set<UTXO>?>) {
+            is Tuple4<String, CoinControlViewType, Amount?, Set<UTXO>?>) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => CoinControlView(
@@ -390,6 +406,20 @@ class RouteGenerator {
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const DebugView(),
             settings: RouteSettings(name: settings.name));
+
+      case XPubView.routeName:
+        if (args is String) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => XPubView(
+              walletId: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case AppearanceSettingsView.routeName:
         return getRoute(
@@ -639,19 +669,13 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case SystemBrightnessThemeSelectionView.routeName:
-        if (args is Tuple2<String, ThemeType>) {
-          return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => SystemBrightnessThemeSelectionView(
-              brightness: args.item1,
-              current: args.item2,
-            ),
-            settings: RouteSettings(
-              name: settings.name,
-            ),
-          );
-        }
-        return _routeError("${settings.name} invalid args: ${args.toString()}");
+        return getRoute(
+          shouldUseMaterialRoute: useMaterialPageRoute,
+          builder: (_) => const SystemBrightnessThemeSelectionView(),
+          settings: RouteSettings(
+            name: settings.name,
+          ),
+        );
 
       case WalletNetworkSettingsView.routeName:
         if (args is Tuple3<String, WalletSyncStatus, NodeConnectionStatus>) {
@@ -1153,7 +1177,7 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case SendFromView.routeName:
-        if (args is Tuple4<Coin, Decimal, String, Trade>) {
+        if (args is Tuple4<Coin, Amount, String, Trade>) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => SendFromView(

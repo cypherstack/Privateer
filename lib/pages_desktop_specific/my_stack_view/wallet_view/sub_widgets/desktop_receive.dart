@@ -199,6 +199,14 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
             ),
           ),
         ),
+          const SizedBox(
+            height: 20,
+          ),
+          SecondaryButton(
+            buttonHeight: ButtonHeight.l,
+            onPressed: generateNewAddress,
+            label: "Generate new address",
+          ),
         const SizedBox(
           height: 32,
         ),

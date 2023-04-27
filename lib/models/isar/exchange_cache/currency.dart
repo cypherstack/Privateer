@@ -44,6 +44,8 @@ class Currency {
   @Index()
   final bool isStackCoin;
 
+  final String? tokenContract;
+
   @ignore
   bool get supportsFixedRate =>
       rateType == SupportedRateType.fixed || rateType == SupportedRateType.both;
@@ -64,6 +66,7 @@ class Currency {
     required this.rateType,
     this.isAvailable,
     required this.isStackCoin,
+    required this.tokenContract,
   });
 
   factory Currency.fromJson(
@@ -86,6 +89,7 @@ class Currency {
         isAvailable: json["isAvailable"] as bool?,
         isStackCoin:
             json["isStackCoin"] as bool? ?? Currency.checkIsStackCoin(ticker),
+        tokenContract: json["tokenContract"] as String?,
       )..id = json["id"] as int?;
     } catch (e) {
       rethrow;
@@ -105,6 +109,7 @@ class Currency {
       "rateType": rateType,
       "isAvailable": isAvailable,
       "isStackCoin": isStackCoin,
+      "tokenContract": tokenContract,
     };
 
     return map;
@@ -122,6 +127,7 @@ class Currency {
     SupportedRateType? rateType,
     bool? isAvailable,
     bool? isStackCoin,
+    String? tokenContract,
   }) {
     return Currency(
       exchangeName: exchangeName ?? this.exchangeName,
@@ -134,6 +140,7 @@ class Currency {
       rateType: rateType ?? this.rateType,
       isAvailable: isAvailable ?? this.isAvailable,
       isStackCoin: isStackCoin ?? this.isStackCoin,
+      tokenContract: tokenContract ?? this.tokenContract,
     )..id = id ?? this.id;
   }
 

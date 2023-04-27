@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stackwallet/models/isar/models/log.dart';
-import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackduo/models/isar/models/log.dart';
+import 'package:stackduo/utilities/logger.dart';
 
 void main() {
   test("Log class", () {

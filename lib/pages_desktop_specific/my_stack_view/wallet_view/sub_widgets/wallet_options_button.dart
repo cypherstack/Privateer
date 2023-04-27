@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/xpub_view.dart';
 import 'package:stackduo/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/desktop_delete_wallet_dialog.dart';
+import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
@@ -13,7 +15,8 @@ import 'package:stackduo/utilities/theme/stack_colors.dart';
 
 enum _WalletOptions {
   addressList,
-  deleteWallet;
+  deleteWallet,
+  showXpub;
 
   String get prettyName {
     switch (this) {
@@ -21,32 +24,19 @@ enum _WalletOptions {
         return "Address list";
       case _WalletOptions.deleteWallet:
         return "Delete wallet";
+      case _WalletOptions.showXpub:
+        return "Show xPub";
     }
   }
 }
 
-class WalletOptionsButton extends ConsumerStatefulWidget {
+class WalletOptionsButton extends StatelessWidget {
   const WalletOptionsButton({
     Key? key,
     required this.walletId,
   }) : super(key: key);
 
   final String walletId;
-
-  @override
-  ConsumerState<WalletOptionsButton> createState() =>
-      _WalletOptionsButtonState();
-}
-
-class _WalletOptionsButtonState extends ConsumerState<WalletOptionsButton> {
-  late final String walletId;
-
-  @override
-  void initState() {
-    walletId = widget.walletId;
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +60,15 @@ class _WalletOptionsButtonState extends ConsumerState<WalletOptionsButton> {
               onAddressListPressed: () async {
                 Navigator.of(context).pop(_WalletOptions.addressList);
               },
+              onShowXpubPressed: () async {
+                Navigator.of(context).pop(_WalletOptions.showXpub);
+              },
+              walletId: walletId,
             );
           },
         );
 
-        if (mounted && func != null) {
+        if (context.mounted && func != null) {
           switch (func) {
             case _WalletOptions.addressList:
               unawaited(
@@ -105,7 +99,33 @@ class _WalletOptionsButtonState extends ConsumerState<WalletOptionsButton> {
               );
 
               if (result == true) {
-                if (mounted) {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              }
+              break;
+            case _WalletOptions.showXpub:
+              final result = await showDialog<bool?>(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => Navigator(
+                  initialRoute: XPubView.routeName,
+                  onGenerateRoute: RouteGenerator.generateRoute,
+                  onGenerateInitialRoutes: (_, __) {
+                    return [
+                      RouteGenerator.generateRoute(
+                        RouteSettings(
+                          name: XPubView.routeName,
+                          arguments: walletId,
+                        ),
+                      ),
+                    ];
+                  },
+                ),
+              );
+
+              if (result == true) {
+                if (context.mounted) {
                   Navigator.of(context).pop();
                 }
               }
@@ -135,18 +155,25 @@ class _WalletOptionsButtonState extends ConsumerState<WalletOptionsButton> {
   }
 }
 
-class WalletOptionsPopupMenu extends StatelessWidget {
+class WalletOptionsPopupMenu extends ConsumerWidget {
   const WalletOptionsPopupMenu({
     Key? key,
     required this.onDeletePressed,
     required this.onAddressListPressed,
+    required this.onShowXpubPressed,
+    required this.walletId,
   }) : super(key: key);
 
   final VoidCallback onDeletePressed;
   final VoidCallback onAddressListPressed;
+  final VoidCallback onShowXpubPressed;
+  final String walletId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool xpubEnabled = ref.watch(walletsChangeNotifierProvider
+        .select((value) => value.getManager(walletId).hasXPub));
+
     return Stack(
       children: [
         Positioned(
@@ -200,6 +227,43 @@ class WalletOptionsPopupMenu extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (xpubEnabled)
+                    const SizedBox(
+                      height: 8,
+                    ),
+                  if (xpubEnabled)
+                    TransparentButton(
+                      onPressed: onShowXpubPressed,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SvgPicture.asset(
+                              Assets.svg.eye,
+                              width: 20,
+                              height: 20,
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .textFieldActiveSearchIconLeft,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                _WalletOptions.showXpub.prettyName,
+                                style: STextStyles.desktopTextExtraExtraSmall(
+                                        context)
+                                    .copyWith(
+                                  color: Theme.of(context)
+                                      .extension<StackColors>()!
+                                      .textDark,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   const SizedBox(
                     height: 8,
                   ),

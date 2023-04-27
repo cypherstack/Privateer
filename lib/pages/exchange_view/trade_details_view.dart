@@ -20,6 +20,7 @@ import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/exchange.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/exchange/simpleswap/simpleswap_exchange.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
@@ -93,8 +94,7 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
             .trades
             .firstWhere((e) => e.tradeId == tradeId);
 
-        if (mounted &&
-            trade.exchangeName != MajesticBankExchange.exchangeName) {
+        if (mounted) {
           final exchange = Exchange.fromName(trade.exchangeName);
           final response = await exchange.updateTrade(trade);
 
@@ -257,11 +257,11 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                       label: "Send from Stack",
                       buttonHeight: ButtonHeight.l,
                       onPressed: () {
-                        final amount = sendAmount;
-                        final address = trade.payInAddress;
-
                         final coin =
                             coinFromTickerCaseInsensitive(trade.payInCurrency);
+                        final amount =
+                            sendAmount.toAmount(fractionDigits: coin.decimals);
+                        final address = trade.payInAddress;
 
                         Navigator.of(context).pushNamed(
                           SendFromView.routeName,
@@ -340,13 +340,32 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                           const SizedBox(
                             height: 4,
                           ),
-                          SelectableText(
-                            "-${Format.localizedStringAsFixed(value: sendAmount, locale: ref.watch(
-                                  localeServiceChangeNotifierProvider
-                                      .select((value) => value.locale),
-                                ), decimalPlaces: trade.payInCurrency.toLowerCase() == "xmr" ? 12 : 8)} ${trade.payInCurrency.toUpperCase()}",
-                            style: STextStyles.itemSubtitle(context),
-                          ),
+                          Builder(builder: (context) {
+                            String text;
+                            try {
+                              final coin = coinFromTickerCaseInsensitive(
+                                  trade.payInCurrency);
+                              final amount = sendAmount.toAmount(
+                                  fractionDigits: coin.decimals);
+                              text = amount.localizedStringAsFixed(
+                                locale: ref.watch(
+                                  localeServiceChangeNotifierProvider.select(
+                                    (value) => value.locale,
+                                  ),
+                                ),
+                              );
+                            } catch (_) {
+                              text = sendAmount.toStringAsFixed(
+                                  trade.payInCurrency.toLowerCase() == "xmr"
+                                      ? 12
+                                      : 8);
+                            }
+
+                            return SelectableText(
+                              "-$text ${trade.payInCurrency.toUpperCase()}",
+                              style: STextStyles.itemSubtitle(context),
+                            );
+                          }),
                         ],
                       ),
                       if (!isDesktop)

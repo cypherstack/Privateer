@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stackwallet/services/event_bus/events/global/node_connection_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/refresh_percent_changed_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/updated_in_background_event.dart';
-import 'package:stackwallet/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
-import 'package:stackwallet/services/event_bus/global_event_bus.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackduo/services/event_bus/events/global/node_connection_status_changed_event.dart';
+import 'package:stackduo/services/event_bus/events/global/refresh_percent_changed_event.dart';
+import 'package:stackduo/services/event_bus/events/global/updated_in_background_event.dart';
+import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
+import 'package:stackduo/services/event_bus/global_event_bus.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 void main() {
   test("NodeConnectionStatusChangedEvent", () async {
@@ -19,7 +19,7 @@ void main() {
         () => GlobalEventBus.instance.fire(NodeConnectionStatusChangedEvent(
             NodeConnectionStatus.connected, "some wallet ID", Coin.bitcoin)),
         returnsNormally);
-    listener.cancel();
+    await listener.cancel();
   });
 
   test("RefreshPercentChangedEvent", () async {
@@ -33,7 +33,7 @@ void main() {
         () => GlobalEventBus.instance
             .fire(RefreshPercentChangedEvent(0.5, "some id")),
         returnsNormally);
-    listener.cancel();
+    await listener.cancel();
   });
 
   test("UpdatedInBackgroundEvent", () async {

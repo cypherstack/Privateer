@@ -3,20 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/locale_service.dart';
-import 'package:stackwallet/services/node_service.dart';
-import 'package:stackwallet/services/wallets.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/listenable_list.dart';
-import 'package:stackwallet/utilities/theme/light_colors.dart';
-import 'package:stackwallet/utilities/theme/stack_colors.dart';
-import 'package:stackwallet/widgets/managed_favorite.dart';
+import 'package:stackduo/models/balance.dart';
+import 'package:stackduo/providers/providers.dart';
+import 'package:stackduo/services/coins/bitcoin/bitcoin_wallet.dart';
+import 'package:stackduo/services/coins/coin_service.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/services/locale_service.dart';
+import 'package:stackduo/services/node_service.dart';
+import 'package:stackduo/services/wallets.dart';
+import 'package:stackduo/services/wallets_service.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
+import 'package:stackduo/utilities/listenable_list.dart';
+import 'package:stackduo/utilities/theme/light_colors.dart';
+import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/widgets/managed_favorite.dart';
 
 import 'managed_favorite_test.mocks.dart';
 
@@ -44,11 +45,10 @@ void main() {
         .thenAnswer((realInvocation) => manager);
     when(manager.balance).thenAnswer(
       (realInvocation) => Balance(
-        coin: Coin.bitcoin,
-        total: 10,
-        spendable: 10,
-        blockedTotal: 0,
-        pendingSpendable: 0,
+        total: 10.toAmountAsRaw(fractionDigits: 8),
+        spendable: 10.toAmountAsRaw(fractionDigits: 8),
+        blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
+        pendingSpendable: 0.toAmountAsRaw(fractionDigits: 8),
       ),
     );
 
@@ -97,11 +97,10 @@ void main() {
         .thenAnswer((realInvocation) => manager);
     when(manager.balance).thenAnswer(
       (realInvocation) => Balance(
-        coin: Coin.bitcoin,
-        total: 10,
-        spendable: 10,
-        blockedTotal: 0,
-        pendingSpendable: 0,
+        total: 10.toAmountAsRaw(fractionDigits: 8),
+        spendable: 10.toAmountAsRaw(fractionDigits: 8),
+        blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
+        pendingSpendable: 0.toAmountAsRaw(fractionDigits: 8),
       ),
     );
 
@@ -168,11 +167,10 @@ void main() {
     when(manager.isFavorite).thenAnswer((realInvocation) => true);
     when(manager.balance).thenAnswer(
       (realInvocation) => Balance(
-        coin: Coin.bitcoin,
-        total: 10,
-        spendable: 10,
-        blockedTotal: 0,
-        pendingSpendable: 0,
+        total: 10.toAmountAsRaw(fractionDigits: 8),
+        spendable: 10.toAmountAsRaw(fractionDigits: 8),
+        blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
+        pendingSpendable: 0.toAmountAsRaw(fractionDigits: 8),
       ),
     );
 

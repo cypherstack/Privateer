@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
+import 'package:stackduo/widgets/animated_widgets/rotating_arrows.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
@@ -66,18 +64,12 @@ class _RescanningDialogState extends State<RescanningDialog>
           maxWidth: 500,
           child: child,
         ),
-        child: StackDialog(
+        child: const StackDialog(
           title: "Rescanning blockchain",
           message: "This may take a while. Please do not exit this screen.",
-          icon: RotationTransition(
-            turns: _spinAnimation,
-            child: SvgPicture.asset(
-              Assets.svg.arrowRotate3,
-              width: 24,
-              height: 24,
-              color:
-                  Theme.of(context).extension<StackColors>()!.accentColorDark,
-            ),
+          icon: RotatingArrows(
+            width: 24,
+            height: 24,
           ),
           // rightButton: TextButton(
           //   style: Theme.of(context).textButtonTheme.style?.copyWith(

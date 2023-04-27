@@ -1,4 +1,4 @@
-import 'package:stackwallet/models/paymint/transactions_model.dart';
+import 'package:stackduo/models/paymint/transactions_model.dart';
 
 final transactionData = TransactionData.fromMap({
   "88b7b5077d940dde1bc63eba37a09dec8e7b9dad14c183a2e879a21b6ec0ac1c": tx1,

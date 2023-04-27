@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/receive_view/addresses/address_card.dart';
 import 'package:stackduo/pages_desktop_specific/addresses/desktop_wallet_addresses_view.dart';
+import 'package:stackduo/providers/db/main_db_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
@@ -41,7 +41,8 @@ class _DesktopAddressListState extends ConsumerState<DesktopAddressList> {
 
   List<Id> _search(String term) {
     if (term.isEmpty) {
-      return MainDB.instance
+      return ref
+          .read(mainDBProvider)
           .getAddresses(widget.walletId)
           .filter()
           .group((q) => q
@@ -60,7 +61,8 @@ class _DesktopAddressListState extends ConsumerState<DesktopAddressList> {
           .findAllSync();
     }
 
-    final labels = MainDB.instance
+    final labels = ref
+        .read(mainDBProvider)
         .getAddressLabels(widget.walletId)
         .filter()
         .group(
@@ -82,7 +84,8 @@ class _DesktopAddressListState extends ConsumerState<DesktopAddressList> {
       return [];
     }
 
-    return MainDB.instance
+    return ref
+        .read(mainDBProvider)
         .getAddresses(widget.walletId)
         .filter()
         .anyOf<AddressLabel, Address>(

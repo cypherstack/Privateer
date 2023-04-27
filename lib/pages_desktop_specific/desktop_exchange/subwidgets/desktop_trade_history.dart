@@ -65,35 +65,21 @@ class _DesktopTradeHistoryState extends ConsumerState<DesktopTradeHistory> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Recent trades",
-                style: STextStyles.desktopTextExtraExtraSmall(context),
-              ),
-              CustomTextButton(
-                text: "See all",
-                onTap: () {
-                  Navigator.of(context)
-                      .pushNamed(DesktopAllTradesView.routeName);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 16,
-          ),
           Expanded(
             child: ListView.separated(
               shrinkWrap: true,
               primary: false,
               itemBuilder: (context, index) {
                 BorderRadius? radius;
-                if (index == tradeCount - 1) {
-                  radius = _borderRadiusLast;
-                } else if (index == 0) {
+                if (index == 0) {
                   radius = _borderRadiusFirst;
+                  if (tradeCount == 1) {
+                    radius = BorderRadius.circular(
+                      Constants.size.checkboxBorderRadius,
+                    );
+                  }
+                } else if (index == tradeCount - 1) {
+                  radius = _borderRadiusLast;
                 }
 
                 return Container(

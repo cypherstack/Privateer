@@ -10,10 +10,10 @@ import 'package:stackduo/providers/wallet/wallet_balance_toggle_state_provider.d
 import 'package:stackduo/services/event_bus/events/global/balance_refreshed_event.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackduo/services/event_bus/global_event_bus.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/wallet_balance_toggle_state.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 
@@ -90,8 +90,7 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
         ref.watch(walletBalanceToggleStateProvider.state).state ==
             WalletBalanceToggleState.available;
 
-    final balanceToShow =
-        _showAvailable ? balance.getSpendable() : balance.getTotal();
+    final balanceToShow = _showAvailable ? balance.spendable : balance.total;
     final title = _showAvailable ? "Available balance" : "Full balance";
 
     return Row(
@@ -130,10 +129,8 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: SelectableText(
-                  "${Format.localizedStringAsFixed(
-                    value: balanceToShow,
+                  "${balanceToShow.localizedStringAsFixed(
                     locale: locale,
-                    decimalPlaces: 8,
                   )} ${coin.ticker}",
                   style: STextStyles.pageTitleH1(context).copyWith(
                     fontSize: 24,
@@ -145,11 +142,11 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
               ),
               if (externalCalls)
                 Text(
-                  "${Format.localizedStringAsFixed(
-                    value: priceTuple.item1 * balanceToShow,
-                    locale: locale,
-                    decimalPlaces: 2,
-                  )} $baseCurrency",
+                  "${(priceTuple.item1 * balanceToShow.decimal).toAmount(
+                        fractionDigits: 2,
+                      ).localizedStringAsFixed(
+                        locale: locale,
+                      )} $baseCurrency",
                   style: STextStyles.subtitle500(context).copyWith(
                     color: Theme.of(context)
                         .extension<StackColors>()!

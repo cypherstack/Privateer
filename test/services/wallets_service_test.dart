@@ -2,10 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_test/hive_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:stackwallet/hive/db.dart';
-import 'package:stackwallet/services/wallets_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
+import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/services/wallets_service.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
+import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 
 @GenerateMocks([SecureStorageWrapper])
 void main() {

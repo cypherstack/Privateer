@@ -1,19 +1,20 @@
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/db/main_db.dart';
-import 'package:stackduo/electrumx_rpc/electrumx.dart';
 import 'package:stackduo/hive/db.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/services/mixins/wallet_db.dart';
-import 'package:stackduo/services/node_service.dart';
 import 'package:stackduo/services/wallets_service.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/constants.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/prefs.dart';
+import 'package:tuple/tuple.dart';
 
 class DbVersionMigrator with WalletDB {
   Future<void> migrate(
@@ -28,15 +29,8 @@ class DbVersionMigrator with WalletDB {
       case 0:
         await Hive.openBox<dynamic>(DB.boxNameAllWalletsData);
         await Hive.openBox<dynamic>(DB.boxNamePrefs);
-        final walletsService =
-            WalletsService(secureStorageInterface: secureStore);
-        final nodeService = NodeService(secureStorageInterface: secureStore);
         final prefs = Prefs.instance;
-        final walletInfoList = await walletsService.walletNames;
         await prefs.init();
-
-        ElectrumX? client;
-        int? latestSetId;
 
         // update version
         await DB.instance.put<dynamic>(
@@ -192,6 +186,17 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(7, secureStore: secureStore);
 
+      case 7:
+        // migrate
+        await _v7(secureStore);
+
+        // update version
+        await DB.instance.put<dynamic>(
+            boxName: DB.boxNameDBInfo, key: "hive_data_version", value: 8);
+
+        // try to continue migrating
+        return await migrate(8, secureStore: secureStore);
+
       default:
         // finally return
         return;
@@ -241,6 +246,45 @@ class DbVersionMigrator with WalletDB {
         key: "rescan_on_open_$walletId",
         value: Constants.rescanV1,
       );
+    }
+  }
+
+  Future<void> _v7(SecureStorageInterface secureStore) async {
+    await Hive.openBox<dynamic>(DB.boxNameAllWalletsData);
+    final walletsService = WalletsService(secureStorageInterface: secureStore);
+    final walletInfoList = await walletsService.walletNames;
+    await MainDB.instance.initMainDB();
+
+    for (final walletId in walletInfoList.keys) {
+      final info = walletInfoList[walletId]!;
+      assert(info.walletId == walletId);
+
+      final count = await MainDB.instance.getTransactions(walletId).count();
+
+      for (var i = 0; i < count; i += 50) {
+        final txns = await MainDB.instance
+            .getTransactions(walletId)
+            .offset(i)
+            .limit(50)
+            .findAll();
+
+        // migrate amount to serialized amount string
+        final txnsData = txns
+            .map(
+              (tx) => Tuple2(
+                tx
+                  ..amountString = Amount(
+                    rawValue: BigInt.from(tx.amount),
+                    fractionDigits: info.coin.decimals,
+                  ).toJsonString(),
+                tx.address.value,
+              ),
+            )
+            .toList();
+
+        // update db records
+        await MainDB.instance.addNewTransactionData(txnsData, walletId);
+      }
     }
   }
 }

@@ -637,6 +637,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
             .getAggregateCurrency(
           coin!.ticker,
           ExchangeRateType.estimated,
+          null,
         )
             .then((value) {
           if (value != null) {
@@ -845,7 +846,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
           height: isDesktop ? 20 : 12,
         ),
         SizedBox(
-          height: 60,
+          height: isDesktop ? 60 : 40,
           child: RateTypeToggle(
             key: UniqueKey(),
             onChanged: onRateTypeChanged,

@@ -1,9 +1,10 @@
-import 'package:stackwallet/models/balance.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/transaction.dart';
-import 'package:stackwallet/models/isar/models/blockchain_data/utxo.dart';
-import 'package:stackwallet/models/paymint/fee_object_model.dart';
-import 'package:stackwallet/services/coins/coin_service.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackduo/models/balance.dart';
+import 'package:stackduo/models/isar/models/blockchain_data/transaction.dart';
+import 'package:stackduo/models/isar/models/blockchain_data/utxo.dart';
+import 'package:stackduo/models/paymint/fee_object_model.dart';
+import 'package:stackduo/services/coins/coin_service.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 class FakeCoinServiceAPI extends CoinServiceAPI {
   @override
@@ -71,12 +72,6 @@ class FakeCoinServiceAPI extends CoinServiceAPI {
   }
 
   @override
-  Future<int> estimateFeeFor(int satoshiAmount, int feeRate) {
-    // TODO: implement estimateFeeFor
-    throw UnimplementedError();
-  }
-
-  @override
   // TODO: implement hasCalledExit
   bool get hasCalledExit => throw UnimplementedError();
 
@@ -99,15 +94,6 @@ class FakeCoinServiceAPI extends CoinServiceAPI {
   @override
   // TODO: implement isRefreshing
   bool get isRefreshing => throw UnimplementedError();
-
-  @override
-  Future<Map<String, dynamic>> prepareSend(
-      {required String address,
-      required int satoshiAmount,
-      Map<String, dynamic>? args}) {
-    // TODO: implement prepareSend
-    throw UnimplementedError();
-  }
 
   @override
   Future<void> updateNode(bool shouldRefresh) {
@@ -177,4 +163,19 @@ class FakeCoinServiceAPI extends CoinServiceAPI {
   @override
   // TODO: implement mnemonicString
   Future<String?> get mnemonicString => throw UnimplementedError();
+
+  @override
+  Future<Amount> estimateFeeFor(Amount amount, int feeRate) {
+    // TODO: implement estimateFeeFor
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, dynamic>> prepareSend(
+      {required String address,
+      required Amount amount,
+      Map<String, dynamic>? args}) {
+    // TODO: implement prepareSend
+    throw UnimplementedError();
+  }
 }

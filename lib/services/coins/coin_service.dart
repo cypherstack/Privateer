@@ -7,6 +7,7 @@ import 'package:stackduo/models/paymint/fee_object_model.dart';
 import 'package:stackduo/services/coins/bitcoin/bitcoin_wallet.dart';
 import 'package:stackduo/services/coins/monero/monero_wallet.dart';
 import 'package:stackduo/services/transaction_notification_tracker.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/prefs.dart';
@@ -100,7 +101,7 @@ abstract class CoinServiceAPI {
 
   Future<Map<String, dynamic>> prepareSend({
     required String address,
-    required int satoshiAmount,
+    required Amount amount,
     Map<String, dynamic>? args,
   });
 
@@ -155,7 +156,7 @@ abstract class CoinServiceAPI {
 
   bool get isConnected;
 
-  Future<int> estimateFeeFor(int satoshiAmount, int feeRate);
+  Future<Amount> estimateFeeFor(Amount amount, int feeRate);
 
   Future<bool> generateNewAddress();
 
