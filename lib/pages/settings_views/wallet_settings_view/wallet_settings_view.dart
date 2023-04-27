@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/address_book_views/address_book_view.dart';
 import 'package:stackduo/pages/home_view/home_view.dart';
 import 'package:stackduo/pages/pinpad_views/lock_screen_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/syncing_preferences_views/syncing_preferences_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/xpub_view.dart';
 import 'package:stackduo/pages/settings_views/sub_widgets/settings_list_button.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_backup_views/wallet_backup_view.dart';
 import 'package:stackduo/pages/settings_views/wallet_settings_view/wallet_network_settings_view/wallet_network_settings_view.dart';
@@ -30,7 +30,7 @@ import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 
 /// [eventBus] should only be set during testing
-class WalletSettingsView extends StatefulWidget {
+class WalletSettingsView extends ConsumerStatefulWidget {
   const WalletSettingsView({
     Key? key,
     required this.walletId,
@@ -49,12 +49,14 @@ class WalletSettingsView extends StatefulWidget {
   final EventBus? eventBus;
 
   @override
-  State<WalletSettingsView> createState() => _WalletSettingsViewState();
+  ConsumerState<WalletSettingsView> createState() => _WalletSettingsViewState();
 }
 
-class _WalletSettingsViewState extends State<WalletSettingsView> {
+class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
   late final String walletId;
   late final Coin coin;
+  late String xpub;
+  late final bool xPubEnabled;
 
   late final EventBus eventBus;
 
@@ -68,6 +70,9 @@ class _WalletSettingsViewState extends State<WalletSettingsView> {
   void initState() {
     walletId = widget.walletId;
     coin = widget.coin;
+    xPubEnabled =
+        ref.read(walletsChangeNotifierProvider).getManager(walletId).hasXPub;
+    xpub = "";
 
     _currentSyncStatus = widget.initialSyncStatus;
     // _currentNodeStatus = widget.initialNodeStatus;
@@ -261,13 +266,32 @@ class _WalletSettingsViewState extends State<WalletSettingsView> {
                                   height: 8,
                                 ),
                                 SettingsListButton(
-                                  iconAssetName: Assets.svg.arrowRotate3,
+                                  iconAssetName: Assets.svg.arrowRotate,
                                   title: "Syncing preferences",
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                         SyncingPreferencesView.routeName);
                                   },
                                 ),
+                                if (xPubEnabled)
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                if (xPubEnabled)
+                                  Consumer(
+                                    builder: (_, ref, __) {
+                                      return SettingsListButton(
+                                        iconAssetName: Assets.svg.eye,
+                                        title: "Wallet xPub",
+                                        onPressed: () {
+                                          Navigator.of(context).pushNamed(
+                                            XPubView.routeName,
+                                            arguments: widget.walletId,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
                                 const SizedBox(
                                   height: 8,
                                 ),

@@ -1,5 +1,6 @@
 import 'package:stackduo/hive/db.dart';
 import 'package:stackduo/models/balance.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 mixin WalletCache {
@@ -69,14 +70,16 @@ mixin WalletCache {
     ) as String?;
     if (jsonString == null) {
       return Balance(
-        coin: _coin,
-        total: 0,
-        spendable: 0,
-        blockedTotal: 0,
-        pendingSpendable: 0,
+        total: Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
+        spendable:
+            Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
+        blockedTotal:
+            Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
+        pendingSpendable:
+            Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
       );
     }
-    return Balance.fromJson(jsonString, _coin);
+    return Balance.fromJson(jsonString, _coin.decimals);
   }
 
   Future<void> updateCachedBalance(Balance balance) async {
@@ -95,14 +98,16 @@ mixin WalletCache {
     ) as String?;
     if (jsonString == null) {
       return Balance(
-        coin: _coin,
-        total: 0,
-        spendable: 0,
-        blockedTotal: 0,
-        pendingSpendable: 0,
+        total: Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
+        spendable:
+            Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
+        blockedTotal:
+            Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
+        pendingSpendable:
+            Amount(rawValue: BigInt.zero, fractionDigits: _coin.decimals),
       );
     }
-    return Balance.fromJson(jsonString, _coin);
+    return Balance.fromJson(jsonString, _coin.decimals);
   }
 
   Future<void> updateCachedBalanceSecondary(Balance balance) async {

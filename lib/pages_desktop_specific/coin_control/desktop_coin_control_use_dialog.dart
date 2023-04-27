@@ -1,4 +1,3 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,10 +6,10 @@ import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/isar/models/blockchain_data/utxo.dart';
 import 'package:stackduo/pages_desktop_specific/coin_control/utxo_row.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/animated_widgets/rotate_icon.dart';
@@ -37,7 +36,7 @@ class DesktopCoinControlUseDialog extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   final String walletId;
-  final Decimal? amountToSend;
+  final Amount? amountToSend;
 
   @override
   ConsumerState<DesktopCoinControlUseDialog> createState() =>
@@ -114,12 +113,16 @@ class _DesktopCoinControlUseDialogState
       );
     }
 
-    final selectedSum = Format.satoshisToAmount(
-      _selectedUTXOs
-          .map((e) => e.value)
-          .fold(0, (value, element) => value += element),
-      coin: coin,
-    );
+    final Amount selectedSum = _selectedUTXOs.map((e) => e.value).fold(
+          Amount(
+            rawValue: BigInt.zero,
+            fractionDigits: coin.decimals,
+          ),
+          (value, element) => value += Amount(
+            rawValue: BigInt.from(element),
+            fractionDigits: coin.decimals,
+          ),
+        );
 
     final enableApply = widget.amountToSend == null
         ? selectedChanged(_selectedUTXOs)
@@ -470,7 +473,7 @@ class _DesktopCoinControlUseDialogState
                                     ),
                                   ),
                                   Text(
-                                    "${widget.amountToSend!.toStringAsFixed(
+                                    "${widget.amountToSend!.decimal.toStringAsFixed(
                                       coin.decimals,
                                     )}"
                                     " ${coin.ticker}",
@@ -505,7 +508,7 @@ class _DesktopCoinControlUseDialogState
                               ),
                             ),
                             Text(
-                              "${selectedSum.toStringAsFixed(
+                              "${selectedSum.decimal.toStringAsFixed(
                                 coin.decimals,
                               )} ${coin.ticker}",
                               style: STextStyles.desktopTextExtraExtraSmall(

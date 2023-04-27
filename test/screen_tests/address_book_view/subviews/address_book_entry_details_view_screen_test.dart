@@ -10,15 +10,15 @@
 // import 'package:mockingjay/mockingjay.dart' as mockingjay;
 import 'package:mockito/annotations.dart';
 // import 'package:mockito/mockito.dart';
-// import 'package:stackwallet/models/models.dart';
-// import 'package:stackwallet/pages/address_book_view/subviews/address_book_entry_details_view.dart';
-import 'package:stackwallet/services/address_book_service.dart';
-import 'package:stackwallet/services/coins/manager.dart';
-import 'package:stackwallet/services/locale_service.dart';
-import 'package:stackwallet/services/notes_service.dart';
-// import 'package:stackwallet/utilities/clipboard_interface.dart';
-// import 'package:stackwallet/widgets/custom_buttons/gradient_button.dart';
-// import 'package:stackwallet/widgets/transaction_card.dart';
+// import 'package:stackduo/models/models.dart';
+// import 'package:stackduo/pages/address_book_view/subviews/address_book_entry_details_view.dart';
+import 'package:stackduo/services/address_book_service.dart';
+import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/services/locale_service.dart';
+import 'package:stackduo/services/notes_service.dart';
+// import 'package:stackduo/utilities/clipboard_interface.dart';
+// import 'package:stackduo/widgets/custom_buttons/gradient_button.dart';
+// import 'package:stackduo/widgets/transaction_card.dart';
 // import 'package:provider/provider.dart';
 //
 // import '../../../sample_data/transaction_data_samples.dart';

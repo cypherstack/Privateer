@@ -1,5 +1,4 @@
 import 'package:cw_core/monero_transaction_priority.dart';
-import 'package:decimal/decimal.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,12 +7,11 @@ import 'package:stackduo/models/models.dart';
 import 'package:stackduo/pages/send_view/sub_widgets/transaction_fee_selection_sheet.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/providers/ui/fee_rate_type_state_provider.dart';
-import 'package:stackduo/providers/wallet/public_private_balance_state_provider.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/animated_text.dart';
@@ -43,8 +41,8 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
     "Calculating...",
   ];
 
-  Future<Decimal> feeFor({
-    required int amount,
+  Future<Amount> feeFor({
+    required Amount amount,
     required FeeRateType feeRateType,
     required int feeRate,
     required Coin coin,
@@ -58,18 +56,13 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
           if (coin == Coin.monero) {
             final fee = await manager.estimateFeeFor(
                 amount, MoneroTransactionPriority.fast.raw!);
-            ref.read(feeSheetSessionCacheProvider).fast[amount] =
-                Format.satoshisToAmount(
-              fee,
-              coin: coin,
-            );
+            ref.read(feeSheetSessionCacheProvider).fast[amount] = fee;
           } else {
             ref.read(feeSheetSessionCacheProvider).fast[amount] =
-                Format.satoshisToAmount(
-                    await manager.estimateFeeFor(amount, feeRate),
-                    coin: coin);
+                await manager.estimateFeeFor(amount, feeRate);
           }
         }
+
         return ref.read(feeSheetSessionCacheProvider).fast[amount]!;
 
       case FeeRateType.average:
@@ -80,18 +73,13 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
           if (coin == Coin.monero) {
             final fee = await manager.estimateFeeFor(
                 amount, MoneroTransactionPriority.regular.raw!);
-            ref.read(feeSheetSessionCacheProvider).average[amount] =
-                Format.satoshisToAmount(
-              fee,
-              coin: coin,
-            );
+            ref.read(feeSheetSessionCacheProvider).average[amount] = fee;
           } else {
             ref.read(feeSheetSessionCacheProvider).average[amount] =
-                Format.satoshisToAmount(
-                    await manager.estimateFeeFor(amount, feeRate),
-                    coin: coin);
+                await manager.estimateFeeFor(amount, feeRate);
           }
         }
+
         return ref.read(feeSheetSessionCacheProvider).average[amount]!;
 
       case FeeRateType.slow:
@@ -102,18 +90,13 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
           if (coin == Coin.monero) {
             final fee = await manager.estimateFeeFor(
                 amount, MoneroTransactionPriority.slow.raw!);
-            ref.read(feeSheetSessionCacheProvider).slow[amount] =
-                Format.satoshisToAmount(
-              fee,
-              coin: coin,
-            );
+            ref.read(feeSheetSessionCacheProvider).slow[amount] = fee;
           } else {
             ref.read(feeSheetSessionCacheProvider).slow[amount] =
-                Format.satoshisToAmount(
-                    await manager.estimateFeeFor(amount, feeRate),
-                    coin: coin);
+                await manager.estimateFeeFor(amount, feeRate);
           }
         }
+
         return ref.read(feeSheetSessionCacheProvider).slow[amount]!;
     }
   }
@@ -217,7 +200,7 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
 }
 
 final sendAmountProvider =
-    StateProvider.autoDispose<Decimal>((_) => Decimal.zero);
+    StateProvider.autoDispose<Amount>((_) => Amount.zero);
 
 class FeeDropDownChild extends ConsumerWidget {
   const FeeDropDownChild({
@@ -232,8 +215,8 @@ class FeeDropDownChild extends ConsumerWidget {
   final FeeObject? feeObject;
   final FeeRateType feeRateType;
   final String walletId;
-  final Future<Decimal> Function({
-    required int amount,
+  final Future<Amount> Function({
+    required Amount amount,
     required FeeRateType feeRateType,
     required int feeRate,
     required Coin coin,
@@ -297,19 +280,20 @@ class FeeDropDownChild extends ConsumerWidget {
               : feeRateType == FeeRateType.slow
                   ? feeObject!.slow
                   : feeObject!.medium,
-          amount: Format.decimalAmountToSatoshis(
-            ref.watch(sendAmountProvider.state).state,
-            manager.coin,
-          ),
+          amount: ref.watch(sendAmountProvider.state).state,
         ),
-        builder: (_, AsyncSnapshot<Decimal> snapshot) {
+        builder: (_, AsyncSnapshot<Amount> snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${feeRateType.prettyName} (~${snapshot.data!} ${manager.coin.ticker})",
+                  "${feeRateType.prettyName} "
+                  "(~${snapshot.data!.decimal.toStringAsFixed(
+                    manager.coin.decimals,
+                  )} "
+                  "${manager.coin.ticker})",
                   style:
                       STextStyles.desktopTextExtraExtraSmall(context).copyWith(
                     color: Theme.of(context)

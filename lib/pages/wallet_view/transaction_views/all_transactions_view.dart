@@ -6,13 +6,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/models/isar/models/blockchain_data/transaction.dart';
 import 'package:stackduo/models/transaction_filter.dart';
-import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/wallet_view/sub_widgets/tx_icon.dart';
 import 'package:stackduo/pages/wallet_view/transaction_views/transaction_details_view.dart';
 import 'package:stackduo/pages/wallet_view/transaction_views/transaction_search_filter_view.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -111,7 +111,7 @@ class _TransactionDetailsViewState extends ConsumerState<AllTransactionsView> {
         return false;
       }
 
-      if (filter.amount != null && filter.amount != tx.amount) {
+      if (filter.amount != null && filter.amount! != tx.realAmount) {
         return false;
       }
 
@@ -847,6 +847,8 @@ class _DesktopTransactionCardRowState
         prefix = "-";
       } else if (_transaction.type == TransactionType.incoming) {
         prefix = "+";
+      } else {
+        prefix = "";
       }
     } else {
       prefix = "";
@@ -937,9 +939,11 @@ class _DesktopTransactionCardRowState
                 flex: 6,
                 child: Builder(
                   builder: (_) {
-                    final amount = _transaction.amount;
+                    final amount = _transaction.realAmount;
                     return Text(
-                      "$prefix${Format.satoshiAmountToPrettyString(amount, locale, coin)} ${coin.ticker}",
+                      "$prefix${amount.localizedStringAsFixed(
+                        locale: locale,
+                      )} ${coin.ticker}",
                       style: STextStyles.desktopTextExtraExtraSmall(context)
                           .copyWith(
                         color: Theme.of(context)
@@ -956,15 +960,14 @@ class _DesktopTransactionCardRowState
                   flex: 4,
                   child: Builder(
                     builder: (_) {
-                      int value = _transaction.amount;
+                      final amount = _transaction.realAmount;
 
                       return Text(
-                        "$prefix${Format.localizedStringAsFixed(
-                          value: Format.satoshisToAmount(value, coin: coin) *
-                              price,
-                          locale: locale,
-                          decimalPlaces: 2,
-                        )} $baseCurrency",
+                        "$prefix${(amount.decimal * price).toAmount(
+                              fractionDigits: 2,
+                            ).localizedStringAsFixed(
+                              locale: locale,
+                            )} $baseCurrency",
                         style: STextStyles.desktopTextExtraExtraSmall(context),
                       );
                     },

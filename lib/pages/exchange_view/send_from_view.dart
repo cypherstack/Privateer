@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,15 +11,14 @@ import 'package:stackduo/pages_desktop_specific/desktop_exchange/desktop_exchang
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/fee_rate_type_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
-import 'package:stackduo/widgets/animated_text.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -44,7 +42,7 @@ class SendFromView extends ConsumerStatefulWidget {
   static const String routeName = "/sendFrom";
 
   final Coin coin;
-  final Decimal amount;
+  final Amount amount;
   final String address;
   final Trade trade;
   final bool shouldPopRoot;
@@ -56,13 +54,9 @@ class SendFromView extends ConsumerStatefulWidget {
 
 class _SendFromViewState extends ConsumerState<SendFromView> {
   late final Coin coin;
-  late final Decimal amount;
+  late final Amount amount;
   late final String address;
   late final Trade trade;
-
-  String formatAmount(Decimal amount, Coin coin) {
-    return amount.toStringAsFixed(Constants.decimalPlacesForCoin(coin));
-  }
 
   @override
   void initState() {
@@ -150,7 +144,13 @@ class _SendFromViewState extends ConsumerState<SendFromView> {
             Row(
               children: [
                 Text(
-                  "You need to send ${formatAmount(amount, coin)} ${coin.ticker}",
+                  "You need to send ${amount.localizedStringAsFixed(
+                    locale: ref.watch(
+                      localeServiceChangeNotifierProvider.select(
+                        (value) => value.locale,
+                      ),
+                    ),
+                  )} ${coin.ticker}",
                   style: isDesktop
                       ? STextStyles.desktopTextExtraExtraSmall(context)
                       : STextStyles.itemSubtitle(context),
@@ -201,7 +201,7 @@ class SendFromCard extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   final String walletId;
-  final Decimal amount;
+  final Amount amount;
   final String address;
   final Trade trade;
   final bool fromDesktopStep4;
@@ -212,13 +212,11 @@ class SendFromCard extends ConsumerStatefulWidget {
 
 class _SendFromCardState extends ConsumerState<SendFromCard> {
   late final String walletId;
-  late final Decimal amount;
+  late final Amount amount;
   late final String address;
   late final Trade trade;
 
   Future<void> _send(Manager manager, {bool? shouldSendPublicFiroFunds}) async {
-    final _amount = Format.decimalAmountToSatoshis(amount, manager.coin);
-
     try {
       bool wasCancelled = false;
 
@@ -262,7 +260,7 @@ class _SendFromCardState extends ConsumerState<SendFromCard> {
 
       txDataFuture = manager.prepareSend(
         address: address,
-        satoshiAmount: _amount,
+        amount: amount,
         args: {
           "feeRate": FeeRateType.average,
           // ref.read(feeRateTypeStateProvider)
@@ -562,35 +560,11 @@ class _SendFromCardState extends ConsumerState<SendFromCard> {
                         height: 2,
                       ),
                     if (!isFiro)
-                      FutureBuilder(
-                        // TODO redo this widget now that its not actually a future
-                        future: Future(() => manager.balance.getTotal()),
-                        builder:
-                            (builderContext, AsyncSnapshot<Decimal> snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.done &&
-                              snapshot.hasData) {
-                            return Text(
-                              "${Format.localizedStringAsFixed(
-                                value: snapshot.data!,
-                                locale: locale,
-                                decimalPlaces:
-                                    Constants.decimalPlacesForCoin(coin),
-                              )} ${coin.ticker}",
-                              style: STextStyles.itemSubtitle(context),
-                            );
-                          } else {
-                            return AnimatedText(
-                              stringsToLoopThrough: const [
-                                "Loading balance",
-                                "Loading balance.",
-                                "Loading balance..",
-                                "Loading balance..."
-                              ],
-                              style: STextStyles.itemSubtitle(context),
-                            );
-                          }
-                        },
+                      Text(
+                        "${manager.balance.spendable.localizedStringAsFixed(
+                          locale: locale,
+                        )} ${coin.ticker}",
+                        style: STextStyles.itemSubtitle(context),
                       ),
                   ],
                 ),

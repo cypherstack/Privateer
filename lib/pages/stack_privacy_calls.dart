@@ -8,10 +8,12 @@ import 'package:stackduo/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackduo/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/providers/global/price_provider.dart';
+import 'package:stackduo/providers/ui/color_theme_provider.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
+import 'package:stackduo/utilities/theme/color_theme.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -171,15 +173,16 @@ class _StackPrivacyCalls extends ConsumerState<StackPrivacyCalls> {
                                     ),
                                   ]
                                 : [
+                                    if (Constants.enableExchange)
+                                      const TextSpan(
+                                          text:
+                                              "Exchange data not preloaded (slower experience).\n\n"),
                                     const TextSpan(
                                         text:
-                                            "Exchange data not preloaded (slower experience)."),
-                                    const TextSpan(
-                                        text:
-                                            "\n\nCoinGecko disabled (price changes not shown, no wallet value shown in other currencies)."),
+                                            "CoinGecko disabled (price changes not shown, no wallet value shown in other currencies).\n\n"),
                                     TextSpan(
                                       text:
-                                          "\n\nRecommended for the privacy conscious.",
+                                          "Recommended for the privacy conscious.",
                                       style: isDesktop
                                           ? STextStyles
                                               .desktopTextExtraExtraSmall600(
@@ -233,10 +236,7 @@ class _StackPrivacyCalls extends ConsumerState<StackPrivacyCalls> {
                                 if (isEasy) {
                                   unawaited(
                                     ExchangeDataLoadingService.instance
-                                        .init()
-                                        .then((_) => ExchangeDataLoadingService
-                                            .instance
-                                            .loadAll()),
+                                        .loadAll(),
                                   );
                                   // unawaited(
                                   //     BuyDataLoadingService().loadAll(ref));
@@ -307,6 +307,10 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
 
   @override
   Widget build(BuildContext context) {
+    final bool lightChan =
+        ref.read(colorThemeProvider.state).state.themeType == ThemeType.chan;
+    final bool darkChan = ref.read(colorThemeProvider.state).state.themeType ==
+        ThemeType.darkChans;
     return Row(
       children: [
         Expanded(
@@ -343,19 +347,15 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // if (isDesktop)
-                      //   const SizedBox(
-                      //     height: 10,
-                      //   ),
-                      SvgPicture.asset(
-                        Assets.svg.personaEasy(context),
-                        width: 140,
-                        height: 140,
-                      ),
-                      // if (isDesktop)
-                      //   const SizedBox(
-                      //     height: 12,
-                      //   ),
+                      (lightChan || darkChan)
+                          ? Image(
+                              image: AssetImage(Assets.png.chanEasy),
+                            )
+                          : SvgPicture.asset(
+                              Assets.svg.personaEasy(context),
+                              width: 140,
+                              height: 140,
+                            ),
                       Center(
                         child: Text(
                           "Easy Crypto",
@@ -452,11 +452,20 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
                         const SizedBox(
                           height: 10,
                         ),
-                      SvgPicture.asset(
-                        Assets.svg.personaIncognito(context),
-                        width: 140,
-                        height: 140,
-                      ),
+                      (lightChan || darkChan)
+                          ? Image(
+                              image: AssetImage(Assets.png.chanIncognito),
+                            )
+                          : SvgPicture.asset(
+                              Assets.svg.personaIncognito(context),
+                              width: 140,
+                              height: 140,
+                            ),
+                      // SvgPicture.asset(
+                      //   Assets.svg.personaIncognito(context),
+                      //   width: 140,
+                      //   height: 140,
+                      // ),
                       if (isDesktop)
                         const SizedBox(
                           height: 12,

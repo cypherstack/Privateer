@@ -13,9 +13,11 @@ import 'package:stackduo/pages/paynym/paynym_home_view.dart';
 import 'package:stackduo/pages/paynym/subwidgets/paynym_bot.dart';
 import 'package:stackduo/pages/send_view/confirm_transaction_view.dart';
 import 'package:stackduo/pages/send_view/send_view.dart';
+import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
@@ -134,10 +136,8 @@ class _PaynymDetailsPopupState extends ConsumerState<PaynymDetailsPopup> {
         context: context,
         builder: (context) => ConfirmPaynymConnectDialog(
           nymName: widget.accountLite.nymName,
+          locale: ref.read(localeServiceChangeNotifierProvider).locale,
           onConfirmPressed: () {
-            //
-            print("CONFIRM NOTIF TX: $preparedTx");
-
             Navigator.of(context).push(
               RouteGenerator.getRoute(
                 builder: (_) => ConfirmTransactionView(
@@ -156,7 +156,10 @@ class _PaynymDetailsPopupState extends ConsumerState<PaynymDetailsPopup> {
               ),
             );
           },
-          amount: (preparedTx["amount"] as int) + (preparedTx["fee"] as int),
+          amount: (preparedTx["amount"] as Amount) +
+              (preparedTx["fee"] as int).toAmountAsRaw(
+                fractionDigits: manager.coin.decimals,
+              ),
           coin: manager.coin,
         ),
       );

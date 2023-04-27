@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/receive_view/addresses/address_details_view.dart';
 import 'package:stackduo/pages_desktop_specific/addresses/sub_widgets/desktop_address_list.dart';
+import 'package:stackduo/providers/db/main_db_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
@@ -35,25 +35,31 @@ class _DesktopWalletAddressesViewState
   static const _headerHeight = 70.0;
   static const _columnWidth0 = 489.0;
 
-  late final Stream<void> addressCollectionWatcher;
+  Stream<void>? addressCollectionWatcher;
 
   void _onAddressCollectionWatcherEvent() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
   @override
   void initState() {
-    addressCollectionWatcher =
-        MainDB.instance.isar.addresses.watchLazy(fireImmediately: true);
-    addressCollectionWatcher.listen((_) => _onAddressCollectionWatcherEvent());
+    addressCollectionWatcher = ref
+        .read(mainDBProvider)
+        .isar
+        .addresses
+        .watchLazy(fireImmediately: true);
+    addressCollectionWatcher!.listen((_) => _onAddressCollectionWatcherEvent());
 
     super.initState();
   }
 
   @override
   void dispose() {
+    addressCollectionWatcher = null;
     super.dispose();
   }
 

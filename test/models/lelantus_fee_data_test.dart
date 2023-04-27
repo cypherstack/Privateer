@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stackwallet/models/lelantus_fee_data.dart';
+import 'package:stackduo/models/lelantus_fee_data.dart';
 
 void main() {
   test("LelantusFeeData constructor", () {

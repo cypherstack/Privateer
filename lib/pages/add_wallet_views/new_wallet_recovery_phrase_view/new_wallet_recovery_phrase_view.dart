@@ -57,9 +57,9 @@ class _NewWalletRecoveryPhraseViewState
   }
 
   @override
-  void dispose() async {
+  void dispose() {
     if (Platform.isAndroid) {
-      await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+      FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
     }
     super.dispose();
   }

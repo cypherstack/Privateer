@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:stackduo/models/paynym/paynym_account.dart';
 import 'package:stackduo/pages/paynym/dialogs/claiming_paynym_dialog.dart';
 import 'package:stackduo/pages/paynym/paynym_home_view.dart';
 import 'package:stackduo/pages/wallet_view/wallet_view.dart';
@@ -11,7 +12,6 @@ import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/providers/wallet/my_paynym_account_state_provider.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/enums/derive_path_type_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
@@ -36,6 +36,29 @@ class PaynymClaimView extends ConsumerStatefulWidget {
 }
 
 class _PaynymClaimViewState extends ConsumerState<PaynymClaimView> {
+  Future<bool> _addSegwitCode(PaynymAccount myAccount) async {
+    final manager =
+        ref.read(walletsChangeNotifierProvider).getManager(widget.walletId);
+
+    // get wallet to access paynym calls
+    final wallet = manager.wallet as PaynymWalletInterface;
+
+    final token = await ref
+        .read(paynymAPIProvider)
+        .token(myAccount.nonSegwitPaymentCode.code);
+    final signature = await wallet.signStringWithNotificationKey(token.value!);
+
+    final pCodeSegwit = await wallet.getPaymentCode(isSegwit: true);
+    final addResult = await ref.read(paynymAPIProvider).add(
+          token.value!,
+          signature,
+          myAccount.nymID,
+          pCodeSegwit.toString(),
+        );
+
+    return addResult.value ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
@@ -167,8 +190,7 @@ class _PaynymClaimViewState extends ConsumerState<PaynymClaimView> {
                   if (shouldCancel) return;
 
                   // get payment code
-                  final pCode = await wallet.getPaymentCode(
-                      DerivePathTypeExt.primaryFor(manager.coin));
+                  final pCode = await wallet.getPaymentCode(isSegwit: false);
 
                   if (shouldCancel) return;
 
@@ -183,6 +205,18 @@ class _PaynymClaimViewState extends ConsumerState<PaynymClaimView> {
                   if (created.value!.claimed) {
                     // payment code already claimed
                     debugPrint("pcode already claimed!!");
+
+                    final account =
+                        await ref.read(paynymAPIProvider).nym(pCode.toString());
+                    if (!account.value!.segwit) {
+                      for (int i = 0; i < 100; i++) {
+                        final result = await _addSegwitCode(account.value!);
+                        if (result == true) {
+                          break;
+                        }
+                      }
+                    }
+
                     if (mounted) {
                       if (isDesktop) {
                         Navigator.of(context, rootNavigator: true).pop();
@@ -221,6 +255,14 @@ class _PaynymClaimViewState extends ConsumerState<PaynymClaimView> {
                   if (claim.value?.claimed == pCode.toString()) {
                     final account =
                         await ref.read(paynymAPIProvider).nym(pCode.toString());
+                    if (!account.value!.segwit) {
+                      for (int i = 0; i < 100; i++) {
+                        final result = await _addSegwitCode(account.value!);
+                        if (result == true) {
+                          break;
+                        }
+                      }
+                    }
 
                     ref.read(myPaynymAccountStateProvider.state).state =
                         account.value!;

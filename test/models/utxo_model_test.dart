@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stackwallet/models/paymint/utxo_model.dart';
+import 'package:stackduo/models/paymint/utxo_model.dart';
 
 void main() {
   group("Status", () {

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stackwallet/models/notification_model.dart';
-import 'package:stackwallet/notifications/notification_card.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/theme/light_colors.dart';
-import 'package:stackwallet/utilities/theme/stack_colors.dart';
+import 'package:stackduo/models/notification_model.dart';
+import 'package:stackduo/notifications/notification_card.dart';
+import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
+import 'package:stackduo/utilities/theme/light_colors.dart';
+import 'package:stackduo/utilities/theme/stack_colors.dart';
 
 void main() {
   testWidgets("test notification card", (widgetTester) async {

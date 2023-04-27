@@ -20,8 +20,8 @@ import 'dart:core';
 // import 'package:hive/hive.dart';
 // import 'package:hive_test/hive_test.dart';
 // import 'package:path_provider/path_provider.dart';
-// import 'package:stackwallet/services/wallets.dart';
-// import 'package:stackwallet/utilities/flutter_secure_storage_interface.dart';
+// import 'package:stackduo/services/wallets.dart';
+// import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 //
 // import 'monero_wallet_test_data.dart';
 //

@@ -8,14 +8,16 @@ import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/coin_control/utxo_card.dart';
 import 'package:stackduo/pages/coin_control/utxo_details_view.dart';
+import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/services/mixins/coin_control_interface.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/widgets/animated_widgets/rotate_icon.dart';
 import 'package:stackduo/widgets/app_bar_field.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -24,12 +26,10 @@ import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/expandable2.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
+import 'package:stackduo/widgets/rounded_container.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/toggle.dart';
 import 'package:tuple/tuple.dart';
-
-import '../../widgets/animated_widgets/rotate_icon.dart';
-import '../../widgets/rounded_container.dart';
 
 enum CoinControlViewType {
   manage,
@@ -49,7 +49,7 @@ class CoinControlView extends ConsumerStatefulWidget {
 
   final String walletId;
   final CoinControlViewType type;
-  final int? requestedTotal;
+  final Amount? requestedTotal;
   final Set<UTXO>? selectedUTXOs;
 
   @override
@@ -673,7 +673,7 @@ class _CoinControlViewState extends ConsumerState<CoinControlView> {
                                       ),
                                       Builder(
                                         builder: (context) {
-                                          int selectedSum =
+                                          final int selectedSumInt =
                                               _selectedAvailable.isEmpty
                                                   ? 0
                                                   : _selectedAvailable
@@ -682,12 +682,18 @@ class _CoinControlViewState extends ConsumerState<CoinControlView> {
                                                         (value, element) =>
                                                             value += element,
                                                       );
+                                          final selectedSum =
+                                              selectedSumInt.toAmountAsRaw(
+                                            fractionDigits: coin.decimals,
+                                          );
                                           return Text(
-                                            "${Format.satoshisToAmount(
-                                              selectedSum,
-                                              coin: coin,
-                                            ).toStringAsFixed(
-                                              coin.decimals,
+                                            "${selectedSum.localizedStringAsFixed(
+                                              locale: ref.watch(
+                                                localeServiceChangeNotifierProvider
+                                                    .select(
+                                                  (value) => value.locale,
+                                                ),
+                                              ),
                                             )} ${coin.ticker}",
                                             style: widget.requestedTotal == null
                                                 ? STextStyles.w600_14(context)
@@ -729,11 +735,13 @@ class _CoinControlViewState extends ConsumerState<CoinControlView> {
                                           style: STextStyles.w600_14(context),
                                         ),
                                         Text(
-                                          "${Format.satoshisToAmount(
-                                            widget.requestedTotal!,
-                                            coin: coin,
-                                          ).toStringAsFixed(
-                                            coin.decimals,
+                                          "${widget.requestedTotal!.localizedStringAsFixed(
+                                            locale: ref.watch(
+                                              localeServiceChangeNotifierProvider
+                                                  .select(
+                                                (value) => value.locale,
+                                              ),
+                                            ),
                                           )} ${coin.ticker}",
                                           style: STextStyles.w600_14(context),
                                         ),

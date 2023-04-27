@@ -16,12 +16,8 @@ import 'package:stackduo/providers/wallet/my_paynym_account_state_provider.dart'
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
-import 'package:stackduo/utilities/enums/derive_path_type_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
-import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
-import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/loading_indicator.dart';
 
@@ -61,7 +57,6 @@ class _DesktopWalletFeaturesState extends ConsumerState<DesktopWalletFeatures> {
         walletId: widget.walletId,
         onPaynymPressed: _onPaynymPressed,
         onCoinControlPressed: _onCoinControlPressed,
-        onAnonymizeAllPressed: _onAnonymizeAllPressed,
         onWhirlpoolPressed: _onWhirlpoolPressed,
       ),
     );
@@ -79,149 +74,6 @@ class _DesktopWalletFeaturesState extends ConsumerState<DesktopWalletFeatures> {
       arguments: widget.walletId,
     );
   }
-
-  Future<void> _onAnonymizeAllPressed() async {
-    Navigator.of(context, rootNavigator: true).pop();
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => DesktopDialog(
-        maxWidth: 500,
-        maxHeight: 210,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-          child: Column(
-            children: [
-              Text(
-                "Attention!",
-                style: STextStyles.desktopH2(context),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "You're about to anonymize all of your public funds.",
-                style: STextStyles.desktopTextSmall(context),
-              ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SecondaryButton(
-                    width: 200,
-                    buttonHeight: ButtonHeight.l,
-                    label: "Cancel",
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  const SizedBox(width: 20),
-                  PrimaryButton(
-                    width: 200,
-                    buttonHeight: ButtonHeight.l,
-                    label: "Continue",
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Future<void> _attemptAnonymize() async {
-  //   final managerProvider = ref
-  //       .read(walletsChangeNotifierProvider)
-  //       .getManagerProvider(widget.walletId);
-  //
-  //   bool shouldPop = false;
-  //   unawaited(
-  //     showDialog(
-  //       context: context,
-  //       builder: (context) => WillPopScope(
-  //         child: const CustomLoadingOverlay(
-  //           message: "Anonymizing balance",
-  //           eventBus: null,
-  //         ),
-  //         onWillPop: () async => shouldPop,
-  //       ),
-  //     ),
-  //   );
-  //   final firoWallet = ref.read(managerProvider).wallet as FiroWallet;
-  //
-  //   // try {
-  //   //   await firoWallet.anonymizeAllPublicFunds();
-  //   //   shouldPop = true;
-  //   //   if (context.mounted) {
-  //   //     Navigator.of(context, rootNavigator: true).pop();
-  //   //     Navigator.of(context).popUntil(
-  //   //       ModalRoute.withName(DesktopWalletView.routeName),
-  //   //     );
-  //   //     unawaited(
-  //   //       showFloatingFlushBar(
-  //   //         type: FlushBarType.success,
-  //   //         message: "Anonymize transaction submitted",
-  //   //         context: context,
-  //   //       ),
-  //   //     );
-  //   //   }
-  //   // } catch (e) {
-  //   //   shouldPop = true;
-  //   //   if (context.mounted) {
-  //   //     Navigator.of(context, rootNavigator: true).pop();
-  //   //     Navigator.of(context).popUntil(
-  //   //       ModalRoute.withName(DesktopWalletView.routeName),
-  //   //     );
-  //   //     await showDialog<dynamic>(
-  //   //       context: context,
-  //   //       builder: (_) => DesktopDialog(
-  //   //         maxWidth: 400,
-  //   //         maxHeight: 300,
-  //   //         child: Padding(
-  //   //           padding: const EdgeInsets.all(24),
-  //   //           child: Column(
-  //   //             crossAxisAlignment: CrossAxisAlignment.start,
-  //   //             children: [
-  //   //               Text(
-  //   //                 "Anonymize all failed",
-  //   //                 style: STextStyles.desktopH3(context),
-  //   //               ),
-  //   //               const Spacer(
-  //   //                 flex: 1,
-  //   //               ),
-  //   //               Text(
-  //   //                 "Reason: $e",
-  //   //                 style: STextStyles.desktopTextSmall(context),
-  //   //               ),
-  //   //               const Spacer(
-  //   //                 flex: 2,
-  //   //               ),
-  //   //               Row(
-  //   //                 children: [
-  //   //                   const Spacer(),
-  //   //                   const SizedBox(
-  //   //                     width: 16,
-  //   //                   ),
-  //   //                   Expanded(
-  //   //                     child: PrimaryButton(
-  //   //                       label: "Ok",
-  //   //                       buttonHeight: ButtonHeight.l,
-  //   //                       onPressed:
-  //   //                           Navigator.of(context, rootNavigator: true).pop,
-  //   //                     ),
-  //   //                   ),
-  //   //                 ],
-  //   //               )
-  //   //             ],
-  //   //           ),
-  //   //         ),
-  //   //       ),
-  //   //     );
-  //   //   }
-  //   // }
-  // }
 
   Future<void> _onPaynymPressed() async {
     Navigator.of(context, rootNavigator: true).pop();
@@ -242,8 +94,7 @@ class _DesktopWalletFeaturesState extends ConsumerState<DesktopWalletFeatures> {
 
     final wallet = manager.wallet as PaynymWalletInterface;
 
-    final code =
-        await wallet.getPaymentCode(DerivePathTypeExt.primaryFor(manager.coin));
+    final code = await wallet.getPaymentCode(isSegwit: false);
 
     final account = await ref.read(paynymAPIProvider).nym(code.toString());
 
@@ -256,7 +107,9 @@ class _DesktopWalletFeaturesState extends ConsumerState<DesktopWalletFeatures> {
       Navigator.of(context, rootNavigator: true).pop();
 
       // check if account exists and for matching code to see if claimed
-      if (account.value != null && account.value!.codes.first.claimed) {
+      if (account.value != null &&
+          account.value!.nonSegwitPaymentCode.claimed &&
+          account.value!.segwit) {
         ref.read(myPaynymAccountStateProvider.state).state = account.value!;
 
         await Navigator.of(context).pushNamed(
@@ -305,19 +158,21 @@ class _DesktopWalletFeaturesState extends ConsumerState<DesktopWalletFeatures> {
           const SizedBox(
             width: 16,
           ),
-        SecondaryButton(
-          label: "More",
-          width: buttonWidth,
-          buttonHeight: ButtonHeight.l,
-          icon: SvgPicture.asset(
-            Assets.svg.bars,
-            height: 20,
-            width: 20,
-            color:
-                Theme.of(context).extension<StackColors>()!.buttonTextSecondary,
+        if (showMore)
+          SecondaryButton(
+            label: "More",
+            width: buttonWidth,
+            buttonHeight: ButtonHeight.l,
+            icon: SvgPicture.asset(
+              Assets.svg.bars,
+              height: 20,
+              width: 20,
+              color: Theme.of(context)
+                  .extension<StackColors>()!
+                  .buttonTextSecondary,
+            ),
+            onPressed: () => _onMorePressed(),
           ),
-          onPressed: () => _onMorePressed(),
-        ),
       ],
     );
   }

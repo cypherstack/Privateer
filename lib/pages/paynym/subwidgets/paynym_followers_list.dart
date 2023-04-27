@@ -75,7 +75,7 @@ class _PaynymFollowersListState extends ConsumerState<PaynymFollowersList> {
 
             // get payment code
             final pCode = await wallet.getPaymentCode(
-              DerivePathTypeExt.primaryFor(manager.coin),
+              isSegwit: false,
             );
 
             // get account from api

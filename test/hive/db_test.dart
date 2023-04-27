@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_test/hive_test.dart';
-import 'package:stackwallet/hive/db.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 void main() {
   group("DB box names", () {

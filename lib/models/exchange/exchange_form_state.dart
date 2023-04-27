@@ -325,28 +325,28 @@ class ExchangeFormState extends ChangeNotifier {
     required bool shouldNotifyListeners,
   }) async {
     try {
-      // switch (exchange.name) {
-      //   case ChangeNowExchange.exchangeName:
-      //     if (!_exchangeSupported(
-      //       exchangeName: exchange.name,
-      //       sendCurrency: sendCurrency,
-      //       receiveCurrency: receiveCurrency,
-      //       exchangeRateType: exchangeRateType,
-      //     )) {
-      //       _exchange = MajesticBankExchange.instance;
-      //     }
-      //     break;
-      //   case MajesticBankExchange.exchangeName:
-      //     if (!_exchangeSupported(
-      //       exchangeName: exchange.name,
-      //       sendCurrency: sendCurrency,
-      //       receiveCurrency: receiveCurrency,
-      //       exchangeRateType: exchangeRateType,
-      //     )) {
-      //       _exchange = ChangeNowExchange.instance;
-      //     }
-      //     break;
-      // }
+      switch (exchange.name) {
+        case ChangeNowExchange.exchangeName:
+          if (!_exchangeSupported(
+            exchangeName: exchange.name,
+            sendCurrency: sendCurrency,
+            receiveCurrency: receiveCurrency,
+            exchangeRateType: exchangeRateType,
+          )) {
+            _exchange = MajesticBankExchange.instance;
+          }
+          break;
+        case MajesticBankExchange.exchangeName:
+          if (!_exchangeSupported(
+            exchangeName: exchange.name,
+            sendCurrency: sendCurrency,
+            receiveCurrency: receiveCurrency,
+            exchangeRateType: exchangeRateType,
+          )) {
+            _exchange = ChangeNowExchange.instance;
+          }
+          break;
+      }
 
       await _updateRanges(shouldNotifyListeners: false);
       await _updateEstimate(shouldNotifyListeners: false);
