@@ -2,24 +2,24 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/exceptions/exchange/pair_unavailable_exception.dart';
-import 'package:stackduo/models/exchange/aggregate_currency.dart';
-import 'package:stackduo/models/exchange/response_objects/estimate.dart';
-import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
-import 'package:stackduo/services/exchange/exchange_response.dart';
-import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
-import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/logger.dart';
-import 'package:stackduo/utilities/show_loading.dart';
-import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/utilities/util.dart';
-import 'package:stackduo/widgets/animated_text.dart';
-import 'package:stackduo/widgets/conditional_parent.dart';
-import 'package:stackduo/widgets/rounded_white_container.dart';
+import 'package:stackwallet/exceptions/exchange/pair_unavailable_exception.dart';
+import 'package:stackwallet/models/exchange/aggregate_currency.dart';
+import 'package:stackwallet/models/exchange/response_objects/estimate.dart';
+import 'package:stackwallet/providers/providers.dart';
+import 'package:stackwallet/services/exchange/change_now/change_now_exchange.dart';
+import 'package:stackwallet/services/exchange/exchange_response.dart';
+import 'package:stackwallet/services/exchange/majestic_bank/majestic_bank_exchange.dart';
+import 'package:stackwallet/utilities/amount/amount.dart';
+import 'package:stackwallet/utilities/assets.dart';
+import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackwallet/utilities/logger.dart';
+import 'package:stackwallet/utilities/show_loading.dart';
+import 'package:stackwallet/utilities/text_styles.dart';
+import 'package:stackwallet/utilities/theme/stack_colors.dart';
+import 'package:stackwallet/utilities/util.dart';
+import 'package:stackwallet/widgets/animated_text.dart';
+import 'package:stackwallet/widgets/conditional_parent.dart';
+import 'package:stackwallet/widgets/rounded_white_container.dart';
 
 class ExchangeProviderOptions extends ConsumerStatefulWidget {
   const ExchangeProviderOptions({
@@ -73,6 +73,11 @@ class _ExchangeProviderOptionsState
     );
     final showMajesticBank = exchangeSupported(
       exchangeName: MajesticBankExchange.exchangeName,
+      sendCurrency: sendCurrency,
+      receiveCurrency: receivingCurrency,
+    );
+    final showTrocador = exchangeSupported(
+      exchangeName: TrocadorExchange.exchangeName,
       sendCurrency: sendCurrency,
       receiveCurrency: receivingCurrency,
     );
@@ -216,7 +221,7 @@ class _ExchangeProviderOptionsState
                                           rate = (toAmount /
                                                   estimate.estimatedAmount)
                                               .toDecimal(
-                                                  scaleOnInfinitePrecision: 12)
+                                                  scaleOnInfinitePrecision: 18)
                                               .toAmount(
                                                   fractionDigits:
                                                       coin.decimals);
@@ -224,7 +229,7 @@ class _ExchangeProviderOptionsState
                                           rate = (estimate.estimatedAmount /
                                                   fromAmount)
                                               .toDecimal(
-                                                  scaleOnInfinitePrecision: 12)
+                                                  scaleOnInfinitePrecision: 18)
                                               .toAmount(
                                                   fractionDigits:
                                                       coin.decimals);
@@ -461,7 +466,7 @@ class _ExchangeProviderOptionsState
                                           rate = (toAmount /
                                                   estimate.estimatedAmount)
                                               .toDecimal(
-                                                  scaleOnInfinitePrecision: 12)
+                                                  scaleOnInfinitePrecision: 18)
                                               .toAmount(
                                                 fractionDigits: coin.decimals,
                                               );
@@ -469,7 +474,7 @@ class _ExchangeProviderOptionsState
                                           rate = (estimate.estimatedAmount /
                                                   fromAmount)
                                               .toDecimal(
-                                                  scaleOnInfinitePrecision: 12)
+                                                  scaleOnInfinitePrecision: 18)
                                               .toAmount(
                                                 fractionDigits: coin.decimals,
                                               );
@@ -505,7 +510,250 @@ class _ExchangeProviderOptionsState
                                         );
                                       } else {
                                         Logging.instance.log(
-                                          "$runtimeType failed to fetch rate for ChangeNOW: ${snapshot.data}",
+                                          "$runtimeType failed to fetch rate for Majestic Bank: ${snapshot.data}",
+                                          level: LogLevel.Warning,
+                                        );
+                                        return Text(
+                                          "Failed to fetch rate",
+                                          style: STextStyles.itemSubtitle12(
+                                                  context)
+                                              .copyWith(
+                                            color: Theme.of(context)
+                                                .extension<StackColors>()!
+                                                .textSubtitle1,
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      return AnimatedText(
+                                        stringsToLoopThrough: const [
+                                          "Loading",
+                                          "Loading.",
+                                          "Loading..",
+                                          "Loading...",
+                                        ],
+                                        style:
+                                            STextStyles.itemSubtitle12(context)
+                                                .copyWith(
+                                          color: Theme.of(context)
+                                              .extension<StackColors>()!
+                                              .textSubtitle1,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              if (!(sendCurrency != null &&
+                                  receivingCurrency != null &&
+                                  toAmount != null &&
+                                  toAmount > Decimal.zero &&
+                                  fromAmount != null &&
+                                  fromAmount > Decimal.zero))
+                                Text(
+                                  "n/a",
+                                  style: STextStyles.itemSubtitle12(context)
+                                      .copyWith(
+                                    color: Theme.of(context)
+                                        .extension<StackColors>()!
+                                        .textSubtitle1,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if ((showChangeNow || showMajesticBank) && showTrocador)
+            isDesktop
+                ? Container(
+                    height: 1,
+                    color:
+                        Theme.of(context).extension<StackColors>()!.background,
+                  )
+                : const SizedBox(
+                    height: 16,
+                  ),
+
+          if (showTrocador)
+            ConditionalParent(
+              condition: isDesktop,
+              builder: (child) => MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: child,
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  if (ref.read(exchangeFormStateProvider).exchange.name !=
+                      TrocadorExchange.exchangeName) {
+                    showLoading(
+                      whileFuture:
+                          ref.read(exchangeFormStateProvider).updateExchange(
+                                exchange: TrocadorExchange.instance,
+                                shouldUpdateData: true,
+                                shouldNotifyListeners: true,
+                              ),
+                      context: context,
+                      isDesktop: isDesktop,
+                      message: "Updating rates",
+                    );
+                  }
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: Padding(
+                    padding: isDesktop
+                        ? const EdgeInsets.all(16)
+                        : const EdgeInsets.all(0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Padding(
+                            padding:
+                                EdgeInsets.only(top: isDesktop ? 20.0 : 15.0),
+                            child: Radio(
+                              activeColor: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .radioButtonIconEnabled,
+                              value: TrocadorExchange.exchangeName,
+                              groupValue: ref.watch(exchangeFormStateProvider
+                                  .select((value) => value.exchange.name)),
+                              onChanged: (_) {
+                                if (ref
+                                        .read(exchangeFormStateProvider)
+                                        .exchange
+                                        .name !=
+                                    TrocadorExchange.exchangeName) {
+                                  ref
+                                      .read(exchangeFormStateProvider)
+                                      .updateExchange(
+                                        exchange: TrocadorExchange.instance,
+                                        shouldUpdateData: true,
+                                        shouldNotifyListeners: true,
+                                      );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 14,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0),
+                          child: SizedBox(
+                            width: isDesktop ? 32 : 24,
+                            height: isDesktop ? 32 : 24,
+                            child: SvgPicture.asset(
+                              Assets.exchange.majesticBankBlue,
+                              width: isDesktop ? 32 : 24,
+                              height: isDesktop ? 32 : 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                TrocadorExchange.exchangeName,
+                                style:
+                                    STextStyles.titleBold12(context).copyWith(
+                                  color: Theme.of(context)
+                                      .extension<StackColors>()!
+                                      .textDark2,
+                                ),
+                              ),
+                              if (sendCurrency != null &&
+                                  receivingCurrency != null &&
+                                  toAmount != null &&
+                                  toAmount > Decimal.zero &&
+                                  fromAmount != null &&
+                                  fromAmount > Decimal.zero)
+                                FutureBuilder(
+                                  future: TrocadorExchange.instance.getEstimate(
+                                    sendCurrency.ticker,
+                                    receivingCurrency.ticker,
+                                    widget.reversed ? toAmount : fromAmount,
+                                    widget.fixedRate,
+                                    widget.reversed,
+                                  ),
+                                  builder: (context,
+                                      AsyncSnapshot<ExchangeResponse<Estimate>>
+                                          snapshot) {
+                                    if (snapshot.connectionState ==
+                                            ConnectionState.done &&
+                                        snapshot.hasData) {
+                                      final estimate = snapshot.data?.value;
+                                      if (estimate != null) {
+                                        Coin coin;
+                                        try {
+                                          coin = coinFromTickerCaseInsensitive(
+                                              receivingCurrency.ticker);
+                                        } catch (_) {
+                                          coin = Coin.bitcoin;
+                                        }
+                                        Amount rate;
+                                        if (estimate.reversed) {
+                                          rate = (toAmount /
+                                                  estimate.estimatedAmount)
+                                              .toDecimal(
+                                                  scaleOnInfinitePrecision: 18)
+                                              .toAmount(
+                                                fractionDigits: coin.decimals,
+                                              );
+                                        } else {
+                                          rate = (estimate.estimatedAmount /
+                                                  fromAmount)
+                                              .toDecimal(
+                                                  scaleOnInfinitePrecision: 18)
+                                              .toAmount(
+                                                fractionDigits: coin.decimals,
+                                              );
+                                        }
+
+                                        return Text(
+                                          "1 ${sendCurrency.ticker.toUpperCase()} ~ ${rate.localizedStringAsFixed(
+                                            locale: ref.watch(
+                                              localeServiceChangeNotifierProvider
+                                                  .select(
+                                                      (value) => value.locale),
+                                            ),
+                                          )} ${receivingCurrency.ticker.toUpperCase()}",
+                                          style: STextStyles.itemSubtitle12(
+                                                  context)
+                                              .copyWith(
+                                            color: Theme.of(context)
+                                                .extension<StackColors>()!
+                                                .textSubtitle1,
+                                          ),
+                                        );
+                                      } else if (snapshot.data?.exception
+                                          is PairUnavailableException) {
+                                        return Text(
+                                          "Unsupported pair",
+                                          style: STextStyles.itemSubtitle12(
+                                                  context)
+                                              .copyWith(
+                                            color: Theme.of(context)
+                                                .extension<StackColors>()!
+                                                .textSubtitle1,
+                                          ),
+                                        );
+                                      } else {
+                                        Logging.instance.log(
+                                          "$runtimeType failed to fetch rate for Trocador: ${snapshot.data}",
                                           level: LogLevel.Warning,
                                         );
                                         return Text(
