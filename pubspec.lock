@@ -379,6 +379,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  cw_wownero:
+    dependency: transitive
+    description:
+      path: "crypto_plugins/flutter_libmonero/cw_wownero"
+      relative: true
+    source: path
+    version: "0.0.1"
   dart_base_x:
     dependency: transitive
     description:

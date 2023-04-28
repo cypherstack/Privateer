@@ -1,7 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
-import 'package:stackduo/models/exchange/response_objects/trade.dart';
-import 'package:stackduo/utilities/enums/exchange_rate_type_enum.dart';
+import 'package:stackwallet/models/exchange/response_objects/trade.dart';
+import 'package:stackwallet/utilities/enums/exchange_rate_type_enum.dart';
 
 class IncompleteExchangeModel extends ChangeNotifier {
   final String sendTicker;
@@ -39,13 +39,13 @@ class IncompleteExchangeModel extends ChangeNotifier {
     }
   }
 
-  String? _rateId;
+  Estimate? _estimate;
 
-  String? get rateId => _rateId;
+  Estimate? get estimate => _estimate;
 
-  set rateId(String? rateId) {
-    if (_rateId != rateId) {
-      _rateId = rateId;
+  set estimate(Estimate? estimate) {
+    if (_estimate != estimate) {
+      _estimate = estimate;
       notifyListeners();
     }
   }
@@ -70,6 +70,6 @@ class IncompleteExchangeModel extends ChangeNotifier {
     required this.rateType,
     required this.reversed,
     required this.walletInitiated,
-    String? rateId,
-  }) : _rateId = rateId;
+    Estimate? estimate,
+  }) : _estimate = estimate;
 }

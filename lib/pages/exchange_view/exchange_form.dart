@@ -543,7 +543,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
           ? ref.read(exchangeFormStateProvider).receiveAmount!
           : estimate.estimatedAmount,
       rateType: rateType,
-      rateId: estimate.rateId,
+      estimate: estimate,
       reversed: estimate.reversed,
       walletInitiated: walletInitiated,
     );
