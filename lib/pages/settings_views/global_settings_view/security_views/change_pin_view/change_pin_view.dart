@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/security_views/security_view.dart';
+import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/providers/global/secure_store_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
-import 'package:stackduo/utilities/enums/flush_bar_type.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
@@ -123,6 +123,8 @@ class _ChangePinViewState extends ConsumerState<ChangePinView> {
                           .background,
                       counterText: "",
                     ),
+                    isRandom:
+                        ref.read(prefsChangeNotifierProvider).randomizePIN,
                     submittedFieldDecoration: _pinPutDecoration.copyWith(
                       color: Theme.of(context)
                           .extension<StackColors>()!
@@ -188,6 +190,8 @@ class _ChangePinViewState extends ConsumerState<ChangePinView> {
                           .background,
                       counterText: "",
                     ),
+                    isRandom:
+                        ref.read(prefsChangeNotifierProvider).randomizePIN,
                     submittedFieldDecoration: _pinPutDecoration.copyWith(
                       color: Theme.of(context)
                           .extension<StackColors>()!
