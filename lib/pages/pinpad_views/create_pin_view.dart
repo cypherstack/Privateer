@@ -9,7 +9,6 @@ import 'package:stackduo/providers/global/secure_store_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/biometrics.dart';
 import 'package:stackduo/utilities/constants.dart';
-import 'package:stackduo/utilities/enums/flush_bar_type.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
@@ -139,6 +138,8 @@ class _CreatePinViewState extends ConsumerState<CreatePinView> {
                           .background,
                       counterText: "",
                     ),
+                    isRandom:
+                        ref.read(prefsChangeNotifierProvider).randomizePIN,
                     submittedFieldDecoration: _pinPutDecoration.copyWith(
                       color: Theme.of(context)
                           .extension<StackColors>()!
@@ -221,6 +222,8 @@ class _CreatePinViewState extends ConsumerState<CreatePinView> {
                     ),
                     selectedFieldDecoration: _pinPutDecoration,
                     followingFieldDecoration: _pinPutDecoration,
+                    isRandom:
+                        ref.read(prefsChangeNotifierProvider).randomizePIN,
                     onSubmit: (String pin) async {
                       // _onSubmitCount++;
                       // if (_onSubmitCount - _onSubmitFailCount > 1) return;
