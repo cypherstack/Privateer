@@ -62,6 +62,22 @@ class _EXCHANGE {
   String get majesticBankBlue => "${_path}mb_blue.svg";
   String get majesticBankGreen => "${_path}mb_green.svg";
   String get trocador => "${_path}trocador.svg";
+
+  String getIconFor({required String exchangeName}) {
+    switch (exchangeName) {
+      case SimpleSwapExchange.exchangeName:
+        return simpleSwap;
+      case ChangeNowExchange.exchangeName:
+        return changeNow;
+      case MajesticBankExchange.exchangeName:
+        return majesticBankBlue;
+      case TrocadorExchange.exchangeName:
+        return trocador;
+      default:
+        throw ArgumentError("Invalid exchange name passed to "
+            "Assets.exchange.getIconFor()");
+    }
+  }
 }
 
 class _COIN_CONTROL {

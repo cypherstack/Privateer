@@ -127,7 +127,7 @@ class ChangeNowExchange extends Exchange {
   }
 
   @override
-  Future<ExchangeResponse<Estimate>> getEstimate(
+  Future<ExchangeResponse<List<Estimate>>> getEstimates(
     String from,
     String to,
     Decimal amount,
@@ -150,7 +150,10 @@ class ChangeNowExchange extends Exchange {
         fromAmount: amount,
       );
     }
-    return response;
+    return ExchangeResponse(
+      value: response.value == null ? null : [response.value!],
+      exception: response.exception,
+    );
   }
 
   @override
