@@ -271,13 +271,6 @@ class _DesktopTradeHistoryState extends ConsumerState<DesktopTradeHistory> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Recent trades",
-            style: STextStyles.desktopTextExtraExtraSmall(context),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
           RoundedWhiteContainer(
             child: Center(
               child: Text(
