@@ -72,11 +72,9 @@ import 'package:stackduo/models/exchange/exchange_form_state.dart';
 
 final efCanExchangeProvider = StateProvider<bool>((ref) {
   final Estimate? estimate = ref.watch(efEstimateProvider);
-  // final Decimal? amount = ref.watch(efReversedProvider)
-  //     ? ref.watch(efSendAmountProvider)
-  //     : ref.watch(efReceiveAmountProvider);
+  final refreshing = ref.watch(efRefreshingProvider);
 
-  return estimate != null;
+  return !refreshing && estimate != null;
 });
 
 final efRefreshingProvider = StateProvider<bool>((ref) => false);
