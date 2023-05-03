@@ -263,6 +263,7 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
                           height: 52,
                         ),
                         CustomPinPut(
+                          // I don't know why is this commented out so I am not wrapping it with Semantics
                           // customKey: CustomKey(
                           //   onPressed: _checkUseBiometrics,
                           //   iconAssetName: Platform.isIOS

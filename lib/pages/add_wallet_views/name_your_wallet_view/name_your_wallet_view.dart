@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
@@ -238,14 +237,22 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                         TextFieldIconButton(
                           key: const Key("genRandomWalletNameButtonKey"),
                           child: _showDiceIcon
-                              ? DiceIcon(
+                              ? Semantics(
+                                label: "Generate Random Wallet Name Button. Generates A Random Name For Wallet.",
+                                excludeSemantics: true,
+                                child: DiceIcon(
                                   width: isDesktop ? 20 : 17,
                                   height: isDesktop ? 20 : 17,
-                                )
-                              : XIcon(
+                              ),
+                            )
+                              : Semantics(
+                                label: "Generate Random Wallet Name Button. Generates A Random Name For Wallet.",
+                                excludeSemantics: true,
+                                child: XIcon(
                                   width: isDesktop ? 21 : 18,
                                   height: isDesktop ? 21 : 18,
-                                ),
+                              ),
+                            ),
                           onTap: () async {
                             if (_showDiceIcon) {
                               textEditingController.text =

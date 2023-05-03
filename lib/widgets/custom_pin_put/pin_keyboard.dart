@@ -141,13 +141,17 @@ class _BackspaceKeyState extends State<BackspaceKey> {
             }
           });
         },
-        child: Center(
-          child: SvgPicture.asset(
+        child: Semantics(
+          label: "Backspace Button. Deletes The Last Digit.",
+          excludeSemantics: true,
+          child: Center(
+            child: SvgPicture.asset(
             Assets.svg.delete,
-            width: 20,
-            height: 20,
-            color:
-                Theme.of(context).extension<StackColors>()!.numpadTextDefault,
+              width: 20,
+              height: 20,
+              color:
+              Theme.of(context).extension<StackColors>()!.numpadTextDefault,
+            ),
           ),
         ),
       ),
