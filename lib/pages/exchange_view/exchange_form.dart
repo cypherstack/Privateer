@@ -589,7 +589,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
   }
 
   Future<void> update() async {
-    ref.read(efRefreshingProvider.notifier).state = true;
+    _addUpdate();
     for (final exchange in exchanges) {
       ref.read(efEstimatesListProvider(exchange.name).notifier).state = null;
     }
@@ -604,7 +604,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
         amount <= Decimal.zero ||
         pair.send == null ||
         pair.receive == null) {
-      ref.read(efRefreshingProvider.notifier).state = false;
+      _removeUpdate();
       return;
     }
     final rateType = ref.read(efRateTypeProvider);
@@ -644,18 +644,36 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
           );
         }
 
-        if (estimateResponse.value != null &&
-            rangeResponse.value != null &&
-            mounted) {
-          ref.read(efEstimatesListProvider(exchange.name).notifier).state =
-              Tuple2(estimateResponse.value!, rangeResponse.value!);
+        if (mounted) {
+          if (estimateResponse.value != null && rangeResponse.value != null) {
+            ref.read(efEstimatesListProvider(exchange.name).notifier).state =
+                Tuple2(estimateResponse.value!, rangeResponse.value!);
+          } else {
+            ref.read(efEstimatesListProvider(exchange.name).notifier).state =
+                null;
+          }
         }
       }
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    _removeUpdate();
+    // });
+  }
+
+  int _updateCount = 0;
+
+  void _addUpdate() {
+    _updateCount++;
+    ref.read(efRefreshingProvider.notifier).state = true;
+  }
+
+  void _removeUpdate() {
+    _updateCount--;
+    if (_updateCount <= 0) {
+      _updateCount = 0;
       ref.read(efRefreshingProvider.notifier).state = false;
-    });
+    }
   }
 
   void updateSend(Estimate? estimate) {
