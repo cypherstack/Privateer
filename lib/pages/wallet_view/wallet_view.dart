@@ -47,6 +47,7 @@ import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
+import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/loading_indicator.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/icons/coin_control_nav_icon.dart';

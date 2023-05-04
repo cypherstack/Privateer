@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/models/exchange/aggregate_currency.dart';
 import 'package:stackduo/models/exchange/incomplete_exchange.dart';
+import 'package:stackduo/models/exchange/response_objects/estimate.dart';
+import 'package:stackduo/models/exchange/response_objects/range.dart';
 import 'package:stackduo/models/isar/exchange_cache/currency.dart';
 import 'package:stackduo/models/isar/exchange_cache/pair.dart';
 import 'package:stackduo/pages/exchange_view/exchange_coin_selection/exchange_currency_selection_view.dart';
@@ -20,6 +22,9 @@ import 'package:stackduo/pages_desktop_specific/desktop_exchange/exchange_steps/
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
+import 'package:stackduo/services/exchange/exchange_response.dart';
+import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
+import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -39,8 +44,6 @@ import 'package:stackduo/widgets/stack_dialog.dart';
 import 'package:stackduo/widgets/textfields/exchange_textfield.dart';
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../services/exchange/exchange_response.dart';
 
 class ExchangeForm extends ConsumerStatefulWidget {
   const ExchangeForm({

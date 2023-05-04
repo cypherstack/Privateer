@@ -1,11 +1,11 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackwallet/models/exchange/active_pair.dart';
-import 'package:stackwallet/models/exchange/response_objects/estimate.dart';
-import 'package:stackwallet/models/exchange/response_objects/range.dart';
-import 'package:stackwallet/services/exchange/exchange.dart';
-import 'package:stackwallet/services/exchange/exchange_response.dart';
-import 'package:stackwallet/utilities/enums/exchange_rate_type_enum.dart';
+import 'package:stackduo/models/exchange/active_pair.dart';
+import 'package:stackduo/models/exchange/response_objects/estimate.dart';
+import 'package:stackduo/models/exchange/response_objects/range.dart';
+import 'package:stackduo/services/exchange/exchange.dart';
+import 'package:stackduo/services/exchange/exchange_response.dart';
+import 'package:stackduo/utilities/enums/exchange_rate_type_enum.dart';
 import 'package:tuple/tuple.dart';
 
 final efEstimatesListProvider = StateProvider.family<
@@ -59,7 +59,6 @@ final efEstimateProvider = StateProvider<Estimate?>((ref) {
   final provider = ref.watch(efExchangeProviderNameProvider);
   final reversed = ref.watch(efReversedProvider);
   final fixedRate = ref.watch(efRateTypeProvider) == ExchangeRateType.fixed;
-import 'package:stackduo/models/exchange/exchange_form_state.dart';
 
   final matches = ref
       .watch(efEstimatesListProvider(exchange.name))

@@ -1,5 +1,5 @@
-name: stackwallet
-description: Stack Wallet
+name: stackduo
+description: Stack Duo
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -11,7 +11,7 @@ description: Stack Wallet
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.7.4+164
+version: 1.0.5+8
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -23,23 +23,16 @@ dependencies:
   mutex: ^3.0.0
   websocket_universal: ^0.5.1
 
-  lelantus:
-    path: ./crypto_plugins/flutter_liblelantus
-
   flutter_libmonero:
     path: ./crypto_plugins/flutter_libmonero
 
   cw_monero:
     path: ./crypto_plugins/flutter_libmonero/cw_monero
 
-  cw_wownero:
-    path: ./crypto_plugins/flutter_libmonero/cw_wownero
 
   cw_core:
     path: ./crypto_plugins/flutter_libmonero/cw_core
 
-  flutter_libepiccash:
-    path: ./crypto_plugins/flutter_libepiccash
 
 #  firo_flutter:
 #    git:
@@ -94,11 +87,6 @@ dependencies:
       ref: 22279d4bb24ed541b431acd269a1bc50af0f36a0
   bs58check: ^1.0.2
 
-  # Eth Plugins
-  web3dart: 2.3.5
-  string_to_hex: 0.2.2
-  ethereum_addresses: 1.0.2
-
   # Storage plugins
   flutter_secure_storage: ^5.0.2
   hive: ^2.0.5
@@ -147,6 +135,7 @@ dependencies:
   string_validator: ^0.3.0
   equatable: ^2.0.5
   async: ^2.10.0
+  flutter_windowmanager: ^0.2.0
   dart_bs58: ^1.0.1
   dart_bs58check: ^3.0.2
   hex: ^0.2.0
@@ -174,7 +163,7 @@ flutter_icons:
   android: true
   ios: true
   image_path: assets/icon/icon.png
-  image_path_android: assets/icon/app_icon_alpha.png
+  image_path_android: assets/icon/icon.png
   image_path_ios: assets/icon/icon.png
   remove_alpha_ios: true
   windows:
@@ -310,8 +299,6 @@ flutter:
     - assets/svg/plus-circle.svg
     - assets/svg/circle-plus-filled.svg
     - assets/svg/configuration.svg
-    - assets/svg/tokens.svg
-    - assets/svg/circle-plus.svg
     - assets/svg/robot-head.svg
     - assets/svg/whirlpool.svg
     - assets/svg/fingerprint.svg
@@ -326,10 +313,6 @@ flutter:
     - assets/svg/framed-address-book.svg
     - assets/svg/framed-gear.svg
     - assets/svg/list-ul.svg
-    - assets/svg/trocador_rating_a.svg
-    - assets/svg/trocador_rating_b.svg
-    - assets/svg/trocador_rating_c.svg
-    - assets/svg/trocador_rating_d.svg
 
 
     # coin icons
@@ -376,8 +359,6 @@ flutter:
     # orange theme specific
     - assets/svg/themed/orange/
 
-    # buy
-    - assets/svg/buy/
 
 
     # lottie animations
@@ -392,16 +373,7 @@ flutter:
 
     # coin gifs
     - assets/gif/coins/bitcoin/
-    - assets/gif/coins/bitcoincash/
-    - assets/gif/coins/dogecoin/
-    - assets/gif/coins/epicCash/
-    - assets/gif/coins/ethereum/
-    - assets/gif/coins/firo/
-    - assets/gif/coins/litecoin/
     - assets/gif/coins/monero/
-    - assets/gif/coins/namecoin/
-    - assets/gif/coins/particl/
-    - assets/gif/coins/wownero/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

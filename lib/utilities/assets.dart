@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
+import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
+import 'package:stackduo/services/exchange/simpleswap/simpleswap_exchange.dart';
+import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/theme/color_theme.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';

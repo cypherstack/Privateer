@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:stackwallet/models/exchange/aggregate_currency.dart';
+import 'package:stackduo/models/exchange/aggregate_currency.dart';
 
 class ActivePair extends ChangeNotifier {
   AggregateCurrency? _send;

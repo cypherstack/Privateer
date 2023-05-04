@@ -1,27 +1,14 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:stackwallet/exceptions/exchange/pair_unavailable_exception.dart';
-import 'package:stackwallet/models/exchange/aggregate_currency.dart';
-import 'package:stackwallet/models/exchange/response_objects/estimate.dart';
-import 'package:stackwallet/providers/providers.dart';
-import 'package:stackwallet/services/exchange/change_now/change_now_exchange.dart';
-import 'package:stackwallet/services/exchange/exchange_response.dart';
-import 'package:stackwallet/services/exchange/majestic_bank/majestic_bank_exchange.dart';
-import 'package:stackwallet/utilities/amount/amount.dart';
-import 'package:stackwallet/utilities/assets.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
-import 'package:stackwallet/utilities/logger.dart';
-import 'package:stackwallet/utilities/show_loading.dart';
-import 'package:stackwallet/utilities/text_styles.dart';
-import 'package:stackwallet/utilities/theme/stack_colors.dart';
-import 'package:stackwallet/utilities/util.dart';
-import 'package:stackwallet/widgets/animated_text.dart';
-import 'package:stackwallet/widgets/conditional_parent.dart';
-import 'package:stackwallet/widgets/exchange/trocador/trocador_kyc_info_button.dart';
-import 'package:stackwallet/widgets/exchange/trocador/trocador_rating_type_enum.dart';
-import 'package:stackwallet/widgets/rounded_white_container.dart';
+import 'package:stackduo/models/exchange/aggregate_currency.dart';
+import 'package:stackduo/pages/exchange_view/sub_widgets/exchange_provider_option.dart';
+import 'package:stackduo/providers/providers.dart';
+import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
+import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
+import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
+import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/utilities/util.dart';
+import 'package:stackduo/widgets/rounded_white_container.dart';
 
 class ExchangeProviderOptions extends ConsumerStatefulWidget {
   const ExchangeProviderOptions({

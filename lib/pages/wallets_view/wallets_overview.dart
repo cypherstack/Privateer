@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackduo/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/utilities/assets.dart';
@@ -169,7 +170,7 @@ class _EthWalletsOverviewState extends ConsumerState<WalletsOverview> {
                   onPressed: () {
                     Navigator.of(context).pushNamed(
                       CreateOrRestoreWalletView.routeName,
-                      arguments: CoinEntity(widget.coin),
+                      arguments: widget.coin,
                     );
                   },
                 ),

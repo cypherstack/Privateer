@@ -20,6 +20,7 @@ import 'package:stackduo/services/event_bus/global_event_bus.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/backup_frequency_type.dart';
+import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -27,11 +28,13 @@ import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
+import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
+import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_scaffold.dart';
+import 'package:stackduo/widgets/desktop/primary_button.dart';
+import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/hover_text_field.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
-
-import '../../../utilities/text_styles.dart';
 
 /// [eventBus] should only be set during testing
 class DesktopWalletView extends ConsumerStatefulWidget {

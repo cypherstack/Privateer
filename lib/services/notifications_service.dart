@@ -8,7 +8,6 @@ import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/notification_model.dart';
 import 'package:stackduo/services/exchange/exchange.dart';
 import 'package:stackduo/services/exchange/exchange_response.dart';
-import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/node_service.dart';
 import 'package:stackduo/services/notifications_api.dart';
 import 'package:stackduo/services/trade_service.dart';
