@@ -4,12 +4,13 @@ import 'package:stackwallet/models/exchange/active_pair.dart';
 import 'package:stackwallet/models/exchange/response_objects/estimate.dart';
 import 'package:stackwallet/models/exchange/response_objects/range.dart';
 import 'package:stackwallet/services/exchange/exchange.dart';
+import 'package:stackwallet/services/exchange/exchange_response.dart';
 import 'package:stackwallet/utilities/enums/exchange_rate_type_enum.dart';
 import 'package:tuple/tuple.dart';
 
-final efEstimatesListProvider =
-    StateProvider.family<Tuple2<List<Estimate>, Range>?, String>(
-        (ref, exchangeName) => null);
+final efEstimatesListProvider = StateProvider.family<
+    Tuple2<ExchangeResponse<List<Estimate>>, Range?>?,
+    String>((ref, exchangeName) => null);
 
 final efRateTypeProvider =
     StateProvider<ExchangeRateType>((ref) => ExchangeRateType.estimated);
@@ -53,11 +54,6 @@ final efCurrencyPairProvider = ChangeNotifierProvider<ActivePair>(
   (ref) => ActivePair(),
 );
 
-final efRangeProvider = StateProvider<Range?>((ref) {
-  final exchange = ref.watch(efExchangeProvider);
-  return ref.watch(efEstimatesListProvider(exchange.name))?.item2;
-});
-
 final efEstimateProvider = StateProvider<Estimate?>((ref) {
   final exchange = ref.watch(efExchangeProvider);
   final provider = ref.watch(efExchangeProviderNameProvider);
@@ -65,8 +61,11 @@ final efEstimateProvider = StateProvider<Estimate?>((ref) {
   final fixedRate = ref.watch(efRateTypeProvider) == ExchangeRateType.fixed;
 import 'package:stackduo/models/exchange/exchange_form_state.dart';
 
-  final matches =
-      ref.watch(efEstimatesListProvider(exchange.name))?.item1.where((e) {
+  final matches = ref
+      .watch(efEstimatesListProvider(exchange.name))
+      ?.item1
+      .value
+      ?.where((e) {
     return e.exchangeProvider == provider &&
         e.fixedRate == fixedRate &&
         e.reversed == reversed;

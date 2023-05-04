@@ -38,6 +38,9 @@ import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
 import 'package:stackduo/widgets/textfields/exchange_textfield.dart';
 import 'package:tuple/tuple.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../services/exchange/exchange_response.dart';
 
 class ExchangeForm extends ConsumerStatefulWidget {
   const ExchangeForm({
@@ -589,7 +592,9 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
   }
 
   Future<void> update() async {
-    _addUpdate();
+    final uuid = const Uuid().v1();
+    _latestUuid = uuid;
+    _addUpdate(uuid);
     for (final exchange in exchanges) {
       ref.read(efEstimatesListProvider(exchange.name).notifier).state = null;
     }
@@ -604,10 +609,12 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
         amount <= Decimal.zero ||
         pair.send == null ||
         pair.receive == null) {
-      _removeUpdate();
+      _removeUpdate(uuid);
       return;
     }
     final rateType = ref.read(efRateTypeProvider);
+    final Map<String, Tuple2<ExchangeResponse<List<Estimate>>, Range?>>
+        results = {};
 
     for (final exchange in exchanges) {
       final sendCurrency = pair.send?.forExchange(exchange.name);
@@ -620,14 +627,6 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
           rateType == ExchangeRateType.fixed,
         );
 
-        if (rangeResponse.value == null) {
-          Logging.instance.log(
-            "Tried to $runtimeType.update Range for:"
-            " $exchange where response: $rangeResponse",
-            level: LogLevel.Info,
-          );
-        }
-
         final estimateResponse = await exchange.getEstimates(
           sendCurrency.ticker,
           receiveCurrency.ticker,
@@ -636,43 +635,41 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
           reversed,
         );
 
-        if (estimateResponse.value == null) {
-          Logging.instance.log(
-            "Tried to $runtimeType._fetchEstimateAndRange Estimate for:"
-            " $exchange where response: $estimateResponse",
-            level: LogLevel.Info,
-          );
-        }
-
-        if (mounted) {
-          if (estimateResponse.value != null && rangeResponse.value != null) {
-            ref.read(efEstimatesListProvider(exchange.name).notifier).state =
-                Tuple2(estimateResponse.value!, rangeResponse.value!);
-          } else {
-            ref.read(efEstimatesListProvider(exchange.name).notifier).state =
-                null;
-          }
-        }
+        results.addAll(
+          {
+            exchange.name: Tuple2(
+              estimateResponse,
+              rangeResponse.value,
+            ),
+          },
+        );
       }
     }
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    _removeUpdate();
-    // });
+    for (final exchange in exchanges) {
+      if (uuid == _latestUuid) {
+        ref.read(efEstimatesListProvider(exchange.name).notifier).state =
+            results[exchange.name];
+      }
+    }
+
+    _removeUpdate(uuid);
   }
 
-  int _updateCount = 0;
+  String? _latestUuid;
+  final Set<String> _uuids = {};
 
-  void _addUpdate() {
-    _updateCount++;
+  void _addUpdate(String uuid) {
+    _uuids.add(uuid);
     ref.read(efRefreshingProvider.notifier).state = true;
   }
 
-  void _removeUpdate() {
-    _updateCount--;
-    if (_updateCount <= 0) {
-      _updateCount = 0;
-      ref.read(efRefreshingProvider.notifier).state = false;
+  void _removeUpdate(String uuid) {
+    _uuids.remove(uuid);
+    if (_uuids.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(efRefreshingProvider.notifier).state = false;
+      });
     }
   }
 
@@ -696,16 +693,24 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
 
     _sendFocusNode.addListener(() {
       if (_sendFocusNode.hasFocus) {
+        final reversed = ref.read(efReversedProvider);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ref.read(efReversedProvider.notifier).state = false;
+          if (reversed == true) {
+            update();
+          }
         });
       }
     });
     _receiveFocusNode.addListener(() {
       if (_receiveFocusNode.hasFocus &&
           ref.read(efExchangeProvider).name != ChangeNowExchange.exchangeName) {
+        final reversed = ref.read(efReversedProvider);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ref.read(efReversedProvider.notifier).state = true;
+          if (reversed != true) {
+            update();
+          }
         });
       }
     });
@@ -841,12 +846,6 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
         SizedBox(
           height: isDesktop ? 10 : 4,
         ),
-        // if (ref.watch(efWarningProvider).isNotEmpty &&
-        //     !ref.watch(efReversedProvider))
-        //   Text(
-        //     ref.watch(efWarningProvider),
-        //     style: STextStyles.errorSmall(context),
-        //   ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -911,27 +910,24 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
           borderRadius: Constants.size.circularBorderRadius,
           background:
               Theme.of(context).extension<StackColors>()!.textFieldDefaultBG,
-          onTap: () {
-            if (!(ref.read(efRateTypeProvider) == ExchangeRateType.estimated) &&
-                _receiveController.text == "-") {
-              _receiveController.text = "";
-            }
-          },
+          onTap: rateType == ExchangeRateType.estimated &&
+                  ref.watch(efExchangeProvider).name ==
+                      ChangeNowExchange.exchangeName
+              ? null
+              : () {
+                  if (_sendController.text == "-") {
+                    _sendController.text = "";
+                  }
+                },
           onChanged: receiveFieldOnChanged,
           onButtonTap: selectReceiveCurrency,
           isWalletCoin: isWalletCoin(coin, true),
           currency: ref
               .watch(efCurrencyPairProvider.select((value) => value.receive)),
-          readOnly: (rateType) == ExchangeRateType.estimated &&
+          readOnly: rateType == ExchangeRateType.estimated &&
               ref.watch(efExchangeProvider).name ==
                   ChangeNowExchange.exchangeName,
         ),
-        // if (ref.watch(efWarningProvider).isNotEmpty &&
-        //     ref.watch(efReversedProvider))
-        //   Text(
-        //     ref.watch(efWarningProvider),
-        //     style: STextStyles.errorSmall(context),
-        //   ),
         SizedBox(
           height: isDesktop ? 20 : 12,
         ),
@@ -942,21 +938,12 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
             onChanged: onRateTypeChanged,
           ),
         ),
-        // AnimatedSize(
-        //   duration: const Duration(milliseconds: 250),
-        //   curve: Curves.easeInOutCirc,
-        //   child: ref.watch(efSendAmountProvider).sendAmount != null &&
-        //       ref.watch(exchangeFormStateProvider).sendAmount != Decimal.zero
-        //       ?
         Padding(
           padding: EdgeInsets.only(top: isDesktop ? 20 : 12),
           child: ExchangeProviderOptions(
             fixedRate: rateType == ExchangeRateType.fixed,
             reversed: ref.watch(efReversedProvider),
           ),
-          // : const SizedBox(
-          //     height: 0,
-          //   ),
         ),
         SizedBox(
           height: isDesktop ? 20 : 12,
