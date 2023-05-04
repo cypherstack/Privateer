@@ -154,6 +154,27 @@ class _EthWalletsOverviewState extends ConsumerState<WalletsOverview> {
               "${widget.coin.prettyName} (${widget.coin.ticker}) wallets",
               style: STextStyles.navBarTitle(context),
             ),
+            actions: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: AppBarIconButton(
+                  icon: SvgPicture.asset(
+                    Assets.svg.plus,
+                    width: 18,
+                    height: 18,
+                    color: Theme.of(context)
+                        .extension<StackColors>()!
+                        .topNavIconPrimary,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      CreateOrRestoreWalletView.routeName,
+                      arguments: CoinEntity(widget.coin),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           body: SafeArea(
             child: Padding(
