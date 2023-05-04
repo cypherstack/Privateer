@@ -189,6 +189,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: AppBarIconButton(
+                    semanticsLabel: "Notifications Button. Takes To Notifications Page.",
                     key: const Key("walletsViewAlertsButton"),
                     size: 36,
                     shadows: const [],
@@ -252,6 +253,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: AppBarIconButton(
+                    semanticsLabel: "Settings Button. Takes To Settings Page.",
                     key: const Key("walletsViewSettingsButton"),
                     size: 36,
                     shadows: const [],

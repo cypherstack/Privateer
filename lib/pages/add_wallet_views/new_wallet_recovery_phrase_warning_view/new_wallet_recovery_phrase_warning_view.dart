@@ -85,6 +85,7 @@ class _NewWalletRecoveryPhraseWarningViewState
                     right: 10,
                   ),
                   child: AppBarIconButton(
+                    semanticsLabel: "Question Button. Opens A Dialog For Recovery Phrase Explanation.",
                     icon: SvgPicture.asset(
                       Assets.svg.circleQuestion,
                       width: 20,

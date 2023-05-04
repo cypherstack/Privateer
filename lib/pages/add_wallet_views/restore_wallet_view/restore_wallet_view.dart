@@ -570,6 +570,7 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: AppBarIconButton(
+                      semanticsLabel: "View QR Code Button. Opens Camera To Scan QR Code For Restoring Wallet",
                       key: const Key("restoreWalletViewQrCodeButton"),
                       size: 36,
                       shadows: const [],
@@ -596,6 +597,7 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: AppBarIconButton(
+                      semanticsLabel: "Paste Button. Pastes From Clipboard For Restoring Wallet.",
                       key: const Key("restoreWalletPasteButton"),
                       size: 36,
                       shadows: const [],
