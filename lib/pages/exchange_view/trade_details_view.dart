@@ -20,6 +20,7 @@ import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/exchange.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/exchange/simpleswap/simpleswap_exchange.dart';
+import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
@@ -1205,6 +1206,13 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                           url =
                               "https://majesticbank.sc/track?trx=${trade.tradeId}";
                           break;
+
+                        default:
+                          if (trade.exchangeName
+                              .startsWith(TrocadorExchange.exchangeName)) {
+                            url =
+                                "https://trocador.app/en/checkout${trade.tradeId}";
+                          }
                       }
                       return ConditionalParent(
                         condition: isDesktop,

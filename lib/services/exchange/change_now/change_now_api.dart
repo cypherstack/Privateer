@@ -400,6 +400,7 @@ class ChangeNowAPI {
             reversed: false,
             rateId: value.rateId,
             warningMessage: value.warningMessage,
+            exchangeProvider: ChangeNowExchange.exchangeName,
           ),
         );
       } catch (_) {
@@ -483,6 +484,7 @@ class ChangeNowAPI {
             reversed: reversed,
             rateId: value.rateId,
             warningMessage: value.warningMessage,
+            exchangeProvider: ChangeNowExchange.exchangeName,
           ),
         );
       } catch (_) {

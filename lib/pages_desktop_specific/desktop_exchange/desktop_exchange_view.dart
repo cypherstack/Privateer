@@ -37,7 +37,8 @@ class _DesktopExchangeViewState extends ConsumerState<DesktopExchangeView> {
         ExchangeDataLoadingService.instance.onLoadingComplete = () {
           WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
             await ExchangeDataLoadingService.instance.setCurrenciesIfEmpty(
-              ref.read(exchangeFormStateProvider),
+              ref.read(efCurrencyPairProvider),
+              ref.read(efRateTypeProvider),
             );
             setState(() {
               _initialCachePopulationUnderway = false;
@@ -53,7 +54,8 @@ class _DesktopExchangeViewState extends ConsumerState<DesktopExchangeView> {
       ExchangeDataLoadingService.instance.onLoadingComplete = () {
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
           await ExchangeDataLoadingService.instance.setCurrenciesIfEmpty(
-            ref.read(exchangeFormStateProvider),
+            ref.read(efCurrencyPairProvider),
+            ref.read(efRateTypeProvider),
           );
           setState(() {
             _initialCachePopulationUnderway = false;

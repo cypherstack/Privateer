@@ -29,8 +29,10 @@ dependencies:
   cw_monero:
     path: ./crypto_plugins/flutter_libmonero/cw_monero
 
+
   cw_core:
     path: ./crypto_plugins/flutter_libmonero/cw_core
+
 
 #  firo_flutter:
 #    git:
@@ -356,6 +358,8 @@ flutter:
 
     # orange theme specific
     - assets/svg/themed/orange/
+
+
 
     # lottie animations
     # basic

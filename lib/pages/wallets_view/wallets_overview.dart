@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackduo/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/utilities/assets.dart';
@@ -154,6 +155,27 @@ class _EthWalletsOverviewState extends ConsumerState<WalletsOverview> {
               "${widget.coin.prettyName} (${widget.coin.ticker}) wallets",
               style: STextStyles.navBarTitle(context),
             ),
+            actions: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: AppBarIconButton(
+                  icon: SvgPicture.asset(
+                    Assets.svg.plus,
+                    width: 18,
+                    height: 18,
+                    color: Theme.of(context)
+                        .extension<StackColors>()!
+                        .topNavIconPrimary,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      CreateOrRestoreWalletView.routeName,
+                      arguments: widget.coin,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           body: SafeArea(
             child: Padding(
