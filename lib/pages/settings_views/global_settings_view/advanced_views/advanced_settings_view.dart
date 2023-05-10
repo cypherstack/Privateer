@@ -10,6 +10,9 @@ import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/draggable_switch_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
+import 'package:tuple/tuple.dart';
+import 'package:stackduo/widgets/choose_coin_view.dart';
+import 'manage_explorer_view.dart';
 
 class AdvancedSettingsView extends StatelessWidget {
   const AdvancedSettingsView({
@@ -219,6 +222,40 @@ class AdvancedSettingsView extends StatelessWidget {
                       ),
                     );
                   },
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              RoundedWhiteContainer(
+                padding: const EdgeInsets.all(0),
+                child: RawMaterialButton(
+                  // splashColor: Theme.of(context).extension<StackColors>()!.highlight,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      Constants.size.circularBorderRadius,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(ChooseCoinView.routeName,
+                        arguments: const Tuple3<String, String, String>("Manage block explorers", "block explorer", ManageExplorerView.routeName));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 20,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          "Change block explorer",
+                          style: STextStyles.titleBold12(context),
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],

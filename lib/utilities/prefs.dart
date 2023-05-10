@@ -6,6 +6,7 @@ import 'package:stackduo/utilities/enums/languages_enum.dart';
 import 'package:stackduo/utilities/enums/sync_type_enum.dart';
 import 'package:stackduo/utilities/theme/color_theme.dart';
 import 'package:uuid/uuid.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 class Prefs extends ChangeNotifier {
   Prefs._();

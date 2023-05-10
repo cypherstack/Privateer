@@ -53,6 +53,7 @@ import 'package:stackduo/pages/send_view/send_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/about_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/manage_explorer_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings/appearance_settings_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings/system_brightness_theme_selection_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/currency_view.dart';
@@ -133,6 +134,7 @@ import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_cha
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
+import 'package:stackduo/widgets/choose_coin_view.dart';
 import 'package:tuple/tuple.dart';
 
 class RouteGenerator {
@@ -202,6 +204,36 @@ class RouteGenerator {
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => const AddWalletView(),
             settings: RouteSettings(name: settings.name));
+
+      case ChooseCoinView.routeName:
+        if (args is Tuple3<String, String, String>) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ChooseCoinView(
+              title: args.item1,
+              coinAdditional: args.item2,
+              nextRouteName: args.item3,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case ManageExplorerView.routeName:
+        if (args is Coin) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => ManageExplorerView(
+              coin: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case WalletsOverview.routeName:
         if (args is Coin) {
