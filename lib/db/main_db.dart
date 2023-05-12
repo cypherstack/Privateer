@@ -7,6 +7,7 @@ import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/stack_file_system.dart';
 import 'package:tuple/tuple.dart';
+import '../models/isar/models/block_explorer.dart';
 
 part 'queries/queries.dart';
 
@@ -32,6 +33,7 @@ class MainDB {
         UTXOSchema,
         AddressSchema,
         AddressLabelSchema,
+        TransactionBlockExplorerSchema,
       ],
       directory: (await StackFileSystem.applicationIsarDirectory()).path,
       // inspector: kDebugMode,
@@ -40,6 +42,25 @@ class MainDB {
       maxSizeMiB: 512,
     );
     return true;
+  }
+
+  // tx block explorers
+  TransactionBlockExplorer? getTransactionBlockExplorer({required Coin coin}) {
+    return isar.transactionBlockExplorers
+        .where()
+        .tickerEqualTo(coin.ticker)
+        .findFirstSync();
+  }
+
+  Future<int> putTransactionBlockExplorer(
+      TransactionBlockExplorer explorer) async {
+    try {
+      return await isar.writeTxn(() async {
+        return await isar.transactionBlockExplorers.put(explorer);
+      });
+    } catch (e) {
+      throw MainDBException("failed putTransactionBlockExplorer: $explorer", e);
+    }
   }
 
   // addresses
