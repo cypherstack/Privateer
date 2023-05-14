@@ -5,7 +5,7 @@ import 'package:stackduo/pages_desktop_specific/my_stack_view/desktop_favorite_w
 import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_summary_table.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 
 class MyWallets extends ConsumerStatefulWidget {

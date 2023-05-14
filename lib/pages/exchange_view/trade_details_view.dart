@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction_status.dart';
 import 'package:stackduo/models/isar/models/blockchain_data/transaction.dart';
+import 'package:stackduo/models/isar/stack_theme.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/exchange_view/edit_trade_note_view.dart';
 import 'package:stackduo/pages/exchange_view/send_from_view.dart';
@@ -21,6 +23,8 @@ import 'package:stackduo/services/exchange/exchange.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/exchange/simpleswap/simpleswap_exchange.dart';
 import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
@@ -28,7 +32,6 @@ import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -110,7 +113,7 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
     super.initState();
   }
 
-  String _fetchIconAssetForStatus(String statusString) {
+  String _fetchIconAssetForStatus(String statusString, ThemeAssets assets) {
     ChangeNowTransactionStatus? status;
     try {
       if (statusString.toLowerCase().startsWith("waiting")) {
@@ -121,10 +124,10 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
       switch (statusString.toLowerCase()) {
         case "funds confirming":
         case "processing payment":
-          return Assets.svg.txExchangePending(context);
+          return assets.txExchangePending;
 
         case "completed":
-          return Assets.svg.txExchange(context);
+          return assets.txExchange;
 
         default:
           status = ChangeNowTransactionStatus.Failed;
@@ -139,11 +142,11 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
       case ChangeNowTransactionStatus.Sending:
       case ChangeNowTransactionStatus.Refunded:
       case ChangeNowTransactionStatus.Verifying:
-        return Assets.svg.txExchangePending(context);
+        return assets.txExchangePending;
       case ChangeNowTransactionStatus.Finished:
-        return Assets.svg.txExchange(context);
+        return assets.txExchange;
       case ChangeNowTransactionStatus.Failed:
-        return Assets.svg.txExchangeFailed(context);
+        return assets.txExchangeFailed;
     }
   }
 
@@ -315,8 +318,17 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                       if (isDesktop)
                         Row(
                           children: [
-                            SvgPicture.asset(
-                              _fetchIconAssetForStatus(trade.status),
+                            SvgPicture.file(
+                              File(
+                                _fetchIconAssetForStatus(
+                                  trade.status,
+                                  ref.watch(
+                                    themeProvider.select(
+                                      (value) => value.assets,
+                                    ),
+                                  ),
+                                ),
+                              ),
                               width: 32,
                               height: 32,
                             ),
@@ -377,8 +389,17 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                             borderRadius: BorderRadius.circular(32),
                           ),
                           child: Center(
-                            child: SvgPicture.asset(
-                              _fetchIconAssetForStatus(trade.status),
+                            child: SvgPicture.file(
+                              File(
+                                _fetchIconAssetForStatus(
+                                  trade.status,
+                                  ref.watch(
+                                    themeProvider.select(
+                                      (value) => value.assets,
+                                    ),
+                                  ),
+                                ),
+                              ),
                               width: 32,
                               height: 32,
                             ),

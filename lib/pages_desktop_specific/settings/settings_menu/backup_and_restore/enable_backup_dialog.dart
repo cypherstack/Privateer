@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stackduo/pages_desktop_specific/settings/settings_menu/backup_and_restore/create_auto_backup.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';

@@ -7,7 +7,7 @@ import 'package:stackduo/providers/ui/selected_paynym_details_item_Provider.dart
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/rounded_container.dart';
 

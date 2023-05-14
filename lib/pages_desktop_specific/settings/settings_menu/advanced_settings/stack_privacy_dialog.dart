@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,10 +8,11 @@ import 'package:stackduo/hive/db.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/providers/global/price_provider.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
@@ -224,6 +226,11 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
 
   @override
   Widget build(BuildContext context) {
+    final easyFile =
+        ref.watch(themeProvider.select((value) => value.assets.personaEasy));
+    final incognitoFile = ref
+        .watch(themeProvider.select((value) => value.assets.personaIncognito));
+
     return Row(
       children: [
         Expanded(
@@ -265,11 +272,22 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
                         const SizedBox(
                           height: 10,
                         ),
-                      SvgPicture.asset(
-                        Assets.svg.personaEasy(context),
-                        width: 120,
-                        height: 120,
-                      ),
+                      //
+                      (easyFile.endsWith(".png"))
+                          ? Image.file(
+                              File(
+                                easyFile,
+                              ),
+                              width: 120,
+                              height: 120,
+                            )
+                          : SvgPicture.file(
+                              File(
+                                easyFile,
+                              ),
+                              width: 120,
+                              height: 120,
+                            ),
                       if (isDesktop)
                         const SizedBox(
                           height: 12,
@@ -371,11 +389,26 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
                         const SizedBox(
                           height: 10,
                         ),
-                      SvgPicture.asset(
-                        Assets.svg.personaIncognito(context),
-                        width: 120,
-                        height: 120,
-                      ),
+                      (incognitoFile.endsWith(".png"))
+                          ? Image.file(
+                              File(
+                                incognitoFile,
+                              ),
+                              width: 120,
+                              height: 120,
+                            )
+                          : SvgPicture.file(
+                              File(
+                                incognitoFile,
+                              ),
+                              width: 120,
+                              height: 120,
+                            ),
+                      // SvgPicture.asset(
+                      //   Assets.svg.personaIncognito(context),
+                      //   width: 120,
+                      //   height: 120,
+                      // ),
                       if (isDesktop)
                         const SizedBox(
                           height: 12,

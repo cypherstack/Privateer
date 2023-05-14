@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 
 class AppBarIconButton extends StatelessWidget {
@@ -27,28 +27,28 @@ class AppBarIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: size,
-      width: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(1000),
-        color: color ?? Theme.of(context).extension<StackColors>()!.background,
-        boxShadow: shadows,
-      ),
-      child: Semantics(
-        label: semanticsLabel,
-        excludeSemantics: true,
-        child: MaterialButton(
-          splashColor: Theme.of(context).extension<StackColors>()!.highlight,
-          padding: EdgeInsets.zero,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(1000),
-          ),
-          onPressed: onPressed,
-          child: icon,
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(1000),
+          color:
+              color ?? Theme.of(context).extension<StackColors>()!.background,
+          boxShadow: shadows,
         ),
-      )
-    );
+        child: Semantics(
+          label: semanticsLabel,
+          excludeSemantics: true,
+          child: MaterialButton(
+            splashColor: Theme.of(context).extension<StackColors>()!.highlight,
+            padding: EdgeInsets.zero,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(1000),
+            ),
+            onPressed: onPressed,
+            child: icon,
+          ),
+        ));
   }
 }
 
@@ -59,7 +59,7 @@ class AppBarBackButton extends StatelessWidget {
     this.isCompact = false,
     this.size,
     this.iconSize,
-    this.semanticsLabel = "Back Button. Takes Back To Previous Page."
+    this.semanticsLabel = "Back Button. Takes Back To Previous Page.",
   }) : super(key: key);
 
   final VoidCallback? onPressed;

@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  desktop_drop
   devicelocale
   flutter_libmonero
   flutter_secure_storage_linux

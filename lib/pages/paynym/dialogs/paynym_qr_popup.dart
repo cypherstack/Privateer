@@ -8,7 +8,7 @@ import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/paynym/subwidgets/paynym_bot.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';

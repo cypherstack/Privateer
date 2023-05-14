@@ -17,7 +17,7 @@ import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
 import 'package:stackduo/providers/ui/unread_notifications_provider.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/utilities/enums/backup_frequency_type.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 
 final currentWalletIdProvider = StateProvider<String?>((_) => null);

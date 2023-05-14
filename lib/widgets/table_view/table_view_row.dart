@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/expandable.dart';
 import 'package:stackduo/widgets/table_view/table_view_cell.dart';
 

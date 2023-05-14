@@ -1,14 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/pages/address_book_views/subviews/contact_popup.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/expandable.dart';
@@ -90,8 +93,14 @@ class _AddressBookCardState extends ConsumerState<AddressBookCard> {
             ),
             child: contact.id == "default"
                 ? Center(
-                    child: SvgPicture.asset(
-                      Assets.svg.stackDuoIcon(context),
+                    child: SvgPicture.file(
+                      File(
+                        ref.watch(
+                          themeProvider.select(
+                            (value) => value.assets.stackIcon,
+                          ),
+                        ),
+                      ),
                       width: 20,
                     ),
                   )

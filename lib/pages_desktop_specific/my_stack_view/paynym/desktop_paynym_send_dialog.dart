@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,13 +10,13 @@ import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/providers/global/price_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
@@ -77,8 +79,10 @@ class _DesktopPaynymSendDialogState
               // Theme.of(context).extension<StackColors>()!.textSubtitle4,
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    Assets.svg.iconFor(coin: coin),
+                  SvgPicture.file(
+                    File(
+                      ref.watch(coinIconProvider(coin)),
+                    ),
                     width: 36,
                     height: 36,
                   ),

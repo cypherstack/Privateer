@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/manage_explorer_view.dart';
 import 'package:stackduo/pages/stack_privacy_calls.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
+import 'package:stackduo/widgets/choose_coin_view.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/draggable_switch_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
-import 'package:stackduo/widgets/choose_coin_view.dart';
-import 'manage_explorer_view.dart';
 
 class AdvancedSettingsView extends StatelessWidget {
   const AdvancedSettingsView({
@@ -238,8 +238,14 @@ class AdvancedSettingsView extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pushNamed(ChooseCoinView.routeName,
-                        arguments: const Tuple3<String, String, String>("Manage block explorers", "block explorer", ManageExplorerView.routeName));
+                    Navigator.of(context).pushNamed(
+                      ChooseCoinView.routeName,
+                      arguments: const Tuple3<String, String, String>(
+                        "Manage block explorers",
+                        "block explorer",
+                        ManageExplorerView.routeName,
+                      ),
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/languages_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
@@ -9,13 +11,10 @@ import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
+import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
+import 'package:stackduo/widgets/rounded_container.dart';
 import 'package:stackduo/widgets/stack_text_field.dart';
-
-import '../../../../utilities/assets.dart';
-import '../../../../utilities/theme/stack_colors.dart';
-import '../../../../widgets/icon_widgets/x_icon.dart';
-import '../../../../widgets/rounded_container.dart';
-import '../../../../widgets/textfield_icon_button.dart';
+import 'package:stackduo/widgets/textfield_icon_button.dart';
 
 class LanguageDialog extends ConsumerStatefulWidget {
   const LanguageDialog({Key? key}) : super(key: key);

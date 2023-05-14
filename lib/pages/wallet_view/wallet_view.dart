@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,9 @@ import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_cha
 import 'package:stackduo/services/event_bus/global_event_bus.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/backup_frequency_type.dart';
@@ -41,7 +45,6 @@ import 'package:stackduo/utilities/enums/wallet_balance_toggle_state.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/show_loading.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -254,7 +257,7 @@ class _WalletViewState extends ConsumerState<WalletView> {
   }
 
   void _onExchangePressed(BuildContext context) async {
-    final coin = ref.read(managerProvider).coin;
+    final Coin coin = ref.read(managerProvider).coin;
 
     if (coin.isTestNet) {
       await showDialog<void>(
@@ -302,7 +305,7 @@ class _WalletViewState extends ConsumerState<WalletView> {
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
 
-    final coin = ref.watch(managerProvider.select((value) => value.coin));
+    final Coin coin = ref.watch(managerProvider.select((value) => value.coin));
 
     return ConditionalParent(
       condition: _rescanningOnOpen,
@@ -371,9 +374,10 @@ class _WalletViewState extends ConsumerState<WalletView> {
                   titleSpacing: 0,
                   title: Row(
                     children: [
-                      SvgPicture.asset(
-                        Assets.svg.iconFor(coin: coin),
-                        // color: Theme.of(context).extension<StackColors>()!.accentColorDark
+                      SvgPicture.file(
+                        File(
+                          ref.watch(coinIconProvider(coin)),
+                        ),
                         width: 24,
                         height: 24,
                       ),
@@ -439,21 +443,41 @@ class _WalletViewState extends ConsumerState<WalletView> {
                           color: Theme.of(context)
                               .extension<StackColors>()!
                               .background,
-                          icon: SvgPicture.asset(
-                            ref.watch(notificationsProvider.select((value) =>
-                                    value.hasUnreadNotificationsFor(walletId)))
-                                ? Assets.svg.bellNew(context)
-                                : Assets.svg.bell,
-                            width: 20,
-                            height: 20,
-                            color: ref.watch(notificationsProvider.select(
-                                    (value) => value
-                                        .hasUnreadNotificationsFor(walletId)))
-                                ? null
-                                : Theme.of(context)
-                                    .extension<StackColors>()!
-                                    .topNavIconPrimary,
-                          ),
+                          icon: ref.watch(notificationsProvider.select(
+                                  (value) => value
+                                      .hasUnreadNotificationsFor(walletId)))
+                              ? SvgPicture.file(
+                                  File(
+                                    ref.watch(
+                                      themeProvider.select(
+                                        (value) => value.assets.bellNew,
+                                      ),
+                                    ),
+                                  ),
+                                  width: 20,
+                                  height: 20,
+                                  color: ref.watch(notificationsProvider.select(
+                                          (value) =>
+                                              value.hasUnreadNotificationsFor(
+                                                  walletId)))
+                                      ? null
+                                      : Theme.of(context)
+                                          .extension<StackColors>()!
+                                          .topNavIconPrimary,
+                                )
+                              : SvgPicture.asset(
+                                  Assets.svg.bell,
+                                  width: 20,
+                                  height: 20,
+                                  color: ref.watch(notificationsProvider.select(
+                                          (value) =>
+                                              value.hasUnreadNotificationsFor(
+                                                  walletId)))
+                                      ? null
+                                      : Theme.of(context)
+                                          .extension<StackColors>()!
+                                          .topNavIconPrimary,
+                                ),
                           onPressed: () {
                             // reset unread state
                             ref.refresh(unreadNotificationsStateProvider);

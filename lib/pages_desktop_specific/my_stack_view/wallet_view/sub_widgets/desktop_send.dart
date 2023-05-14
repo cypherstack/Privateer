@@ -20,6 +20,7 @@ import 'package:stackduo/providers/ui/fee_rate_type_state_provider.dart';
 import 'package:stackduo/providers/ui/preview_tx_button_state_provider.dart';
 import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
@@ -29,7 +30,6 @@ import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/prefs.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/animated_text.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
@@ -729,8 +729,6 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
     debugPrint("BUILD: $runtimeType");
     final provider = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManagerProvider(walletId)));
-    final String locale = ref.watch(
-        localeServiceChangeNotifierProvider.select((value) => value.locale));
 
     final showCoinControl = ref.watch(
           prefsChangeNotifierProvider.select(

@@ -34,7 +34,7 @@ import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/form_input_status_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
@@ -570,7 +570,8 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: AppBarIconButton(
-                      semanticsLabel: "View QR Code Button. Opens Camera To Scan QR Code For Restoring Wallet",
+                      semanticsLabel:
+                          "View QR Code Button. Opens Camera To Scan QR Code For Restoring Wallet.",
                       key: const Key("restoreWalletViewQrCodeButton"),
                       size: 36,
                       shadows: const [],
@@ -597,7 +598,8 @@ class _RestoreWalletViewState extends ConsumerState<RestoreWalletView> {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: AppBarIconButton(
-                      semanticsLabel: "Paste Button. Pastes From Clipboard For Restoring Wallet.",
+                      semanticsLabel:
+                          "Paste Button. Pastes From Clipboard For Restoring Wallet.",
                       key: const Key("restoreWalletPasteButton"),
                       size: 36,
                       shadows: const [],

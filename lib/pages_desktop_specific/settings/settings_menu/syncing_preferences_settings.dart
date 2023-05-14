@@ -7,7 +7,7 @@ import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/sync_type_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/rounded_container.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';

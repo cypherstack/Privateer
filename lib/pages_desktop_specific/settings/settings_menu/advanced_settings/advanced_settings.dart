@@ -6,7 +6,7 @@ import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/draggable_switch_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';

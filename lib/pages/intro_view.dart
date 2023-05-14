@@ -1,27 +1,31 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/pages/stack_privacy_calls.dart';
 import 'package:stackduo/pages_desktop_specific/password/create_password_view.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/prefs.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class IntroView extends StatefulWidget {
+class IntroView extends ConsumerStatefulWidget {
   const IntroView({Key? key}) : super(key: key);
 
   static const String routeName = "/introView";
 
   @override
-  State<IntroView> createState() => _IntroViewState();
+  ConsumerState<IntroView> createState() => _IntroViewState();
 }
 
-class _IntroViewState extends State<IntroView> {
+class _IntroViewState extends ConsumerState<IntroView> {
   late final bool isDesktop;
 
   @override
@@ -52,8 +56,14 @@ class _IntroViewState extends State<IntroView> {
                         constraints: const BoxConstraints(
                           maxWidth: 300,
                         ),
-                        child: SvgPicture.asset(
-                          Assets.svg.stack(context),
+                        child: SvgPicture.file(
+                          File(
+                            ref.watch(
+                              themeProvider.select(
+                                (value) => value.assets.stack,
+                              ),
+                            ),
+                          ),
                           width: isDesktop ? 324 : 266,
                           height: isDesktop ? 324 : 266,
                         ),
@@ -115,8 +125,14 @@ class _IntroViewState extends State<IntroView> {
                       SizedBox(
                         width: 130,
                         height: 130,
-                        child: SvgPicture.asset(
-                          Assets.svg.stackDuoIcon(context),
+                        child: SvgPicture.file(
+                          File(
+                            ref.watch(
+                              themeProvider.select(
+                                (value) => value.assets.stackIcon,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       const Spacer(

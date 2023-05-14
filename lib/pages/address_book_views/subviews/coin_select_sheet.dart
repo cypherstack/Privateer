@@ -1,12 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
-import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/themes/coin_image_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 
 class CoinSelectSheet extends StatelessWidget {
   const CoinSelectSheet({Key? key}) : super(key: key);
@@ -86,8 +88,10 @@ class CoinSelectSheet extends StatelessWidget {
                               padding: const EdgeInsets.all(12),
                               child: Row(
                                 children: [
-                                  SvgPicture.asset(
-                                    Assets.svg.iconFor(coin: coin),
+                                  SvgPicture.file(
+                                    File(
+                                      ref.watch(coinImageProvider(coin)),
+                                    ),
                                     height: 20,
                                     width: 20,
                                   ),

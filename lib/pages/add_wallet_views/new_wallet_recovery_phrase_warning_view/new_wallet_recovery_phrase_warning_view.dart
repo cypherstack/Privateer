@@ -17,7 +17,7 @@ import 'package:stackduo/utilities/default_nodes.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -85,7 +85,8 @@ class _NewWalletRecoveryPhraseWarningViewState
                     right: 10,
                   ),
                   child: AppBarIconButton(
-                    semanticsLabel: "Question Button. Opens A Dialog For Recovery Phrase Explanation.",
+                    semanticsLabel:
+                        "Question Button. Opens A Dialog For Recovery Phrase Explanation.",
                     icon: SvgPicture.asset(
                       Assets.svg.circleQuestion,
                       width: 20,

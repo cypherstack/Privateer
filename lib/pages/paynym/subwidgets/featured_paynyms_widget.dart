@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stackduo/pages/paynym/subwidgets/paynym_card.dart';
 import 'package:stackduo/utilities/featured_paynyms.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';

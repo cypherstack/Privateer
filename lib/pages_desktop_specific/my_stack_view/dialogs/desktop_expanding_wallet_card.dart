@@ -5,7 +5,7 @@ import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/animated_widgets/rotate_icon.dart';
 import 'package:stackduo/widgets/expandable.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';

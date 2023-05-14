@@ -8,7 +8,7 @@ import 'package:stackduo/pages_desktop_specific/addresses/sub_widgets/desktop_ad
 import 'package:stackduo/providers/db/main_db_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackduo/widgets/desktop/desktop_scaffold.dart';

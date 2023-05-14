@@ -1,23 +1,27 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
+import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction_status.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
+import 'package:stackduo/models/isar/stack_theme.dart';
 import 'package:stackduo/pages/exchange_view/trade_details_view.dart';
 import 'package:stackduo/providers/exchange/trade_sent_from_stack_lookup_provider.dart';
 import 'package:stackduo/providers/global/trades_service_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/route_generator.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
@@ -28,8 +32,6 @@ import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/stack_text_field.dart';
 import 'package:stackduo/widgets/textfield_icon_button.dart';
 import 'package:tuple/tuple.dart';
-
-import '../../db/main_db.dart';
 
 class DesktopAllTradesView extends ConsumerStatefulWidget {
   const DesktopAllTradesView({Key? key}) : super(key: key);
@@ -286,7 +288,7 @@ class DesktopTradeRowCard extends ConsumerStatefulWidget {
 class _DesktopTradeRowCardState extends ConsumerState<DesktopTradeRowCard> {
   late final String tradeId;
 
-  String _fetchIconAssetForStatus(String statusString, BuildContext context) {
+  String _fetchIconAssetForStatus(String statusString, ThemeAssets assets) {
     ChangeNowTransactionStatus? status;
     try {
       if (statusString.toLowerCase().startsWith("waiting")) {
@@ -297,10 +299,10 @@ class _DesktopTradeRowCardState extends ConsumerState<DesktopTradeRowCard> {
       switch (statusString.toLowerCase()) {
         case "funds confirming":
         case "processing payment":
-          return Assets.svg.txExchangePending(context);
+          return assets.txExchangePending;
 
         case "completed":
-          return Assets.svg.txExchange(context);
+          return assets.txExchange;
 
         default:
           status = ChangeNowTransactionStatus.Failed;
@@ -315,11 +317,11 @@ class _DesktopTradeRowCardState extends ConsumerState<DesktopTradeRowCard> {
       case ChangeNowTransactionStatus.Sending:
       case ChangeNowTransactionStatus.Refunded:
       case ChangeNowTransactionStatus.Verifying:
-        return Assets.svg.txExchangePending(context);
+        return assets.txExchangePending;
       case ChangeNowTransactionStatus.Finished:
-        return Assets.svg.txExchange(context);
+        return assets.txExchange;
       case ChangeNowTransactionStatus.Failed:
-        return Assets.svg.txExchangeFailed(context);
+        return assets.txExchangeFailed;
     }
   }
 
@@ -521,10 +523,13 @@ class _DesktopTradeRowCardState extends ConsumerState<DesktopTradeRowCard> {
                   borderRadius: BorderRadius.circular(32),
                 ),
                 child: Center(
-                  child: SvgPicture.asset(
-                    _fetchIconAssetForStatus(
-                      trade.status,
-                      context,
+                  child: SvgPicture.file(
+                    File(
+                      _fetchIconAssetForStatus(
+                        trade.status,
+                        ref.watch(
+                            themeProvider.select((value) => value.assets)),
+                      ),
                     ),
                     width: 32,
                     height: 32,

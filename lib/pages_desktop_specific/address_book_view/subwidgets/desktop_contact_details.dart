@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:isar/isar.dart';
+import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/address_book_views/subviews/add_new_contact_address_view.dart';
@@ -11,9 +14,10 @@ import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
 import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
@@ -22,8 +26,6 @@ import 'package:stackduo/widgets/loading_indicator.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/transaction_card.dart';
 import 'package:tuple/tuple.dart';
-
-import '../../../db/main_db.dart';
 
 class DesktopContactDetails extends ConsumerStatefulWidget {
   const DesktopContactDetails({
@@ -118,8 +120,14 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                           ),
                           child: contact.id == "default"
                               ? Center(
-                                  child: SvgPicture.asset(
-                                    Assets.svg.stackDuoIcon(context),
+                                  child: SvgPicture.file(
+                                    File(
+                                      ref.watch(
+                                        themeProvider.select(
+                                          (value) => value.assets.stackIcon,
+                                        ),
+                                      ),
+                                    ),
                                     width: 32,
                                   ),
                                 )

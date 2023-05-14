@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bip47/bip47.dart';
 import 'package:cw_core/monero_transaction_priority.dart';
@@ -21,6 +22,8 @@ import 'package:stackduo/providers/ui/preview_tx_button_state_provider.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
@@ -32,7 +35,6 @@ import 'package:stackduo/utilities/enums/fee_rate_type_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/prefs.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/animated_text.dart';
 import 'package:stackduo/widgets/background.dart';
@@ -647,8 +649,12 @@ class _SendViewState extends ConsumerState<SendView> {
                               padding: const EdgeInsets.all(12.0),
                               child: Row(
                                 children: [
-                                  SvgPicture.asset(
-                                    Assets.svg.iconFor(coin: coin),
+                                  SvgPicture.file(
+                                    File(
+                                      ref.watch(
+                                        coinIconProvider(coin),
+                                      ),
+                                    ),
                                     width: 22,
                                     height: 22,
                                   ),
@@ -850,7 +856,8 @@ class _SendViewState extends ConsumerState<SendView> {
                                         children: [
                                           _addressToggleFlag
                                               ? TextFieldIconButton(
-                                                  semanticsLabel: "Clear Button. Clears The Address Field Input.",
+                                                  semanticsLabel:
+                                                      "Clear Button. Clears The Address Field Input.",
                                                   key: const Key(
                                                       "sendViewClearAddressFieldButtonKey"),
                                                   onTap: () {
@@ -867,7 +874,8 @@ class _SendViewState extends ConsumerState<SendView> {
                                                   child: const XIcon(),
                                                 )
                                               : TextFieldIconButton(
-                                                  semanticsLabel: "Paste Button. Pastes The Clipboard Into The Address Field Input.",
+                                                  semanticsLabel:
+                                                      "Paste Button. Pastes From Clipboard To Address Field Input.",
                                                   key: const Key(
                                                       "sendViewPasteAddressFieldButtonKey"),
                                                   onTap: () async {
@@ -910,7 +918,8 @@ class _SendViewState extends ConsumerState<SendView> {
                                                 ),
                                           if (sendToController.text.isEmpty)
                                             TextFieldIconButton(
-                                              semanticsLabel: "Address Book Button. Opens Address Book For Address Field.",
+                                              semanticsLabel:
+                                                  "Address Book Button. Opens Address Book For Address Field.",
                                               key: const Key(
                                                   "sendViewAddressBookButtonKey"),
                                               onTap: () {
@@ -923,7 +932,8 @@ class _SendViewState extends ConsumerState<SendView> {
                                             ),
                                           if (sendToController.text.isEmpty)
                                             TextFieldIconButton(
-                                              semanticsLabel: "Scan QR Button. Opens Camera For Scanning QR Code.",
+                                              semanticsLabel:
+                                                  "Scan QR Button. Opens Camera For Scanning QR Code.",
                                               key: const Key(
                                                   "sendViewScanQrButtonKey"),
                                               onTap: () async {

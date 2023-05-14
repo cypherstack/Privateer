@@ -40,7 +40,6 @@ import 'package:stackduo/providers/global/base_currencies_provider.dart';
 // import 'package:stackduo/providers/global/has_authenticated_start_state_provider.dart';
 import 'package:stackduo/providers/global/trades_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/providers/ui/color_theme_provider.dart';
 import 'package:stackduo/route_generator.dart';
 // import 'package:stackduo/services/buy/buy_data_loading_service.dart';
 import 'package:stackduo/services/debug_service.dart';
@@ -50,6 +49,8 @@ import 'package:stackduo/services/node_service.dart';
 import 'package:stackduo/services/notifications_api.dart';
 import 'package:stackduo/services/notifications_service.dart';
 import 'package:stackduo/services/trade_service.dart';
+import 'package:stackduo/themes/theme_providers.dart';
+import 'package:stackduo/themes/theme_service.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/db_version_migration.dart';
 import 'package:stackduo/utilities/enums/backup_frequency_type.dart';
@@ -57,9 +58,8 @@ import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/prefs.dart';
 import 'package:stackduo/utilities/stack_file_system.dart';
-import 'package:stackduo/utilities/theme/color_theme.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
+import 'package:stackduo/widgets/crypto_notifications.dart';
 import 'package:window_size/window_size.dart';
 
 final openedFromSWBFileStringStateProvider =
@@ -183,6 +183,37 @@ void main() async {
   //     overlays: [SystemUiOverlay.bottom]);
   await NotificationApi.init();
 
+  await MainDB.instance.initMainDB();
+  ThemeService.instance.init(MainDB.instance);
+
+  // install default themes
+  if (!(await ThemeService.instance.verifyInstalled(themeId: "light"))) {
+    Logging.instance.log(
+      "Installing default light theme...",
+      level: LogLevel.Info,
+    );
+    final lightZip = await rootBundle.load("assets/default_themes/light.zip");
+    await ThemeService.instance
+        .install(themeArchiveData: lightZip.buffer.asUint8List());
+    Logging.instance.log(
+      "Installing default light theme... finished",
+      level: LogLevel.Info,
+    );
+  }
+  if (!(await ThemeService.instance.verifyInstalled(themeId: "dark"))) {
+    Logging.instance.log(
+      "Installing default dark theme... ",
+      level: LogLevel.Info,
+    );
+    final darkZip = await rootBundle.load("assets/default_themes/dark.zip");
+    await ThemeService.instance
+        .install(themeArchiveData: darkZip.buffer.asUint8List());
+    Logging.instance.log(
+      "Installing default dark theme... finished",
+      level: LogLevel.Info,
+    );
+  }
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -248,7 +279,6 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       _desktopHasPassword =
           await ref.read(storageCryptoHandlerProvider).hasPassword();
     }
-    await MainDB.instance.initMainDB();
   }
 
   Future<void> load() async {
@@ -261,6 +291,9 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       if (!Util.isDesktop) {
         await loadShared();
       }
+
+      ref.read(applicationThemesDirectoryPathProvider.notifier).state =
+          (await StackFileSystem.applicationThemesDirectory()).path;
 
       _notificationsService = ref.read(notificationsProvider);
       _nodeService = ref.read(nodeServiceChangeNotifierProvider);
@@ -327,25 +360,22 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
 
   @override
   void initState() {
-    StackColorTheme colorTheme;
+    String themeId;
     if (ref.read(prefsChangeNotifierProvider).enableSystemBrightness) {
       final brightness = WidgetsBinding.instance.window.platformBrightness;
       switch (brightness) {
         case Brightness.dark:
-          colorTheme = ref
-              .read(prefsChangeNotifierProvider)
-              .systemBrightnessDarkTheme
-              .colorTheme;
+          themeId =
+              ref.read(prefsChangeNotifierProvider).systemBrightnessDarkThemeId;
           break;
         case Brightness.light:
-          colorTheme = ref
+          themeId = ref
               .read(prefsChangeNotifierProvider)
-              .systemBrightnessLightTheme
-              .colorTheme;
+              .systemBrightnessLightThemeId;
           break;
       }
     } else {
-      colorTheme = ref.read(prefsChangeNotifierProvider).theme.colorTheme;
+      themeId = ref.read(prefsChangeNotifierProvider).themeId;
     }
 
     loadingCompleter = Completer();
@@ -356,8 +386,13 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
         .loadLocale(notify: false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(colorThemeProvider.state).state =
-          StackColors.fromStackColorTheme(colorTheme);
+      //Add themes path to provider
+      ref.read(applicationThemesDirectoryPathProvider.notifier).state =
+          (await StackFileSystem.applicationThemesDirectory()).path;
+
+      ref.read(themeProvider.state).state = ref.read(pThemeService).getTheme(
+            themeId: themeId,
+          )!;
 
       if (Platform.isAndroid) {
         // fetch open file if it exists
@@ -377,26 +412,25 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
     });
 
     WidgetsBinding.instance.window.onPlatformBrightnessChanged = () {
-      StackColorTheme colorTheme;
+      String themeId;
       switch (WidgetsBinding.instance.window.platformBrightness) {
         case Brightness.dark:
-          colorTheme = ref
-              .read(prefsChangeNotifierProvider)
-              .systemBrightnessDarkTheme
-              .colorTheme;
+          themeId =
+              ref.read(prefsChangeNotifierProvider).systemBrightnessDarkThemeId;
           break;
         case Brightness.light:
-          colorTheme = ref
+          themeId = ref
               .read(prefsChangeNotifierProvider)
-              .systemBrightnessLightTheme
-              .colorTheme;
+              .systemBrightnessLightThemeId;
           break;
       }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (ref.read(prefsChangeNotifierProvider).enableSystemBrightness) {
-          ref.read(colorThemeProvider.notifier).state =
-              StackColors.fromStackColorTheme(colorTheme);
+          ref.read(themeProvider.state).state =
+              ref.read(pThemeService).getTheme(
+                    themeId: themeId,
+                  )!;
         }
       });
     };
@@ -531,7 +565,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
     //       addToDebugMessagesDB: false);
     // });
 
-    final colorScheme = ref.watch(colorThemeProvider.state).state;
+    final colorScheme = ref.watch(colorProvider.state).state;
 
     return MaterialApp(
       key: GlobalKey(),
@@ -629,70 +663,74 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
               _buildOutlineInputBorder(colorScheme.textFieldDefaultBG),
         ),
       ),
-      home: Util.isDesktop
-          ? FutureBuilder(
-              future: loadShared(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (_desktopHasPassword) {
-                    String? startupWalletId;
-                    if (ref
-                        .read(prefsChangeNotifierProvider)
-                        .gotoWalletOnStartup) {
-                      startupWalletId =
-                          ref.read(prefsChangeNotifierProvider).startupWalletId;
+      home: CryptoNotifications(
+        child: Util.isDesktop
+            ? FutureBuilder(
+                future: loadShared(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (_desktopHasPassword) {
+                      String? startupWalletId;
+                      if (ref
+                          .read(prefsChangeNotifierProvider)
+                          .gotoWalletOnStartup) {
+                        startupWalletId = ref
+                            .read(prefsChangeNotifierProvider)
+                            .startupWalletId;
+                      }
+
+                      return DesktopLoginView(
+                        startupWalletId: startupWalletId,
+                        load: load,
+                      );
+                    } else {
+                      return const IntroView();
                     }
-
-                    return DesktopLoginView(
-                      startupWalletId: startupWalletId,
-                      load: load,
-                    );
                   } else {
-                    return const IntroView();
+                    return const LoadingView();
                   }
-                } else {
-                  return const LoadingView();
-                }
-              },
-            )
-          : FutureBuilder(
-              future: load(),
-              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  // FlutterNativeSplash.remove();
-                  if (ref.read(walletsChangeNotifierProvider).hasWallets ||
-                      ref.read(prefsChangeNotifierProvider).hasPin) {
-                    // return HomeView();
+                },
+              )
+            : FutureBuilder(
+                future: load(),
+                builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    // FlutterNativeSplash.remove();
+                    if (ref.read(walletsChangeNotifierProvider).hasWallets ||
+                        ref.read(prefsChangeNotifierProvider).hasPin) {
+                      // return HomeView();
 
-                    String? startupWalletId;
-                    if (ref
-                        .read(prefsChangeNotifierProvider)
-                        .gotoWalletOnStartup) {
-                      startupWalletId =
-                          ref.read(prefsChangeNotifierProvider).startupWalletId;
+                      String? startupWalletId;
+                      if (ref
+                          .read(prefsChangeNotifierProvider)
+                          .gotoWalletOnStartup) {
+                        startupWalletId = ref
+                            .read(prefsChangeNotifierProvider)
+                            .startupWalletId;
+                      }
+
+                      return LockscreenView(
+                        isInitialAppLogin: true,
+                        routeOnSuccess: HomeView.routeName,
+                        routeOnSuccessArguments: startupWalletId,
+                        biometricsAuthenticationTitle: "Unlock Stack",
+                        biometricsLocalizedReason:
+                            "Unlock your stack duo using biometrics",
+                        biometricsCancelButtonString: "Cancel",
+                      );
+                    } else {
+                      return const IntroView();
                     }
-
-                    return LockscreenView(
-                      isInitialAppLogin: true,
-                      routeOnSuccess: HomeView.routeName,
-                      routeOnSuccessArguments: startupWalletId,
-                      biometricsAuthenticationTitle: "Unlock Stack",
-                      biometricsLocalizedReason:
-                          "Unlock your stack duo using biometrics",
-                      biometricsCancelButtonString: "Cancel",
-                    );
                   } else {
-                    return const IntroView();
+                    // CURRENTLY DISABLED as cannot be animated
+                    // technically not needed as FlutterNativeSplash will overlay
+                    // anything returned here until the future completes but
+                    // FutureBuilder requires you to return something
+                    return const LoadingView();
                   }
-                } else {
-                  // CURRENTLY DISABLED as cannot be animated
-                  // technically not needed as FlutterNativeSplash will overlay
-                  // anything returned here until the future completes but
-                  // FutureBuilder requires you to return something
-                  return const LoadingView();
-                }
-              },
-            ),
+                },
+              ),
+      ),
     );
   }
 }

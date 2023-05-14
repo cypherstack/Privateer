@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:stackduo/hive/db.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/intro_view.dart';
-import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/stack_file_system.dart';
 import 'package:stackduo/utilities/text_styles.dart';
@@ -94,8 +94,14 @@ class _ForgotPasswordDesktopViewState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.asset(
-                  Assets.svg.stackDuoIcon(context),
+                SvgPicture.file(
+                  File(
+                    ref.watch(
+                      themeProvider.select(
+                        (value) => value.assets.stackIcon,
+                      ),
+                    ),
+                  ),
                   width: 100,
                 ),
                 const SizedBox(

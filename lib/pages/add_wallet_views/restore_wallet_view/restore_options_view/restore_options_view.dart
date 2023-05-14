@@ -12,14 +12,14 @@ import 'package:stackduo/pages/add_wallet_views/restore_wallet_view/restore_opti
 import 'package:stackduo/pages/add_wallet_views/restore_wallet_view/restore_wallet_view.dart';
 import 'package:stackduo/pages/add_wallet_views/restore_wallet_view/sub_widgets/mnemonic_word_count_select_sheet.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
-import 'package:stackduo/providers/ui/color_theme_provider.dart';
 import 'package:stackduo/providers/ui/verify_recovery_phrase/mnemonic_word_count_state_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -66,7 +66,7 @@ class _RestoreOptionsViewState extends ConsumerState<RestoreOptionsView> {
 
   @override
   void initState() {
-    baseColor = ref.read(colorThemeProvider.state).state.textSubtitle2;
+    baseColor = ref.read(themeProvider.state).state.textSubtitle2;
     walletName = widget.walletName;
     coin = widget.coin;
     isDesktop = Util.isDesktop;

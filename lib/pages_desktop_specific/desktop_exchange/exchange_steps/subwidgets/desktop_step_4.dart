@@ -7,7 +7,7 @@ import 'package:stackduo/pages_desktop_specific/desktop_exchange/exchange_steps/
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/rounded_container.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 
