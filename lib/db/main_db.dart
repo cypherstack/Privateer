@@ -37,6 +37,7 @@ class MainDB {
         AddressLabelSchema,
         TransactionBlockExplorerSchema,
         StackThemeSchema,
+        ContactEntrySchema,
       ],
       directory: (await StackFileSystem.applicationIsarDirectory()).path,
       // inspector: kDebugMode,
@@ -45,6 +46,45 @@ class MainDB {
       maxSizeMiB: 512,
     );
     return true;
+  }
+
+  // contact entries
+  List<ContactEntry> getContactEntries() {
+    return isar.contactEntrys.where().findAllSync();
+  }
+
+  Future<bool> deleteContactEntry({required String id}) {
+    try {
+      return isar.writeTxn(() async {
+        await isar.contactEntrys.deleteByCustomId(id);
+        return true;
+      });
+    } catch (e) {
+      throw MainDBException("failed deleteContactEntry: $id", e);
+    }
+  }
+
+  Future<bool> isContactEntryExists({required String id}) async {
+    return isar.contactEntrys
+        .where()
+        .customIdEqualTo(id)
+        .count()
+        .then((value) => value > 0);
+  }
+
+  ContactEntry? getContactEntry({required String id}) {
+    return isar.contactEntrys.where().customIdEqualTo(id).findFirstSync();
+  }
+
+  Future<bool> putContactEntry({required ContactEntry contactEntry}) async {
+    try {
+      return await isar.writeTxn(() async {
+        await isar.contactEntrys.put(contactEntry);
+        return true;
+      });
+    } catch (e) {
+      throw MainDBException("failed putContactEntry: $contactEntry", e);
+    }
   }
 
   // tx block explorers
