@@ -16,7 +16,7 @@ import 'package:stackduo/utilities/enums/sync_type_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/test_monero_node_connection.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:tuple/tuple.dart';
 

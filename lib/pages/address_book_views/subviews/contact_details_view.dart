@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,15 +10,17 @@ import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/address_book_views/subviews/add_new_contact_address_view.dart';
 import 'package:stackduo/pages/address_book_views/subviews/edit_contact_address_view.dart';
 import 'package:stackduo/pages/address_book_views/subviews/edit_contact_name_emoji_view.dart';
+import 'package:stackduo/providers/db/main_db_provider.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
 import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
@@ -26,8 +30,6 @@ import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
 import 'package:stackduo/widgets/transaction_card.dart';
 import 'package:tuple/tuple.dart';
-
-import '../../../db/main_db.dart';
 
 class ContactDetailsView extends ConsumerStatefulWidget {
   const ContactDetailsView({
@@ -61,7 +63,8 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView> {
 
     List<Tuple2<String, Transaction>> result = [];
     for (final manager in managers) {
-      final transactions = await MainDB.instance
+      final transactions = await ref
+          .read(mainDBProvider)
           .getTransactions(manager.walletId)
           .filter()
           .anyOf(contact.addresses.map((e) => e.address),
@@ -197,7 +200,7 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView> {
                           onPressed: () {
                             ref
                                 .read(addressBookServiceProvider)
-                                .removeContact(_contact.id);
+                                .removeContact(_contact.customId);
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
                             showFloatingFlushBar(
@@ -334,8 +337,10 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView> {
                             padding: const EdgeInsets.all(12),
                             child: Row(
                               children: [
-                                SvgPicture.asset(
-                                  Assets.svg.iconFor(coin: e.coin),
+                                SvgPicture.file(
+                                  File(
+                                    ref.watch(coinIconProvider(e.coin)),
+                                  ),
                                   height: 24,
                                 ),
                                 const SizedBox(

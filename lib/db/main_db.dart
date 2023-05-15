@@ -2,12 +2,14 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/exceptions/main_db/main_db_exception.dart';
+import 'package:stackduo/models/isar/models/block_explorer.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
+import 'package:stackduo/models/isar/stack_theme.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/stack_file_system.dart';
 import 'package:tuple/tuple.dart';
-import '../models/isar/models/block_explorer.dart';
 
 part 'queries/queries.dart';
 
@@ -34,6 +36,8 @@ class MainDB {
         AddressSchema,
         AddressLabelSchema,
         TransactionBlockExplorerSchema,
+        StackThemeSchema,
+        ContactEntrySchema,
       ],
       directory: (await StackFileSystem.applicationIsarDirectory()).path,
       // inspector: kDebugMode,
@@ -42,6 +46,45 @@ class MainDB {
       maxSizeMiB: 512,
     );
     return true;
+  }
+
+  // contact entries
+  List<ContactEntry> getContactEntries() {
+    return isar.contactEntrys.where().findAllSync();
+  }
+
+  Future<bool> deleteContactEntry({required String id}) {
+    try {
+      return isar.writeTxn(() async {
+        await isar.contactEntrys.deleteByCustomId(id);
+        return true;
+      });
+    } catch (e) {
+      throw MainDBException("failed deleteContactEntry: $id", e);
+    }
+  }
+
+  Future<bool> isContactEntryExists({required String id}) async {
+    return isar.contactEntrys
+        .where()
+        .customIdEqualTo(id)
+        .count()
+        .then((value) => value > 0);
+  }
+
+  ContactEntry? getContactEntry({required String id}) {
+    return isar.contactEntrys.where().customIdEqualTo(id).findFirstSync();
+  }
+
+  Future<bool> putContactEntry({required ContactEntry contactEntry}) async {
+    try {
+      return await isar.writeTxn(() async {
+        await isar.contactEntrys.put(contactEntry);
+        return true;
+      });
+    } catch (e) {
+      throw MainDBException("failed putContactEntry: $contactEntry", e);
+    }
   }
 
   // tx block explorers

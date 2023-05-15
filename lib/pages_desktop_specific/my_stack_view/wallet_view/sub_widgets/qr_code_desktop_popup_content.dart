@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 

@@ -12,7 +12,7 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
 import 'package:stackduo/widgets/trade_card.dart';

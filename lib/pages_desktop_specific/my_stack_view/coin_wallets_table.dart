@@ -5,7 +5,7 @@ import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/deskto
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/rounded_container.dart';
 import 'package:stackduo/widgets/wallet_info_row/wallet_info_row.dart';
 

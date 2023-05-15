@@ -1,13 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/exchange/simpleswap/simpleswap_exchange.dart';
 import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
-import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/theme/color_theme.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/utilities/util.dart';
 
 abstract class Assets {
   static const svg = _SVG();
@@ -15,34 +9,6 @@ abstract class Assets {
   static const lottie = _ANIMATIONS();
   static const socials = _SOCIALS();
   static const exchange = _EXCHANGE();
-  static const gif = _GIF();
-
-  static Future<void> precache(BuildContext context) async {
-    final assets = [
-      svg.stack(context),
-      svg.personaEasy(context),
-      svg.personaIncognito(context),
-      ...Coin.values.map(
-        (e) => svg.imageFor(context: context, coin: e),
-      ),
-    ];
-
-    if (Util.isDesktop) {
-      assets.add(svg.themeChan);
-      assets.add(svg.themeDarkChan);
-    }
-
-    final futures = assets.map(
-      (e) => precachePicture(
-          ExactAssetPicture(
-            SvgPicture.svgStringDecoderBuilder,
-            e,
-          ),
-          context),
-    );
-
-    await Future.wait(futures);
-  }
 }
 
 class _SOCIALS {
@@ -98,80 +64,7 @@ class _COIN_CONTROL {
 class _SVG {
   const _SVG();
 
-  static String _path(BuildContext context) {
-    switch (Theme.of(context).extension<StackColors>()!.themeType) {
-      // chan theme uses all the same assets as the light theme
-      case ThemeType.chan:
-        return "assets/svg/themed/${ThemeType.light.name}";
-      case ThemeType.darkChans:
-        return "assets/svg/themed/${ThemeType.dark.name}";
-
-      default:
-        return "assets/svg/themed/${Theme.of(context).extension<StackColors>()!.themeType.name}";
-    }
-  }
-
   final coinControl = const _COIN_CONTROL();
-
-  String? background(BuildContext context) {
-    switch (Theme.of(context).extension<StackColors>()!.themeType) {
-      case ThemeType.light:
-      case ThemeType.chan:
-      case ThemeType.dark:
-      case ThemeType.orange:
-      case ThemeType.oledBlack:
-      case ThemeType.darkChans:
-        return null;
-
-      case ThemeType.oceanBreeze:
-      case ThemeType.fruitSorbet:
-      case ThemeType.forest:
-        return "${_path(context)}/bg.svg";
-    }
-  }
-
-  String bellNew(BuildContext context) => "${_path(context)}/bell-new.svg";
-  String stackIcon(BuildContext context) => "${_path(context)}/stack-icon1.svg";
-  String exchange(BuildContext context) => "${_path(context)}/exchange-2.svg";
-  String stackDuoIcon(BuildContext context) =>
-      "${_path(context)}/stack-duo-icon.svg";
-
-  String receive(BuildContext context) =>
-      "${_path(context)}/tx-icon-receive.svg";
-  String receivePending(BuildContext context) =>
-      "${_path(context)}/tx-icon-receive-pending.svg";
-  String receiveCancelled(BuildContext context) =>
-      "${_path(context)}/tx-icon-receive-failed.svg";
-
-  String send(BuildContext context) => "${_path(context)}/tx-icon-send.svg";
-  String sendPending(BuildContext context) =>
-      "${_path(context)}/tx-icon-send-pending.svg";
-  String sendCancelled(BuildContext context) =>
-      "${_path(context)}/tx-icon-send-failed.svg";
-
-  String txExchange(BuildContext context) =>
-      "${_path(context)}/tx-exchange-icon.svg";
-  String txExchangePending(BuildContext context) =>
-      "${_path(context)}/tx-exchange-icon-pending.svg";
-  String txExchangeFailed(BuildContext context) =>
-      "${_path(context)}/tx-exchange-icon-failed.svg";
-
-  String personaIncognito(BuildContext context) =>
-      "${_path(context)}/persona-incognito-1.svg";
-  String personaEasy(BuildContext context) =>
-      "${_path(context)}/persona-easy-1.svg";
-
-  String stack(BuildContext context) => "${_path(context)}/stack.svg";
-
-  String get themeFruit => "assets/svg/fruit-sorbet-theme.svg";
-  String get themeForest => "assets/svg/forest-theme.svg";
-  String get themeOledBlack => "assets/svg/oled-black-theme.svg";
-  String get themeOcean => "assets/svg/ocean-breeze-theme.svg";
-  String get themeOrange => "assets/svg/orange-theme.svg";
-  String get themeLight => "assets/svg/light-mode.svg";
-  String get themeDark => "assets/svg/dark-theme.svg";
-  String get themeChan => "assets/svg/chanstheme.svg";
-  String get themeDarkChan => "assets/svg/darkChansTheme.svg";
 
   String get circleSliders => "assets/svg/configuration.svg";
   String get circlePlus => "assets/svg/plus-circle.svg";
@@ -270,6 +163,10 @@ class _SVG {
   String get whirlPool => "assets/svg/whirlpool.svg";
   String get fingerprint => "assets/svg/fingerprint.svg";
   String get faceId => "assets/svg/faceid.svg";
+  String get circlePlusDark => "assets/svg/circle-plus.svg";
+  String get file => "assets/svg/file.svg";
+  String get fileUpload => "assets/svg/file-upload.svg";
+
   String get ellipse1 => "assets/svg/Ellipse-43.svg";
   String get ellipse2 => "assets/svg/Ellipse-42.svg";
   String get chevronRight => "assets/svg/chevron-right.svg";
@@ -278,7 +175,7 @@ class _SVG {
   String get exchange3 => "assets/svg/exchange-3.svg";
   String get messageQuestion => "assets/svg/message-question-1.svg";
   String get list => "assets/svg/list-ul.svg";
-  String get unclaimedPaynym => "assets/svg/unclaimed.svg";
+  String get unclaimedPaynym => "assets/svg/unclaimed.png";
 
   String get trocadorRatingA => "assets/svg/trocador_rating_a.svg";
   String get trocadorRatingB => "assets/svg/trocador_rating_b.svg";
@@ -291,32 +188,6 @@ class _SVG {
   // small icons
   String get bitcoin => "assets/svg/coin_icons/Bitcoin.svg";
   String get monero => "assets/svg/coin_icons/Monero.svg";
-
-  String iconFor({required Coin coin}) {
-    switch (coin) {
-      case Coin.bitcoin:
-        return bitcoin;
-      case Coin.monero:
-        return monero;
-      case Coin.bitcoinTestNet:
-        return bitcoinTestnet;
-    }
-  }
-
-  // big icons
-  String bitcoinImage(BuildContext context) => "${_path(context)}/bitcoin.svg";
-  String moneroImage(BuildContext context) => "${_path(context)}/monero.svg";
-
-  String imageFor({required BuildContext context, required Coin coin}) {
-    switch (coin) {
-      case Coin.bitcoin:
-        return bitcoinImage(context);
-      case Coin.monero:
-        return moneroImage(context);
-      case Coin.bitcoinTestNet:
-        return bitcoinImage(context);
-    }
-  }
 }
 
 class _PNG {
@@ -326,9 +197,6 @@ class _PNG {
 
   String get glasses => "assets/images/glasses.png";
   String get glassesHidden => "assets/images/glasses-hidden.png";
-
-  String get chanEasy => "assets/images/chan-persona-easy.png";
-  String get chanIncognito => "assets/images/chan-persona-incognito.png";
 }
 
 class _ANIMATIONS {
@@ -338,18 +206,4 @@ class _ANIMATIONS {
   String get iconSend => "assets/lottie/icon_send.json";
   String get loaderAndCheckmark => "assets/lottie/loader_and_checkmark.json";
   String get arrowRotate => "assets/lottie/arrow_rotate.json";
-}
-
-class _GIF {
-  const _GIF();
-
-  String get stacyPlain => "assets/gif/stacy-plain.gif";
-
-  String plain(Coin coin) {
-    return "assets/gif/coins/${coin.mainNetVersion.name}/plain.gif";
-  }
-
-  String kiss(Coin coin) {
-    return "assets/gif/coins/${coin.mainNetVersion.name}/kiss.gif";
-  }
 }

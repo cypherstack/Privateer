@@ -1,16 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/widgets/rounded_white_container.dart';
-import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/providers/global/node_service_provider.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'background.dart';
-import 'custom_buttons/app_bar_icon_button.dart';
+import 'package:stackduo/widgets/background.dart';
+import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
+import 'package:stackduo/widgets/rounded_white_container.dart';
 
 class ChooseCoinView extends ConsumerStatefulWidget {
   const ChooseCoinView({
@@ -64,7 +65,7 @@ class _ChooseCoinViewState extends ConsumerState<ChooseCoinView> {
             },
           ),
           title: Text(
-            widget.title ?? "Choose Coin",
+            widget.title,
             style: STextStyles.navBarTitle(context),
           ),
         ),
@@ -79,12 +80,7 @@ class _ChooseCoinViewState extends ConsumerState<ChooseCoinView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ...coins.map(
-                      (coin) {
-                    final count = ref
-                        .watch(nodeServiceChangeNotifierProvider
-                        .select((value) => value.getNodesFor(coin)))
-                        .length;
-
+                  (coin) {
                     return Padding(
                       padding: const EdgeInsets.all(4),
                       child: RoundedWhiteContainer(
@@ -97,7 +93,7 @@ class _ChooseCoinViewState extends ConsumerState<ChooseCoinView> {
                             ),
                           ),
                           materialTapTargetSize:
-                          MaterialTapTargetSize.shrinkWrap,
+                              MaterialTapTargetSize.shrinkWrap,
                           onPressed: () {
                             Navigator.of(context).pushNamed(
                               widget.nextRouteName,
@@ -108,8 +104,10 @@ class _ChooseCoinViewState extends ConsumerState<ChooseCoinView> {
                             padding: const EdgeInsets.all(12),
                             child: Row(
                               children: [
-                                SvgPicture.asset(
-                                  Assets.svg.iconFor(coin: coin),
+                                SvgPicture.file(
+                                  File(
+                                    ref.watch(coinIconProvider(coin)),
+                                  ),
                                   width: 24,
                                   height: 24,
                                 ),
@@ -120,7 +118,7 @@ class _ChooseCoinViewState extends ConsumerState<ChooseCoinView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${coin.prettyName} ${widget.coinAdditional ?? ""}",
+                                      "${coin.prettyName} ${widget.coinAdditional}",
                                       style: STextStyles.titleBold12(context),
                                     ),
                                   ],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +15,12 @@ import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_wi
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -472,8 +473,14 @@ class _ConfirmTransactionViewState
                           ),
                           child: Row(
                             children: [
-                              SvgPicture.asset(
-                                Assets.svg.send(context),
+                              SvgPicture.file(
+                                File(
+                                  ref.watch(
+                                    themeProvider.select(
+                                      (value) => value.assets.send,
+                                    ),
+                                  ),
+                                ),
                                 width: 32,
                                 height: 32,
                               ),

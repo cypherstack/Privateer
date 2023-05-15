@@ -19,7 +19,7 @@ import 'package:stackduo/pages/settings_views/sub_widgets/settings_list_button.d
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';

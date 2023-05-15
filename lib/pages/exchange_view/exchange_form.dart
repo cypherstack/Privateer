@@ -29,7 +29,7 @@ import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/exchange_rate_type_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
@@ -831,7 +831,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
         ),
         ExchangeTextField(
           key: Key("exchangeTextFieldKeyFor_"
-              "${Theme.of(context).extension<StackColors>()!.themeType.name}"
+              "${Theme.of(context).extension<StackColors>()!.themeId}"
               "${ref.watch(efCurrencyPairProvider.select((value) => value.send?.ticker))}"),
           controller: _sendController,
           focusNode: _sendFocusNode,
@@ -913,7 +913,7 @@ class _ExchangeFormState extends ConsumerState<ExchangeForm> {
         ),
         ExchangeTextField(
           key: Key(
-              "exchangeTextFieldKeyFor1_${Theme.of(context).extension<StackColors>()!.themeType.name}"),
+              "exchangeTextFieldKeyFor1_${Theme.of(context).extension<StackColors>()!.themeId}"),
           focusNode: _receiveFocusNode,
           controller: _receiveController,
           textStyle: STextStyles.smallMed14(context).copyWith(

@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';

@@ -4,7 +4,7 @@ import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_wi
 import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 
 class WalletKeysButton extends StatelessWidget {
   const WalletKeysButton({

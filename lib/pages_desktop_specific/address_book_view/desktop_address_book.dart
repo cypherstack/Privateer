@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/models/contact.dart';
-import 'package:stackduo/models/contact_address_entry.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/pages/address_book_views/subviews/add_address_book_entry_view.dart';
 import 'package:stackduo/pages/address_book_views/subviews/address_book_filter_view.dart';
 import 'package:stackduo/pages_desktop_specific/address_book_view/subwidgets/desktop_address_book_scaffold.dart';
@@ -10,11 +9,11 @@ import 'package:stackduo/pages_desktop_specific/address_book_view/subwidgets/des
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_book_filter_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/address_book_card.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
@@ -104,19 +103,18 @@ class _DesktopAddressBook extends ConsumerState<DesktopAddressBook> {
       final managers = ref.read(walletsChangeNotifierProvider).managers;
       for (final manager in managers) {
         addresses.add(
-          ContactAddressEntry(
-            coin: manager.coin,
-            address: await manager.currentReceivingAddress,
-            label: "Current Receiving",
-            other: manager.walletName,
-          ),
+          ContactAddressEntry()
+            ..coinName = manager.coin.name
+            ..address = await manager.currentReceivingAddress
+            ..label = "Current Receiving"
+            ..other = manager.walletName,
         );
       }
-      final self = Contact(
+      final self = ContactEntry(
         name: "My Stack",
         addresses: addresses,
         isFavorite: true,
-        id: "default",
+        customId: "default",
       );
       await ref.read(addressBookServiceProvider).editContact(self);
     });
@@ -322,14 +320,14 @@ class _DesktopAddressBook extends ConsumerState<DesktopAddressBook> {
                                     .extension<StackColors>()!
                                     .accentColorDark
                                     .withOpacity(
-                                      currentContactId == favorites[i].id
+                                      currentContactId == favorites[i].customId
                                           ? 0.08
                                           : 0,
                                     ),
                                 child: RawMaterialButton(
                                   onPressed: () {
                                     setState(() {
-                                      currentContactId = favorites[i].id;
+                                      currentContactId = favorites[i].customId;
                                     });
                                   },
                                   padding: const EdgeInsets.symmetric(
@@ -345,8 +343,8 @@ class _DesktopAddressBook extends ConsumerState<DesktopAddressBook> {
                                   ),
                                   child: AddressBookCard(
                                     key: Key(
-                                        "favContactCard_${favorites[i].id}_key"),
-                                    contactId: favorites[i].id,
+                                        "favContactCard_${favorites[i].customId}_key"),
+                                    contactId: favorites[i].customId,
                                     desktopSendFrom: false,
                                   ),
                                 ),
@@ -392,14 +390,16 @@ class _DesktopAddressBook extends ConsumerState<DesktopAddressBook> {
                                         .extension<StackColors>()!
                                         .accentColorDark
                                         .withOpacity(
-                                          currentContactId == allContacts[i].id
+                                          currentContactId ==
+                                                  allContacts[i].customId
                                               ? 0.08
                                               : 0,
                                         ),
                                     child: RawMaterialButton(
                                       onPressed: () {
                                         setState(() {
-                                          currentContactId = allContacts[i].id;
+                                          currentContactId =
+                                              allContacts[i].customId;
                                         });
                                       },
                                       padding: const EdgeInsets.symmetric(
@@ -415,8 +415,8 @@ class _DesktopAddressBook extends ConsumerState<DesktopAddressBook> {
                                       ),
                                       child: AddressBookCard(
                                         key: Key(
-                                            "favContactCard_${allContacts[i].id}_key"),
-                                        contactId: allContacts[i].id,
+                                            "favContactCard_${allContacts[i].customId}_key"),
+                                        contactId: allContacts[i].customId,
                                         desktopSendFrom: false,
                                       ),
                                     ),

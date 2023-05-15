@@ -7,7 +7,7 @@ import 'package:stackduo/providers/exchange/exchange_form_state_provider.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';

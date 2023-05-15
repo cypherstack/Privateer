@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/animated_widgets/rotating_arrows.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';

@@ -4,7 +4,7 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/exchange_rate_type_enum.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/toggle.dart';
 

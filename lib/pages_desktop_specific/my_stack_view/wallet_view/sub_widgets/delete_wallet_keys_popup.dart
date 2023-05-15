@@ -11,7 +11,7 @@ import 'package:stackduo/route_generator.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';

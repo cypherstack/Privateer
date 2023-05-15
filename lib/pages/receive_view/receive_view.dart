@@ -10,12 +10,12 @@ import 'package:stackduo/pages/receive_view/addresses/wallet_addresses_view.dart
 import 'package:stackduo/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/route_generator.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
@@ -140,7 +140,8 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
               child: AspectRatio(
                 aspectRatio: 1,
                 child: AppBarIconButton(
-                  semanticsLabel: "Address List Pop-up Button. Opens A Pop-up For Address List Button.",
+                  semanticsLabel:
+                      "Address List Pop-up Button. Opens A Pop-up For Address List Button.",
                   key: const Key("walletNetworkSettingsAddNewNodeViewButton"),
                   size: 36,
                   shadows: const [],
@@ -230,6 +231,7 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      HapticFeedback.lightImpact();
                       clipboard.setData(
                         ClipboardData(text: receivingAddress),
                       );

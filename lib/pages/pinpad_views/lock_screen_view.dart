@@ -17,7 +17,7 @@ import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/show_loading.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
@@ -38,6 +38,7 @@ class LockscreenView extends ConsumerStatefulWidget {
     this.routeOnSuccessArguments,
     this.biometrics = const Biometrics(),
     this.onSuccess,
+    this.customKeyLabel = "Button",
   }) : super(key: key);
 
   static const String routeName = "/lockscreen";
@@ -52,6 +53,7 @@ class LockscreenView extends ConsumerStatefulWidget {
   final String biometricsCancelButtonString;
   final Biometrics biometrics;
   final VoidCallback? onSuccess;
+  final String customKeyLabel;
 
   @override
   ConsumerState<LockscreenView> createState() => _LockscreenViewState();
@@ -161,7 +163,7 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
   @override
   void didChangeDependencies() {
     if (widget.isInitialAppLogin) {
-      unawaited(Assets.precache(context));
+      // unawaited(Assets.precache(context));
     }
     super.didChangeDependencies();
   }
@@ -202,55 +204,56 @@ class _LockscreenViewState extends ConsumerState<LockscreenView> {
   late Biometrics biometrics;
 
   Widget get _body => Background(
-        child: Scaffold(
-          backgroundColor:
-              Theme.of(context).extension<StackColors>()!.background,
-          appBar: AppBar(
-            leading: widget.showBackButton
-                ? AppBarBackButton(
-                    onPressed: () async {
-                      if (FocusScope.of(context).hasFocus) {
-                        FocusScope.of(context).unfocus();
-                        await Future<void>.delayed(
-                            const Duration(milliseconds: 70));
-                      }
-                      if (mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  )
-                : Container(),
-            actions: [
-              // check prefs and hide if user has biometrics toggle off?
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: 16.0,
+        child: SafeArea(
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            backgroundColor:
+                Theme.of(context).extension<StackColors>()!.background,
+            appBar: AppBar(
+              leading: widget.showBackButton
+                  ? AppBarBackButton(
+                      onPressed: () async {
+                        if (FocusScope.of(context).hasFocus) {
+                          FocusScope.of(context).unfocus();
+                          await Future<void>.delayed(
+                              const Duration(milliseconds: 70));
+                        }
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    )
+                  : Container(),
+              actions: [
+                // check prefs and hide if user has biometrics toggle off?
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        right: 16.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (ref
+                                  .read(prefsChangeNotifierProvider)
+                                  .useBiometrics ==
+                              true)
+                            CustomTextButton(
+                              text: "Use biometrics",
+                              onTap: () async {
+                                await _checkUseBiometrics();
+                              },
+                            ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (ref
-                                .read(prefsChangeNotifierProvider)
-                                .useBiometrics ==
-                            true)
-                          CustomTextButton(
-                            text: "Use biometrics",
-                            onTap: () async {
-                              await _checkUseBiometrics();
-                            },
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          body: SafeArea(
-            child: Column(
+                  ],
+                ),
+              ],
+            ),
+            body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Shake(

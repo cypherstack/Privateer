@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,12 +8,13 @@ import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/models/isar/models/blockchain_data/utxo.dart';
 import 'package:stackduo/pages_desktop_specific/coin_control/utxo_row.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/animated_widgets/rotate_icon.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -358,8 +361,10 @@ class _DesktopCoinControlUseDialogState
                                   color: Colors.transparent,
                                   child: Row(
                                     children: [
-                                      SvgPicture.asset(
-                                        Assets.svg.iconFor(coin: coin),
+                                      SvgPicture.file(
+                                        File(
+                                          ref.watch(coinIconProvider(coin)),
+                                        ),
                                         width: 24,
                                         height: 24,
                                       ),

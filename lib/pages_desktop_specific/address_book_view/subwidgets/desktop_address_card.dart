@@ -1,22 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:stackduo/models/contact_address_entry.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/address_book_views/subviews/edit_contact_address_view.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/enums/flush_bar_type.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 
-class DesktopAddressCard extends StatelessWidget {
+class DesktopAddressCard extends ConsumerWidget {
   const DesktopAddressCard({
     Key? key,
     required this.entry,
@@ -29,13 +31,13 @@ class DesktopAddressCard extends StatelessWidget {
   final ClipboardInterface clipboard;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SvgPicture.asset(
-          Assets.svg.iconFor(
-            coin: entry.coin,
+        SvgPicture.file(
+          File(
+            ref.watch(coinIconProvider(entry.coin)),
           ),
           height: 32,
           width: 32,

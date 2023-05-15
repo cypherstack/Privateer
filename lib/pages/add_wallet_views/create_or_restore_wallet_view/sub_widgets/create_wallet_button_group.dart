@@ -3,7 +3,7 @@ import 'package:stackduo/pages/add_wallet_views/name_your_wallet_view/name_your_
 import 'package:stackduo/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:tuple/tuple.dart';
 
 class CreateWalletButtonGroup extends StatelessWidget {

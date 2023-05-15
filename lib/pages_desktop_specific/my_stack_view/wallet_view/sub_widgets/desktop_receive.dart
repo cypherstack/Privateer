@@ -9,13 +9,12 @@ import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/receive_view/generate_receiving_uri_qr_code_view.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/route_generator.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/enums/flush_bar_type.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
@@ -199,14 +198,14 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
             ),
           ),
         ),
-          const SizedBox(
-            height: 20,
-          ),
-          SecondaryButton(
-            buttonHeight: ButtonHeight.l,
-            onPressed: generateNewAddress,
-            label: "Generate new address",
-          ),
+        const SizedBox(
+          height: 20,
+        ),
+        SecondaryButton(
+          buttonHeight: ButtonHeight.l,
+          onPressed: generateNewAddress,
+          label: "Generate new address",
+        ),
         const SizedBox(
           height: 32,
         ),

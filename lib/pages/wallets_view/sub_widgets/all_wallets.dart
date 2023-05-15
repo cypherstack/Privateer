@@ -4,7 +4,7 @@ import 'package:stackduo/pages/add_wallet_views/add_wallet_view/add_wallet_view.
 import 'package:stackduo/pages/wallets_view/sub_widgets/wallet_list_item.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 
 class AllWallets extends StatelessWidget {

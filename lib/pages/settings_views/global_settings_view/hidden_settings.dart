@@ -8,7 +8,7 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_api.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 

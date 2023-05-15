@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/support_view.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackduo/widgets/desktop/desktop_scaffold.dart';
 

@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/draggable_switch_button.dart';
@@ -102,9 +104,12 @@ class _StartupWalletSelectionViewState
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.all(4),
-                                          child: SvgPicture.asset(
-                                            Assets.svg
-                                                .iconFor(coin: manager.coin),
+                                          child: SvgPicture.file(
+                                            File(
+                                              ref.watch(
+                                                coinIconProvider(manager.coin),
+                                              ),
+                                            ),
                                             width: 20,
                                             height: 20,
                                           ),

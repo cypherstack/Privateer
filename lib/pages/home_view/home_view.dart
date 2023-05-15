@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,10 +13,11 @@ import 'package:stackduo/pages/wallets_view/wallets_view.dart';
 import 'package:stackduo/providers/global/notifications_provider.dart';
 import 'package:stackduo/providers/ui/home_view_index_provider.dart';
 import 'package:stackduo/providers/ui/unread_notifications_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/animated_widgets/rotate_icon.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -160,8 +162,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 GestureDetector(
                   onTap: _hiddenOptions,
                   child: RotateIcon(
-                    icon: SvgPicture.asset(
-                      Assets.svg.stackDuoIcon(context),
+                    icon: SvgPicture.file(
+                      File(
+                        ref.watch(
+                          themeProvider.select(
+                            (value) => value.assets.stackIcon,
+                          ),
+                        ),
+                      ),
                       width: 24,
                       height: 24,
                     ),
@@ -189,27 +197,44 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: AppBarIconButton(
-                    semanticsLabel: "Notifications Button. Takes To Notifications Page.",
+                    semanticsLabel:
+                        "Notifications Button. Takes To Notifications Page.",
                     key: const Key("walletsViewAlertsButton"),
                     size: 36,
                     shadows: const [],
                     color: Theme.of(context)
                         .extension<StackColors>()!
                         .backgroundAppBar,
-                    icon: SvgPicture.asset(
-                      ref.watch(notificationsProvider
-                              .select((value) => value.hasUnreadNotifications))
-                          ? Assets.svg.bellNew(context)
-                          : Assets.svg.bell,
-                      width: 20,
-                      height: 20,
-                      color: ref.watch(notificationsProvider
-                              .select((value) => value.hasUnreadNotifications))
-                          ? null
-                          : Theme.of(context)
-                              .extension<StackColors>()!
-                              .topNavIconPrimary,
-                    ),
+                    icon: ref.watch(notificationsProvider
+                            .select((value) => value.hasUnreadNotifications))
+                        ? SvgPicture.file(
+                            File(
+                              ref.watch(
+                                themeProvider.select(
+                                  (value) => value.assets.bellNew,
+                                ),
+                              ),
+                            ),
+                            width: 20,
+                            height: 20,
+                            color: ref.watch(notificationsProvider.select(
+                                    (value) => value.hasUnreadNotifications))
+                                ? null
+                                : Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .topNavIconPrimary,
+                          )
+                        : SvgPicture.asset(
+                            Assets.svg.bell,
+                            width: 20,
+                            height: 20,
+                            color: ref.watch(notificationsProvider.select(
+                                    (value) => value.hasUnreadNotifications))
+                                ? null
+                                : Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .topNavIconPrimary,
+                          ),
                     onPressed: () {
                       // reset unread state
                       ref.refresh(unreadNotificationsStateProvider);

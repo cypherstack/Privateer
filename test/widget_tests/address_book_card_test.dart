@@ -14,6 +14,7 @@ import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/address_book_card.dart';
 
+import '../sample_data/theme_json.dart';
 import 'address_book_card_test.mocks.dart';
 
 class MockedFunctions extends Mock {
@@ -24,12 +25,20 @@ class MockedFunctions extends Mock {
 void main() {
   testWidgets('test returns Contact Address Entry', (widgetTester) async {
     final service = MockAddressBookService();
+    const applicationThemesDirectoryPath = "";
 
     when(service.getContactById("default")).thenAnswer(
-      (realInvocation) => Contact(
+      (realInvocation) => ContactEntry(
         name: "John Doe",
-        addresses: [],
+        addresses: [
+          ContactAddressEntry()
+            ..coinName = Coin.bitcoincash.name
+            ..address = "some bch address"
+            ..label = "Bills"
+            ..other = null
+        ],
         isFavorite: true,
+        customId: '',
       ),
     );
 
@@ -44,7 +53,11 @@ void main() {
           theme: ThemeData(
             extensions: [
               StackColors.fromStackColorTheme(
-                LightColors(),
+                StackTheme.fromJson(
+                  json: lightThemeJsonMap,
+                  applicationThemesDirectoryPath:
+                      applicationThemesDirectoryPath,
+                ),
               ),
             ],
           ),

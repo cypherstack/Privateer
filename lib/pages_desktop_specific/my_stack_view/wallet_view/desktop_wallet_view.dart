@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,12 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackduo/services/event_bus/global_event_bus.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/backup_frequency_type.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -260,8 +262,10 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
                 const SizedBox(
                   width: 15,
                 ),
-                SvgPicture.asset(
-                  Assets.svg.iconFor(coin: coin),
+                SvgPicture.file(
+                  File(
+                    ref.watch(coinIconProvider(coin)),
+                  ),
                   width: 32,
                   height: 32,
                 ),
@@ -316,8 +320,10 @@ class _DesktopWalletViewState extends ConsumerState<DesktopWalletView> {
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    SvgPicture.asset(
-                      Assets.svg.iconFor(coin: coin),
+                    SvgPicture.file(
+                      File(
+                        ref.watch(coinIconProvider(coin)),
+                      ),
                       width: 40,
                       height: 40,
                     ),

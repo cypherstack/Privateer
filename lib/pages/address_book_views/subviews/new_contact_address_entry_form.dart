@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +9,8 @@ import 'package:stackduo/pages/address_book_views/subviews/coin_select_sheet.dar
 import 'package:stackduo/providers/providers.dart';
 // import 'package:stackduo/providers/global/should_show_lockscreen_on_resume_state_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
@@ -15,7 +19,6 @@ import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackduo/widgets/icon_widgets/qrcode_icon.dart';
@@ -139,8 +142,10 @@ class _NewContactAddressEntryFormState
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          SvgPicture.asset(
-                            Assets.svg.iconFor(coin: coin),
+                          SvgPicture.file(
+                            File(
+                              ref.watch(coinIconProvider(coin)),
+                            ),
                             height: 24,
                             width: 24,
                           ),
@@ -209,12 +214,19 @@ class _NewContactAddressEntryFormState
                               )
                             : Row(
                                 children: [
-                                  SvgPicture.asset(
-                                    Assets.svg.iconFor(
-                                        coin: ref.watch(
+                                  SvgPicture.file(
+                                    File(
+                                      ref.watch(
+                                        coinIconProvider(
+                                          ref.watch(
                                             addressEntryDataProvider(widget.id)
                                                 .select(
-                                                    (value) => value.coin))!),
+                                              (value) => value.coin,
+                                            ),
+                                          )!,
+                                        ),
+                                      ),
+                                    ),
                                     height: 20,
                                     width: 20,
                                   ),

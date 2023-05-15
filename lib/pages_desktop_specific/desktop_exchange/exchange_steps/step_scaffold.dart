@@ -22,7 +22,7 @@ import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/exchange_rate_type_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_loading_overlay.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';

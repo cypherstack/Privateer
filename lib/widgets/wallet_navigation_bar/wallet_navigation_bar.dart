@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/wallet_navigation_bar/components/wallet_navigation_bar_item.dart';
 
@@ -175,7 +175,7 @@ class _WalletNavigationBarState extends ConsumerState<WalletNavigationBar> {
                                             height: 20,
                                             color: Theme.of(context)
                                                 .extension<StackColors>()!
-                                                .infoItemIcons,
+                                                .bottomNavIconIconHighlighted,
                                           ),
                                           crossFadeState: ref
                                                   .watch(walletNavBarMore.state)
@@ -190,10 +190,10 @@ class _WalletNavigationBarState extends ConsumerState<WalletNavigationBar> {
                                             style:
                                                 STextStyles.buttonSmall(context)
                                                     .copyWith(
-                                                        color: Theme.of(context)
-                                                            .extension<
-                                                                StackColors>()!
-                                                            .bottomNavText),
+                                              color: Theme.of(context)
+                                                  .extension<StackColors>()!
+                                                  .bottomNavText,
+                                            ),
                                           ),
                                           secondChild: Text(
                                             "More",
@@ -202,7 +202,7 @@ class _WalletNavigationBarState extends ConsumerState<WalletNavigationBar> {
                                                     .copyWith(
                                               color: Theme.of(context)
                                                   .extension<StackColors>()!
-                                                  .infoItemIcons,
+                                                  .bottomNavIconIconHighlighted,
                                             ),
                                           ),
                                           crossFadeState: ref

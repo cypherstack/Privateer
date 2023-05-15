@@ -6,7 +6,7 @@ import 'package:stackduo/pages/address_book_views/subviews/edit_contact_name_emo
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
@@ -147,7 +147,7 @@ class _DesktopContactOptionsMenuPopupState
                               onPressed: () {
                                 ref
                                     .read(addressBookServiceProvider)
-                                    .removeContact(contact.id);
+                                    .removeContact(contact.customId);
                                 Navigator.of(context).pop();
                                 showFloatingFlushBar(
                                   type: FlushBarType.success,

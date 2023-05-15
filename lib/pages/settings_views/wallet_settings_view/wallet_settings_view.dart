@@ -22,7 +22,7 @@ import 'package:stackduo/services/event_bus/global_event_bus.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -348,76 +348,6 @@ class _WalletSettingsViewState extends ConsumerState<WalletSettingsView> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class EpicBoxInfoForm extends ConsumerStatefulWidget {
-  const EpicBoxInfoForm({
-    Key? key,
-    required this.walletId,
-  }) : super(key: key);
-
-  final String walletId;
-
-  @override
-  ConsumerState<EpicBoxInfoForm> createState() => _EpiBoxInfoFormState();
-}
-
-class _EpiBoxInfoFormState extends ConsumerState<EpicBoxInfoForm> {
-  final hostController = TextEditingController();
-  final portController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    hostController.dispose();
-    portController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RoundedWhiteContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: hostController,
-            decoration: const InputDecoration(hintText: "Host"),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextField(
-            autocorrect: Util.isDesktop ? false : true,
-            enableSuggestions: Util.isDesktop ? false : true,
-            controller: portController,
-            decoration: const InputDecoration(hintText: "Port"),
-            keyboardType:
-                Util.isDesktop ? null : const TextInputType.numberWithOptions(),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          TextButton(
-            onPressed: () async {},
-            child: Text(
-              "Save",
-              style: STextStyles.button(context).copyWith(
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .accentColorDark),
-            ),
-          ),
-        ],
       ),
     );
   }

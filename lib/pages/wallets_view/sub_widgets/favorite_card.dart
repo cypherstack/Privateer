@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,12 +7,13 @@ import 'package:stackduo/pages/wallet_view/wallet_view.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:tuple/tuple.dart';
@@ -212,8 +215,10 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                             overflow: TextOverflow.fade,
                           ),
                         ),
-                        SvgPicture.asset(
-                          Assets.svg.iconFor(coin: coin),
+                        SvgPicture.file(
+                          File(
+                            ref.watch(coinIconProvider(coin)),
+                          ),
                           width: 24,
                           height: 24,
                         ),

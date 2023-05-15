@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 
 class NumberKey extends StatefulWidget {
   const NumberKey({
@@ -119,42 +119,42 @@ class _BackspaceKeyState extends State<BackspaceKey> {
         shadows: const [],
       ),
       child: MaterialButton(
-        // splashColor: Theme.of(context).extension<StackColors>()!.highlight,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        shape: const StadiumBorder(),
-        onPressed: () {
-          onPressed.call();
-          setState(() {
-            _color = Theme.of(context)
-                .extension<StackColors>()!
-                .numpadBackDefault
-                .withOpacity(0.8);
-          });
+          // splashColor: Theme.of(context).extension<StackColors>()!.highlight,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          shape: const StadiumBorder(),
+          onPressed: () {
+            onPressed.call();
+            setState(() {
+              _color = Theme.of(context)
+                  .extension<StackColors>()!
+                  .numpadBackDefault
+                  .withOpacity(0.8);
+            });
 
-          Future<void>.delayed(const Duration(milliseconds: 200), () {
-            if (mounted) {
-              setState(() {
-                _color = Theme.of(context)
+            Future<void>.delayed(const Duration(milliseconds: 200), () {
+              if (mounted) {
+                setState(() {
+                  _color = Theme.of(context)
+                      .extension<StackColors>()!
+                      .numpadBackDefault;
+                });
+              }
+            });
+          },
+          child: Semantics(
+            label: "Backspace Button. Deletes The Last Digit.",
+            excludeSemantics: true,
+            child: Center(
+              child: SvgPicture.asset(
+                Assets.svg.delete,
+                width: 20,
+                height: 20,
+                color: Theme.of(context)
                     .extension<StackColors>()!
-                    .numpadBackDefault;
-              });
-            }
-          });
-        },
-        child: Semantics(
-          label: "Backspace Button. Deletes The Last Digit.",
-          excludeSemantics: true,
-          child: Center(
-            child: SvgPicture.asset(
-            Assets.svg.delete,
-              width: 20,
-              height: 20,
-              color:
-              Theme.of(context).extension<StackColors>()!.numpadTextDefault,
+                    .numpadTextDefault,
+              ),
             ),
-          ),
-        ),
-      ),
+          )),
     );
   }
 }
@@ -203,42 +203,47 @@ class CustomKey extends StatelessWidget {
     Key? key,
     required this.onPressed,
     this.iconAssetName,
+    this.semanticsLabel = "Button",
   }) : super(key: key);
 
   final VoidCallback onPressed;
   final String? iconAssetName;
+  final String semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 72,
-      width: 72,
-      decoration: ShapeDecoration(
-        shape: const StadiumBorder(),
-        color: Theme.of(context).extension<StackColors>()!.numpadBackDefault,
-        shadows: const [],
-      ),
-      child: MaterialButton(
-        // splashColor: Theme.of(context).extension<StackColors>()!.highlight,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        shape: const StadiumBorder(),
-        onPressed: () {
-          onPressed.call();
-        },
-        child: Center(
-          child: iconAssetName == null
-              ? null
-              : SvgPicture.asset(
-                  iconAssetName!,
-                  width: 20,
-                  height: 20,
-                  color: Theme.of(context)
-                      .extension<StackColors>()!
-                      .numpadTextDefault,
-                ),
+        height: 72,
+        width: 72,
+        decoration: ShapeDecoration(
+          shape: const StadiumBorder(),
+          color: Theme.of(context).extension<StackColors>()!.numpadBackDefault,
+          shadows: const [],
         ),
-      ),
-    );
+        child: Semantics(
+          label: semanticsLabel,
+          excludeSemantics: true,
+          child: MaterialButton(
+            // splashColor: Theme.of(context).extension<StackColors>()!.highlight,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: const StadiumBorder(),
+            onPressed: () {
+              onPressed.call();
+            },
+            child: Center(
+              child: iconAssetName == null
+                  ? null
+                  : SvgPicture.asset(
+                      iconAssetName!,
+                      width: 20,
+                      height: 20,
+                      color: Theme.of(context)
+                          .extension<StackColors>()!
+                          .numpadTextDefault,
+                    ),
+            ),
+          ),
+        ));
   }
 }
 

@@ -6,15 +6,15 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/models/transaction_filter.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/providers/ui/color_theme_provider.dart';
 import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -61,7 +61,7 @@ class _TransactionSearchViewState
 
   @override
   initState() {
-    baseColor = ref.read(colorThemeProvider.state).state.textSubtitle2;
+    baseColor = ref.read(themeProvider.state).state.textSubtitle2;
     final filterState = ref.read(transactionFilterProvider.state).state;
     if (filterState != null) {
       _isActiveReceivedCheckbox = filterState.received;

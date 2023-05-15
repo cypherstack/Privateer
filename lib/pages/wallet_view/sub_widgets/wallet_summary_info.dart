@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,12 +11,13 @@ import 'package:stackduo/providers/wallet/wallet_balance_toggle_state_provider.d
 import 'package:stackduo/services/event_bus/events/global/balance_refreshed_event.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackduo/services/event_bus/global_event_bus.dart';
+import 'package:stackduo/themes/coin_icon_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/wallet_balance_toggle_state.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 
 class WalletSummaryInfo extends ConsumerStatefulWidget {
   const WalletSummaryInfo({
@@ -158,9 +160,9 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
         ),
         Column(
           children: [
-            SvgPicture.asset(
-              Assets.svg.iconFor(
-                coin: coin,
+            SvgPicture.file(
+              File(
+                ref.watch(coinIconProvider(coin)),
               ),
               width: 24,
               height: 24,

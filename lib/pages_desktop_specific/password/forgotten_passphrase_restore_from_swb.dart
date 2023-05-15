@@ -20,7 +20,7 @@ import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';

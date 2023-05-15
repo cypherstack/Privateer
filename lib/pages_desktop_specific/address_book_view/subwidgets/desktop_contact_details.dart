@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/models/contact.dart';
+import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/address_book_views/subviews/add_new_contact_address_view.dart';
 import 'package:stackduo/pages_desktop_specific/address_book_view/subwidgets/desktop_address_card.dart';
@@ -11,9 +14,10 @@ import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
 import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
@@ -22,8 +26,6 @@ import 'package:stackduo/widgets/loading_indicator.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/transaction_card.dart';
 import 'package:tuple/tuple.dart';
-
-import '../../../db/main_db.dart';
 
 class DesktopContactDetails extends ConsumerStatefulWidget {
   const DesktopContactDetails({
@@ -41,7 +43,7 @@ class DesktopContactDetails extends ConsumerStatefulWidget {
 class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
   List<Tuple2<String, Transaction>> _cachedTransactions = [];
 
-  bool _contactHasAddress(String address, Contact contact) {
+  bool _contactHasAddress(String address, ContactEntry contact) {
     for (final entry in contact.addresses) {
       if (entry.address == address) {
         return true;
@@ -81,7 +83,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
   @override
   Widget build(BuildContext context) {
     // provider hack to prevent trying to update widget with deleted contact
-    Contact? _contact;
+    ContactEntry? _contact;
     try {
       _contact = ref.watch(addressBookServiceProvider
           .select((value) => value.getContactById(widget.contactId)));
@@ -118,8 +120,14 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                           ),
                           child: contact.id == "default"
                               ? Center(
-                                  child: SvgPicture.asset(
-                                    Assets.svg.stackDuoIcon(context),
+                                  child: SvgPicture.file(
+                                    File(
+                                      ref.watch(
+                                        themeProvider.select(
+                                          (value) => value.assets.stackIcon,
+                                        ),
+                                      ),
+                                    ),
                                     width: 32,
                                   ),
                                 )
@@ -154,7 +162,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                             barrierColor: Colors.transparent,
                             builder: (context) {
                               return DesktopContactOptionsMenuPopup(
-                                contactId: contact.id,
+                                contactId: contact.customId,
                               );
                             },
                           );
@@ -256,7 +264,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                                     padding: const EdgeInsets.all(18),
                                     child: DesktopAddressCard(
                                       entry: contact.addresses[i],
-                                      contactId: contact.id,
+                                      contactId: contact.customId,
                                     ),
                                   ),
                                 ],

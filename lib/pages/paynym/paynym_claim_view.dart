@@ -13,7 +13,7 @@ import 'package:stackduo/providers/wallet/my_paynym_account_state_provider.dart'
 import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -138,8 +138,10 @@ class _PaynymClaimViewState extends ConsumerState<PaynymClaimView> {
               const Spacer(
                 flex: 1,
               ),
-              SvgPicture.asset(
-                Assets.svg.unclaimedPaynym,
+              Image(
+                image: AssetImage(
+                  Assets.svg.unclaimedPaynym,
+                ),
                 width: MediaQuery.of(context).size.width / 2,
               ),
               const SizedBox(

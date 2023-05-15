@@ -13,7 +13,7 @@ import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
@@ -94,7 +94,10 @@ class _TransactionsListState extends ConsumerState<TransactionsList> {
             TransactionCard(
               // this may mess with combined firo transactions
               key: isConfirmed
-                  ? Key(tx.txid + tx.type.name + tx.address.value.toString())
+                  ? Key(tx.txid +
+                      tx.type.name +
+                      tx.address.value.toString() +
+                      tx.height.toString())
                   : UniqueKey(), //
               transaction: tx,
               walletId: widget.walletId,
@@ -191,7 +194,10 @@ class _TransactionsListState extends ConsumerState<TransactionsList> {
         child: TransactionCard(
           // this may mess with combined firo transactions
           key: isConfirmed
-              ? Key(tx.txid + tx.type.name + tx.address.value.toString())
+              ? Key(tx.txid +
+                  tx.type.name +
+                  tx.address.value.toString() +
+                  tx.height.toString())
               : UniqueKey(),
           transaction: tx,
           walletId: widget.walletId,
@@ -252,6 +258,7 @@ class _TransactionsListState extends ConsumerState<TransactionsList> {
             },
             child: Util.isDesktop
                 ? ListView.separated(
+                    shrinkWrap: true,
                     itemBuilder: (context, index) {
                       BorderRadius? radius;
                       if (_transactions2.length == 1) {

@@ -6,7 +6,7 @@ import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/services/event_bus/events/global/wallet_sync_status_changed_event.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 
 class WalletSummary extends StatelessWidget {
   const WalletSummary({

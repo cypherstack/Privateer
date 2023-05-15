@@ -6,7 +6,7 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 

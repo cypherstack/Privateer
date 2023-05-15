@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,13 +9,12 @@ import 'package:stackduo/pages/pinpad_views/create_pin_view.dart';
 import 'package:stackduo/pages_desktop_specific/password/create_password_view.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
 import 'package:stackduo/providers/global/price_provider.dart';
-import 'package:stackduo/providers/ui/color_theme_provider.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/color_theme.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -307,10 +307,11 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
 
   @override
   Widget build(BuildContext context) {
-    final bool lightChan =
-        ref.read(colorThemeProvider.state).state.themeType == ThemeType.chan;
-    final bool darkChan = ref.read(colorThemeProvider.state).state.themeType ==
-        ThemeType.darkChans;
+    final easyFile =
+        ref.watch(themeProvider.select((value) => value.assets.personaEasy));
+    final incognitoFile = ref
+        .watch(themeProvider.select((value) => value.assets.personaIncognito));
+
     return Row(
       children: [
         Expanded(
@@ -347,12 +348,16 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      (lightChan || darkChan)
-                          ? Image(
-                              image: AssetImage(Assets.png.chanEasy),
+                      (easyFile.endsWith(".png"))
+                          ? Image.file(
+                              File(
+                                easyFile,
+                              ),
                             )
-                          : SvgPicture.asset(
-                              Assets.svg.personaEasy(context),
+                          : SvgPicture.file(
+                              File(
+                                easyFile,
+                              ),
                               width: 140,
                               height: 140,
                             ),
@@ -452,12 +457,16 @@ class _PrivacyToggleState extends ConsumerState<PrivacyToggle> {
                         const SizedBox(
                           height: 10,
                         ),
-                      (lightChan || darkChan)
-                          ? Image(
-                              image: AssetImage(Assets.png.chanIncognito),
+                      (incognitoFile.endsWith(".png"))
+                          ? Image.file(
+                              File(
+                                incognitoFile,
+                              ),
                             )
-                          : SvgPicture.asset(
-                              Assets.svg.personaIncognito(context),
+                          : SvgPicture.file(
+                              File(
+                                incognitoFile,
+                              ),
                               width: 140,
                               height: 140,
                             ),

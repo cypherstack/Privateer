@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_settings/debug_info_dialog.dart';
+import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_settings/desktop_manage_block_explorers_dialog.dart';
 import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_settings/stack_privacy_dialog.dart';
 import 'package:stackduo/providers/global/prefs_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/draggable_switch_button.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
@@ -58,7 +59,7 @@ class _AdvancedSettings extends ConsumerState<AdvancedSettings> {
                             ),
                             TextSpan(
                               text:
-                                  "\n\nConfigurate these settings only if you know what you are doing!",
+                                  "\n\nConfigure these settings only if you know what you are doing!",
                               style: STextStyles.desktopTextExtraExtraSmall(
                                   context),
                             ),
@@ -183,7 +184,7 @@ class _AdvancedSettings extends ConsumerState<AdvancedSettings> {
                             PrimaryButton(
                               label: "Change",
                               buttonHeight: ButtonHeight.xs,
-                              width: 86,
+                              width: 101,
                               onPressed: () async {
                                 await showDialog<dynamic>(
                                   context: context,
@@ -207,8 +208,6 @@ class _AdvancedSettings extends ConsumerState<AdvancedSettings> {
                     thickness: 0.5,
                   ),
                 ),
-
-                /// TODO: Make a dialog popup
                 Padding(
                   padding: const EdgeInsets.all(10),
                   child: Row(
@@ -234,6 +233,44 @@ class _AdvancedSettings extends ConsumerState<AdvancedSettings> {
                             barrierDismissible: true,
                             builder: (context) {
                               return const DebugInfoDialog();
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Divider(
+                    thickness: 0.5,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Block explorers",
+                        style: STextStyles.desktopTextExtraSmall(context)
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .textDark),
+                        textAlign: TextAlign.left,
+                      ),
+                      PrimaryButton(
+                        buttonHeight: ButtonHeight.xs,
+                        label: "Edit",
+                        width: 101,
+                        onPressed: () async {
+                          await showDialog<dynamic>(
+                            context: context,
+                            useSafeArea: false,
+                            barrierDismissible: true,
+                            builder: (context) {
+                              return const DesktopManageBlockExplorersDialog();
                             },
                           );
                         },

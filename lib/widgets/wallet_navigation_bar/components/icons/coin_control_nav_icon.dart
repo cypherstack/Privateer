@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 
 class CoinControlNavIcon extends StatelessWidget {
   const CoinControlNavIcon({Key? key}) : super(key: key);

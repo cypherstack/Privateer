@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
@@ -8,13 +9,13 @@ import 'package:stackduo/pages/add_wallet_views/restore_wallet_view/restore_opti
 import 'package:stackduo/pages_desktop_specific/my_stack_view/exit_to_my_stack_button.dart';
 import 'package:stackduo/providers/global/wallets_service_provider.dart';
 import 'package:stackduo/providers/ui/verify_recovery_phrase/mnemonic_word_count_state_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/name_generator.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -238,21 +239,23 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                           key: const Key("genRandomWalletNameButtonKey"),
                           child: _showDiceIcon
                               ? Semantics(
-                                label: "Generate Random Wallet Name Button. Generates A Random Name For Wallet.",
-                                excludeSemantics: true,
-                                child: DiceIcon(
-                                  width: isDesktop ? 20 : 17,
-                                  height: isDesktop ? 20 : 17,
-                              ),
-                            )
+                                  label:
+                                      "Generate Random Wallet Name Button. Generates A Random Name For Wallet.",
+                                  excludeSemantics: true,
+                                  child: DiceIcon(
+                                    width: isDesktop ? 20 : 17,
+                                    height: isDesktop ? 20 : 17,
+                                  ),
+                                )
                               : Semantics(
-                                label: "Generate Random Wallet Name Button. Generates A Random Name For Wallet.",
-                                excludeSemantics: true,
-                                child: XIcon(
-                                  width: isDesktop ? 21 : 18,
-                                  height: isDesktop ? 21 : 18,
-                              ),
-                            ),
+                                  label:
+                                      "Generate Random Wallet Name Button. Generates A Random Name For Wallet.",
+                                  excludeSemantics: true,
+                                  child: XIcon(
+                                    width: isDesktop ? 21 : 18,
+                                    height: isDesktop ? 21 : 18,
+                                  ),
+                                ),
                           onTap: () async {
                             if (_showDiceIcon) {
                               textEditingController.text =

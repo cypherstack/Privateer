@@ -32,11 +32,9 @@ import 'package:stackduo/services/mixins/wallet_cache.dart';
 import 'package:stackduo/services/mixins/wallet_db.dart';
 import 'package:stackduo/services/mixins/xpubable.dart';
 import 'package:stackduo/services/node_service.dart';
-import 'package:stackduo/services/notifications_api.dart';
 import 'package:stackduo/services/transaction_notification_tracker.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/bip32_utils.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/default_nodes.dart';
@@ -48,6 +46,7 @@ import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/paynym_is_api.dart';
 import 'package:stackduo/utilities/prefs.dart';
+import 'package:stackduo/widgets/crypto_notifications.dart';
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
@@ -832,32 +831,35 @@ class BitcoinWallet extends CoinServiceAPI
       final confirmations = tx.getConfirmations(currentChainHeight);
 
       if (tx.type == isar_models.TransactionType.incoming) {
-        unawaited(NotificationApi.showNotification(
-          title: "Incoming transaction",
-          body: walletName,
-          walletId: walletId,
-          iconAssetName: Assets.svg.iconFor(coin: coin),
-          date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
-          shouldWatchForUpdates: confirmations < MINIMUM_CONFIRMATIONS,
-          coinName: coin.name,
-          txid: tx.txid,
-          confirmations: confirmations,
-          requiredConfirmations: MINIMUM_CONFIRMATIONS,
-        ));
+        CryptoNotificationsEventBus.instance.fire(
+          CryptoNotificationEvent(
+            title: "Incoming transaction",
+            walletId: walletId,
+            walletName: walletName,
+            date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
+            shouldWatchForUpdates: confirmations < MINIMUM_CONFIRMATIONS,
+            coin: coin,
+            txid: tx.txid,
+            confirmations: confirmations,
+            requiredConfirmations: MINIMUM_CONFIRMATIONS,
+          ),
+        );
         await txTracker.addNotifiedPending(tx.txid);
       } else if (tx.type == isar_models.TransactionType.outgoing) {
-        unawaited(NotificationApi.showNotification(
-          title: "Sending transaction",
-          body: walletName,
-          walletId: walletId,
-          iconAssetName: Assets.svg.iconFor(coin: coin),
-          date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
-          shouldWatchForUpdates: confirmations < MINIMUM_CONFIRMATIONS,
-          coinName: coin.name,
-          txid: tx.txid,
-          confirmations: confirmations,
-          requiredConfirmations: MINIMUM_CONFIRMATIONS,
-        ));
+        CryptoNotificationsEventBus.instance.fire(
+          CryptoNotificationEvent(
+            title: "Sending transaction",
+            walletId: walletId,
+            date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
+            shouldWatchForUpdates: confirmations < MINIMUM_CONFIRMATIONS,
+            txid: tx.txid,
+            confirmations: confirmations,
+            requiredConfirmations: MINIMUM_CONFIRMATIONS,
+            walletName: walletName,
+            coin: coin,
+          ),
+        );
+
         await txTracker.addNotifiedPending(tx.txid);
       }
     }
@@ -865,26 +867,34 @@ class BitcoinWallet extends CoinServiceAPI
     // notify on confirmed
     for (final tx in unconfirmedTxnsToNotifyConfirmed) {
       if (tx.type == isar_models.TransactionType.incoming) {
-        unawaited(NotificationApi.showNotification(
-          title: "Incoming transaction confirmed",
-          body: walletName,
-          walletId: walletId,
-          iconAssetName: Assets.svg.iconFor(coin: coin),
-          date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
-          shouldWatchForUpdates: false,
-          coinName: coin.name,
-        ));
+        CryptoNotificationsEventBus.instance.fire(
+          CryptoNotificationEvent(
+            title: "Incoming transaction confirmed",
+            walletId: walletId,
+            date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
+            shouldWatchForUpdates: false,
+            txid: tx.txid,
+            requiredConfirmations: MINIMUM_CONFIRMATIONS,
+            walletName: walletName,
+            coin: coin,
+          ),
+        );
+
         await txTracker.addNotifiedConfirmed(tx.txid);
       } else if (tx.type == isar_models.TransactionType.outgoing) {
-        unawaited(NotificationApi.showNotification(
-          title: "Outgoing transaction confirmed",
-          body: walletName,
-          walletId: walletId,
-          iconAssetName: Assets.svg.iconFor(coin: coin),
-          date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
-          shouldWatchForUpdates: false,
-          coinName: coin.name,
-        ));
+        CryptoNotificationsEventBus.instance.fire(
+          CryptoNotificationEvent(
+            title: "Outgoing transaction confirmed",
+            walletId: walletId,
+            date: DateTime.fromMillisecondsSinceEpoch(tx.timestamp * 1000),
+            shouldWatchForUpdates: false,
+            txid: tx.txid,
+            requiredConfirmations: MINIMUM_CONFIRMATIONS,
+            walletName: walletName,
+            coin: coin,
+          ),
+        );
+
         await txTracker.addNotifiedConfirmed(tx.txid);
       }
     }

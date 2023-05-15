@@ -4,7 +4,7 @@ import 'package:stackduo/notifications/notification_card.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/unread_notifications_provider.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackduo/widgets/desktop/desktop_scaffold.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
