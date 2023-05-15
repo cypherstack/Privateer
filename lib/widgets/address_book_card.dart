@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/models/contact.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/pages/address_book_views/subviews/contact_popup.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';

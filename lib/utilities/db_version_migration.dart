@@ -2,8 +2,10 @@ import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/db/main_db.dart';
 import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart' as isar_contact;
 import 'package:stackduo/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/services/mixins/wallet_db.dart';
@@ -197,16 +199,16 @@ class DbVersionMigrator with WalletDB {
         // try to continue migrating
         return await migrate(8, secureStore: secureStore);
 
-      case 9:
+      case 8:
         // migrate
-        await _v9();
+        await _v8();
 
         // update version
         await DB.instance.put<dynamic>(
-            boxName: DB.boxNameDBInfo, key: "hive_data_version", value: 10);
+            boxName: DB.boxNameDBInfo, key: "hive_data_version", value: 9);
 
         // try to continue migrating
-        return await migrate(10, secureStore: secureStore);
+        return await migrate(9, secureStore: secureStore);
 
       default:
         // finally return
@@ -299,7 +301,8 @@ class DbVersionMigrator with WalletDB {
     }
   }
 
-  Future<void> _v9() async {
+  // this is actually v9 in sw
+  Future<void> _v8() async {
     final addressBookBox = await Hive.openBox<dynamic>(DB.boxNameAddressBook);
     await MainDB.instance.initMainDB();
 

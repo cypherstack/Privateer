@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/models/contact.dart';
-import 'package:stackduo/models/contact_address_entry.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/pages/address_book_views/subviews/new_contact_address_entry_form.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';

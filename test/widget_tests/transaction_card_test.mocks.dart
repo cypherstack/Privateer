@@ -6,7 +6,7 @@
 import 'dart:async' as _i14;
 import 'dart:ui' as _i16;
 
-import 'package:decimal/decimal.dart' as _i23;
+import 'package:decimal/decimal.dart' as _i22;
 import 'package:flutter/foundation.dart' as _i4;
 import 'package:flutter_riverpod/flutter_riverpod.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
@@ -17,8 +17,8 @@ import 'package:stackduo/services/coins/coin_service.dart' as _i7;
 import 'package:stackduo/services/coins/manager.dart' as _i6;
 import 'package:stackduo/services/locale_service.dart' as _i18;
 import 'package:stackduo/services/node_service.dart' as _i3;
-import 'package:stackduo/services/notes_service.dart' as _i24;
-import 'package:stackduo/services/price_service.dart' as _i22;
+import 'package:stackduo/services/notes_service.dart' as _i23;
+import 'package:stackduo/services/price_service.dart' as _i21;
 import 'package:stackduo/services/wallets.dart' as _i12;
 import 'package:stackduo/services/wallets_service.dart' as _i2;
 import 'package:stackduo/utilities/amount/amount.dart' as _i10;
@@ -26,7 +26,6 @@ import 'package:stackduo/utilities/enums/backup_frequency_type.dart' as _i20;
 import 'package:stackduo/utilities/enums/coin_enum.dart' as _i13;
 import 'package:stackduo/utilities/enums/sync_type_enum.dart' as _i19;
 import 'package:stackduo/utilities/prefs.dart' as _i15;
-import 'package:stackduo/utilities/theme/color_theme.dart' as _i21;
 import 'package:tuple/tuple.dart' as _i11;
 
 // ignore_for_file: type=lint
@@ -1233,6 +1232,19 @@ class MockPrefs extends _i1.Mock implements _i15.Prefs {
         returnValueForMissingStub: null,
       );
   @override
+  bool get randomizePIN => (super.noSuchMethod(
+        Invocation.getter(#randomizePIN),
+        returnValue: false,
+      ) as bool);
+  @override
+  set randomizePIN(bool? randomizePIN) => super.noSuchMethod(
+        Invocation.setter(
+          #randomizePIN,
+          randomizePIN,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   bool get useBiometrics => (super.noSuchMethod(
         Invocation.getter(#useBiometrics),
         returnValue: false,
@@ -1403,43 +1415,43 @@ class MockPrefs extends _i1.Mock implements _i15.Prefs {
         returnValueForMissingStub: null,
       );
   @override
-  _i21.ThemeType get theme => (super.noSuchMethod(
-        Invocation.getter(#theme),
-        returnValue: _i21.ThemeType.light,
-      ) as _i21.ThemeType);
+  String get themeId => (super.noSuchMethod(
+        Invocation.getter(#themeId),
+        returnValue: '',
+      ) as String);
   @override
-  set theme(_i21.ThemeType? theme) => super.noSuchMethod(
+  set themeId(String? themeId) => super.noSuchMethod(
         Invocation.setter(
-          #theme,
-          theme,
+          #themeId,
+          themeId,
         ),
         returnValueForMissingStub: null,
       );
   @override
-  _i21.ThemeType get systemBrightnessLightTheme => (super.noSuchMethod(
-        Invocation.getter(#systemBrightnessLightTheme),
-        returnValue: _i21.ThemeType.light,
-      ) as _i21.ThemeType);
+  String get systemBrightnessLightThemeId => (super.noSuchMethod(
+        Invocation.getter(#systemBrightnessLightThemeId),
+        returnValue: '',
+      ) as String);
   @override
-  set systemBrightnessLightTheme(_i21.ThemeType? systemBrightnessLightTheme) =>
+  set systemBrightnessLightThemeId(String? systemBrightnessLightThemeId) =>
       super.noSuchMethod(
         Invocation.setter(
-          #systemBrightnessLightTheme,
-          systemBrightnessLightTheme,
+          #systemBrightnessLightThemeId,
+          systemBrightnessLightThemeId,
         ),
         returnValueForMissingStub: null,
       );
   @override
-  _i21.ThemeType get systemBrightnessDarkTheme => (super.noSuchMethod(
-        Invocation.getter(#systemBrightnessDarkTheme),
-        returnValue: _i21.ThemeType.light,
-      ) as _i21.ThemeType);
+  String get systemBrightnessDarkThemeId => (super.noSuchMethod(
+        Invocation.getter(#systemBrightnessDarkThemeId),
+        returnValue: '',
+      ) as String);
   @override
-  set systemBrightnessDarkTheme(_i21.ThemeType? systemBrightnessDarkTheme) =>
+  set systemBrightnessDarkThemeId(String? systemBrightnessDarkThemeId) =>
       super.noSuchMethod(
         Invocation.setter(
-          #systemBrightnessDarkTheme,
-          systemBrightnessDarkTheme,
+          #systemBrightnessDarkThemeId,
+          systemBrightnessDarkThemeId,
         ),
         returnValueForMissingStub: null,
       );
@@ -1529,7 +1541,7 @@ class MockPrefs extends _i1.Mock implements _i15.Prefs {
 /// A class which mocks [PriceService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPriceService extends _i1.Mock implements _i22.PriceService {
+class MockPriceService extends _i1.Mock implements _i21.PriceService {
   MockPriceService() {
     _i1.throwOnMissingStub(this);
   }
@@ -1561,20 +1573,20 @@ class MockPriceService extends _i1.Mock implements _i22.PriceService {
         returnValue: false,
       ) as bool);
   @override
-  _i11.Tuple2<_i23.Decimal, double> getPrice(_i13.Coin? coin) =>
+  _i11.Tuple2<_i22.Decimal, double> getPrice(_i13.Coin? coin) =>
       (super.noSuchMethod(
         Invocation.method(
           #getPrice,
           [coin],
         ),
-        returnValue: _FakeTuple2_9<_i23.Decimal, double>(
+        returnValue: _FakeTuple2_9<_i22.Decimal, double>(
           this,
           Invocation.method(
             #getPrice,
             [coin],
           ),
         ),
-      ) as _i11.Tuple2<_i23.Decimal, double>);
+      ) as _i11.Tuple2<_i22.Decimal, double>);
   @override
   _i14.Future<void> updatePrice() => (super.noSuchMethod(
         Invocation.method(
@@ -1637,7 +1649,7 @@ class MockPriceService extends _i1.Mock implements _i22.PriceService {
 /// A class which mocks [NotesService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockNotesService extends _i1.Mock implements _i24.NotesService {
+class MockNotesService extends _i1.Mock implements _i23.NotesService {
   MockNotesService() {
     _i1.throwOnMissingStub(this);
   }

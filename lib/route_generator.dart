@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/models/contact_address_entry.dart';
 import 'package:stackduo/models/exchange/incomplete_exchange.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/models/paynym/paynym_account_lite.dart';
 import 'package:stackduo/models/send_view_auto_fill_data.dart';
@@ -137,8 +137,6 @@ import 'package:stackduo/utilities/enums/add_wallet_type_enum.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/widgets/choose_coin_view.dart';
 import 'package:tuple/tuple.dart';
-
-import 'models/isar/models/contact_entry.dart';
 
 class RouteGenerator {
   static const bool useMaterialPageRoute = true;

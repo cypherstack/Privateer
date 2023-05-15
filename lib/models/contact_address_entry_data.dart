@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:stackduo/models/contact_address_entry.dart';
+import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 

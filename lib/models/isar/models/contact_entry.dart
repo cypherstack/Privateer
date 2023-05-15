@@ -1,5 +1,5 @@
 import 'package:isar/isar.dart';
-import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackduo/utilities/enums/coin_enum.dart';
 
 part 'contact_entry.g.dart';
 
