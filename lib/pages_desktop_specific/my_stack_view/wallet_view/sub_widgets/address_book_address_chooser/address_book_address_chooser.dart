@@ -4,11 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/sub_widgets/address_book_address_chooser/sub_widgets/contact_list_item.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
 import 'package:stackduo/widgets/stack_text_field.dart';
@@ -34,7 +34,7 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
 
   String _searchTerm = "";
 
-  int _compareContactFavorite(Contact a, Contact b) {
+  int _compareContactFavorite(ContactEntry a, ContactEntry b) {
     if (a.isFavorite && b.isFavorite) {
       return 0;
     } else if (a.isFavorite) {
@@ -44,8 +44,8 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
     }
   }
 
-  List<Contact> pullOutFavorites(List<Contact> contacts) {
-    final List<Contact> favorites = [];
+  List<ContactEntry> pullOutFavorites(List<ContactEntry> contacts) {
+    final List<ContactEntry> favorites = [];
     contacts.removeWhere((contact) {
       if (contact.isFavorite) {
         favorites.add(contact);
@@ -57,7 +57,7 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
     return favorites;
   }
 
-  List<Contact> filter(List<Contact> contacts, String searchTerm) {
+  List<ContactEntry> filter(List<ContactEntry> contacts, String searchTerm) {
     if (widget.coin != null) {
       contacts.removeWhere(
           (e) => e.addresses.where((a) => a.coin == widget.coin!).isEmpty);
@@ -75,7 +75,7 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
     return contacts;
   }
 
-  bool _matches(String term, Contact contact) {
+  bool _matches(String term, ContactEntry contact) {
     final text = term.toLowerCase();
     if (contact.name.toLowerCase().contains(text)) {
       return true;
@@ -191,7 +191,7 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
             ),
             child: Consumer(
               builder: (context, ref, _) {
-                List<Contact> contacts = ref
+                List<ContactEntry> contacts = ref
                     .watch(addressBookServiceProvider
                         .select((value) => value.contacts))
                     .toList();
@@ -228,7 +228,7 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
                         ),
                       );
                     } else if (index < favorites.length + 1) {
-                      final id = favorites[index - 1].id;
+                      final id = favorites[index - 1].customId;
                       return ContactListItem(
                         key: Key("contactContactListItem_${id}_key"),
                         contactId: id,
@@ -248,7 +248,8 @@ class _AddressBookAddressChooserState extends State<AddressBookAddressChooser> {
                         ),
                       );
                     } else {
-                      final id = contacts[index - favorites.length - 2].id;
+                      final id =
+                          contacts[index - favorites.length - 2].customId;
                       return ContactListItem(
                         key: Key("contactContactListItem_${id}_key"),
                         contactId: id,

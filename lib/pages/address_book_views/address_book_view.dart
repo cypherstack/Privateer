@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/models/contact_address_entry.dart';
 import 'package:stackduo/pages/address_book_views/subviews/add_address_book_entry_view.dart';
 import 'package:stackduo/pages/address_book_views/subviews/address_book_filter_view.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_book_filter_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/address_book_card.dart';
 import 'package:stackduo/widgets/background.dart';
@@ -72,19 +71,18 @@ class _AddressBookViewState extends ConsumerState<AddressBookView> {
       final managers = ref.read(walletsChangeNotifierProvider).managers;
       for (final manager in managers) {
         addresses.add(
-          ContactAddressEntry(
-            coin: manager.coin,
-            address: await manager.currentReceivingAddress,
-            label: "Current Receiving",
-            other: manager.walletName,
-          ),
+          ContactAddressEntry()
+            ..coinName = manager.coin.name
+            ..address = await manager.currentReceivingAddress
+            ..label = "Current Receiving"
+            ..other = manager.walletName,
         );
       }
-      final self = Contact(
+      final self = ContactEntry(
         name: "My Stack",
         addresses: addresses,
         isFavorite: true,
-        id: "default",
+        customId: "default",
       );
       await ref.read(addressBookServiceProvider).editContact(self);
     });
@@ -101,7 +99,8 @@ class _AddressBookViewState extends ConsumerState<AddressBookView> {
   @override
   Widget build(BuildContext context) {
     debugPrint("BUILD: $runtimeType");
-    final contacts = ref.watch(addressBookServiceProvider.select((value) => value.contacts));
+    final contacts =
+        ref.watch(addressBookServiceProvider.select((value) => value.contacts));
 
     final isDesktop = Util.isDesktop;
     return ConditionalParent(
@@ -304,8 +303,8 @@ class _AddressBookViewState extends ConsumerState<AddressBookView> {
                       .where((element) => element.isFavorite)
                       .map(
                         (e) => AddressBookCard(
-                          key: Key("favContactCard_${e.id}_key"),
-                          contactId: e.id,
+                          key: Key("favContactCard_${e.customId}_key"),
+                          contactId: e.customId,
                         ),
                       ),
                 ],
@@ -350,8 +349,9 @@ class _AddressBookViewState extends ConsumerState<AddressBookView> {
                                 .matches(widget.filterTerm ?? _searchTerm, e))
                             .map(
                               (e) => AddressBookCard(
-                                key: Key("desktopContactCard_${e.id}_key"),
-                                contactId: e.id,
+                                key:
+                                    Key("desktopContactCard_${e.customId}_key"),
+                                contactId: e.customId,
                               ),
                             ),
                       ],

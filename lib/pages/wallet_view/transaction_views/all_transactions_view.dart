@@ -12,13 +12,13 @@ import 'package:stackduo/pages/wallet_view/transaction_views/transaction_search_
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/format.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -119,8 +119,8 @@ class _TransactionDetailsViewState extends ConsumerState<AllTransactionsView> {
     }).toList();
   }
 
-  bool _isKeywordMatch(Transaction tx, String keyword, List<Contact> contacts,
-      Map<String, String> notes) {
+  bool _isKeywordMatch(Transaction tx, String keyword,
+      List<ContactEntry> contacts, Map<String, String> notes) {
     if (keyword.isEmpty) {
       return true;
     }

@@ -49,7 +49,7 @@ class _AddressBookCardState extends ConsumerState<AddressBookCard> {
   @override
   Widget build(BuildContext context) {
     // provider hack to prevent trying to update widget with deleted contact
-    Contact? _contact;
+    ContactEntry? _contact;
     try {
       _contact = ref.watch(addressBookServiceProvider
           .select((value) => value.getContactById(contactId)));
@@ -82,7 +82,7 @@ class _AddressBookCardState extends ConsumerState<AddressBookCard> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: contact.id == "default"
+              color: contact.customId == "default"
                   ? Theme.of(context)
                       .extension<StackColors>()!
                       .myStackContactIconBG
@@ -91,7 +91,7 @@ class _AddressBookCardState extends ConsumerState<AddressBookCard> {
                       .textFieldDefaultBG,
               borderRadius: BorderRadius.circular(32),
             ),
-            child: contact.id == "default"
+            child: contact.customId == "default"
                 ? Center(
                     child: SvgPicture.file(
                       File(
@@ -179,7 +179,7 @@ class _AddressBookCardState extends ConsumerState<AddressBookCard> {
               useSafeArea: true,
               barrierDismissible: true,
               builder: (_) => ContactPopUp(
-                contactId: contact.id,
+                contactId: contact.customId,
               ),
             );
           },

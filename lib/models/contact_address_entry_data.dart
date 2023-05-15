@@ -57,7 +57,7 @@ class AddressEntryData extends ChangeNotifier {
   }
 
   bool get isValidAddress {
-    if ( coin == null) {
+    if (coin == null) {
       return true;
     }
     if (_address == null) {
@@ -67,8 +67,11 @@ class AddressEntryData extends ChangeNotifier {
   }
 
   ContactAddressEntry buildAddressEntry() {
-    return ContactAddressEntry(
-        coin: coin!, address: address!, label: addressLabel!);
+    return ContactAddressEntry()
+      ..coinName = coin!.name
+      ..address = address!
+      ..other = null
+      ..label = addressLabel!;
   }
 
   @override

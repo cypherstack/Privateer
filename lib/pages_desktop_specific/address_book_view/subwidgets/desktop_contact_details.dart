@@ -43,7 +43,7 @@ class DesktopContactDetails extends ConsumerStatefulWidget {
 class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
   List<Tuple2<String, Transaction>> _cachedTransactions = [];
 
-  bool _contactHasAddress(String address, Contact contact) {
+  bool _contactHasAddress(String address, ContactEntry contact) {
     for (final entry in contact.addresses) {
       if (entry.address == address) {
         return true;
@@ -83,7 +83,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
   @override
   Widget build(BuildContext context) {
     // provider hack to prevent trying to update widget with deleted contact
-    Contact? _contact;
+    ContactEntry? _contact;
     try {
       _contact = ref.watch(addressBookServiceProvider
           .select((value) => value.getContactById(widget.contactId)));
@@ -162,7 +162,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                             barrierColor: Colors.transparent,
                             builder: (context) {
                               return DesktopContactOptionsMenuPopup(
-                                contactId: contact.id,
+                                contactId: contact.customId,
                               );
                             },
                           );
@@ -264,7 +264,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                                     padding: const EdgeInsets.all(18),
                                     child: DesktopAddressCard(
                                       entry: contact.addresses[i],
-                                      contactId: contact.id,
+                                      contactId: contact.customId,
                                     ),
                                   ),
                                 ],

@@ -9,12 +9,12 @@ import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/contact_name_is_not_empty_state_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/valid_contact_state_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -688,11 +688,12 @@ class _AddAddressBookEntryViewState
                                                           forms[i].id))
                                                   .buildAddressEntry());
                                             }
-                                            Contact contact = Contact(
+                                            ContactEntry contact = ContactEntry(
                                               emojiChar: _selectedEmoji?.char,
                                               name: nameController.text,
                                               addresses: entries,
                                               isFavorite: _isFavorite,
+                                              customId: const Uuid().v1(),
                                             );
 
                                             if (await ref

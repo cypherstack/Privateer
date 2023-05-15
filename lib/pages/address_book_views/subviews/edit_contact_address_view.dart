@@ -7,11 +7,11 @@ import 'package:stackduo/pages/address_book_views/subviews/new_contact_address_e
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/valid_contact_state_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -49,7 +49,7 @@ class _EditContactAddressViewState
   late final BarcodeScannerInterface barcodeScanner;
   late final ClipboardInterface clipboard;
 
-  Future<void> save(Contact contact) async {
+  Future<void> save(ContactEntry contact) async {
     if (FocusScope.of(context).hasFocus) {
       FocusScope.of(context).unfocus();
       await Future<void>.delayed(
@@ -73,7 +73,7 @@ class _EditContactAddressViewState
 
     entries.insert(index, editedEntry);
 
-    Contact editedContact = contact.copyWith(addresses: entries);
+    ContactEntry editedContact = contact.copyWith(addresses: entries);
 
     if (await ref.read(addressBookServiceProvider).editContact(editedContact)) {
       if (mounted) {
@@ -226,7 +226,8 @@ class _EditContactAddressViewState
                 );
 
                 _addresses.remove(entry);
-                Contact editedContact = contact.copyWith(addresses: _addresses);
+                ContactEntry editedContact =
+                    contact.copyWith(addresses: _addresses);
                 if (await ref
                     .read(addressBookServiceProvider)
                     .editContact(editedContact)) {

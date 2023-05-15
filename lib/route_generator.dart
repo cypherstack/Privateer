@@ -138,6 +138,8 @@ import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/widgets/choose_coin_view.dart';
 import 'package:tuple/tuple.dart';
 
+import 'models/isar/models/contact_entry.dart';
+
 class RouteGenerator {
   static const bool useMaterialPageRoute = true;
 
