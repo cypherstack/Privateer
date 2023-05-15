@@ -250,7 +250,8 @@ class Manager with ChangeNotifier {
     );
   }
 
-  bool get hasXPub => _currentWallet is XPubAble;
+  // TODO: re enable once xpubs have been redone
+  bool get hasXPub => false; //_currentWallet is XPubAble;
 
   Future<String> get xpub async {
     if (!hasXPub) {
