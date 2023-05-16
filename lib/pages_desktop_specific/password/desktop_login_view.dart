@@ -246,7 +246,7 @@ class _DesktopLoginViewState extends ConsumerState<DesktopLoginView> {
                           ),
                           suffixIcon: UnconstrainedBox(
                             child: SizedBox(
-                              height: 70,
+                              height: 40,
                               child: Row(
                                 children: [
                                   const SizedBox(
