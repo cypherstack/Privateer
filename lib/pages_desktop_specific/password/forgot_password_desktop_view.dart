@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/pages_desktop_specific/password/delete_password_warning_view.dart';
 import 'package:stackduo/themes/stack_colors.dart';
-import 'package:stackduo/themes/theme_providers.dart';
+import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
@@ -49,13 +47,9 @@ class _ForgotPasswordDesktopViewState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.file(
-                  File(
-                    ref.watch(
-                      themeProvider.select(
-                        (value) => value.assets.stackIcon,
-                      ),
-                    ),
+                SvgPicture.asset(
+                  Assets.svg.appIconForBrightness(
+                    MediaQuery.of(context).platformBrightness,
                   ),
                   width: 100,
                 ),

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,7 +5,6 @@ import 'package:stackduo/models/isar/models/contact_entry.dart';
 import 'package:stackduo/pages/address_book_views/subviews/contact_popup.dart';
 import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
-import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -93,13 +90,9 @@ class _AddressBookCardState extends ConsumerState<AddressBookCard> {
             ),
             child: contact.customId == "default"
                 ? Center(
-                    child: SvgPicture.file(
-                      File(
-                        ref.watch(
-                          themeProvider.select(
-                            (value) => value.assets.stackIcon,
-                          ),
-                        ),
+                    child: SvgPicture.asset(
+                      Assets.svg.appIconForBrightness(
+                        MediaQuery.of(context).platformBrightness,
                       ),
                       width: 20,
                     ),

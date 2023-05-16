@@ -316,6 +316,7 @@ flutter:
     - assets/svg/list-ul.svg
     - assets/svg/file.svg
     - assets/svg/file-upload.svg
+    - assets/svg/stack-duo-icon.svg
     - assets/svg/trocador_rating_a.svg
     - assets/svg/trocador_rating_b.svg
     - assets/svg/trocador_rating_c.svg

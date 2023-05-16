@@ -1997,7 +1997,10 @@ class ThemeAssets {
   late final String personaIncognito;
   late final String personaEasy;
   late final String stack;
+
+  @Deprecated("Use assets.dart's appIcon()")
   late final String stackIcon;
+
   late final String receive;
   late final String receivePending;
   late final String receiveCancelled;

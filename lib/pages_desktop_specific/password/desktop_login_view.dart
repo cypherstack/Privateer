@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +10,6 @@ import 'package:stackduo/pages_desktop_specific/password/forgot_password_desktop
 import 'package:stackduo/providers/desktop/storage_crypto_handler_provider.dart';
 import 'package:stackduo/providers/global/secure_store_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
-import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/db_version_migration.dart';
@@ -167,13 +165,9 @@ class _DesktopLoginViewState extends ConsumerState<DesktopLoginView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.file(
-                  File(
-                    ref.watch(
-                      themeProvider.select(
-                        (value) => value.assets.stackIcon,
-                      ),
-                    ),
+                SvgPicture.asset(
+                  Assets.svg.appIconForBrightness(
+                    MediaQuery.of(context).platformBrightness,
                   ),
                   width: 100,
                 ),

@@ -6,11 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/pages/stack_privacy_calls.dart';
 import 'package:stackduo/pages_desktop_specific/password/create_password_view.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/prefs.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
@@ -125,13 +125,9 @@ class _IntroViewState extends ConsumerState<IntroView> {
                       SizedBox(
                         width: 130,
                         height: 130,
-                        child: SvgPicture.file(
-                          File(
-                            ref.watch(
-                              themeProvider.select(
-                                (value) => value.assets.stackIcon,
-                              ),
-                            ),
+                        child: SvgPicture.asset(
+                          Assets.svg.appIconForBrightness(
+                            MediaQuery.of(context).platformBrightness,
                           ),
                         ),
                       ),
