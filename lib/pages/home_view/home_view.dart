@@ -162,13 +162,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 GestureDetector(
                   onTap: _hiddenOptions,
                   child: RotateIcon(
-                    icon: SvgPicture.file(
-                      File(
-                        ref.watch(
-                          themeProvider.select(
-                            (value) => value.assets.stackIcon,
-                          ),
-                        ),
+                    icon: SvgPicture.asset(
+                      Assets.svg.appIconForBrightness(
+                        MediaQuery.of(context).platformBrightness,
                       ),
                       width: 24,
                       height: 24,

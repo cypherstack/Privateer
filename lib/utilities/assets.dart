@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
 import 'package:stackduo/services/exchange/simpleswap/simpleswap_exchange.dart';
@@ -63,6 +65,16 @@ class _COIN_CONTROL {
 
 class _SVG {
   const _SVG();
+
+  String appIconForBrightness(Brightness brightness) {
+    switch (brightness) {
+      case Brightness.dark:
+        // TODO: get a dark icon
+        return "assets/svg/stack-duo-icon.svg";
+      case Brightness.light:
+        return "assets/svg/stack-duo-icon.svg";
+    }
+  }
 
   final coinControl = const _COIN_CONTROL();
 

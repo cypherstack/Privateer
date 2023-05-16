@@ -13,7 +13,6 @@ import 'package:stackduo/providers/global/address_book_service_provider.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
-import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -110,16 +109,12 @@ class ContactPopUp extends ConsumerWidget {
                                             .textFieldDefaultBG,
                                         borderRadius: BorderRadius.circular(32),
                                       ),
-                                      child: contact.id == "default"
+                                      child: contact.customId == "default"
                                           ? Center(
-                                              child: SvgPicture.file(
-                                                File(
-                                                  ref.watch(
-                                                    themeProvider.select(
-                                                      (value) => value
-                                                          .assets.stackIcon,
-                                                    ),
-                                                  ),
+                                              child: SvgPicture.asset(
+                                                Assets.svg.appIconForBrightness(
+                                                  MediaQuery.of(context)
+                                                      .platformBrightness,
                                                 ),
                                                 width: 20,
                                               ),
@@ -146,13 +141,13 @@ class ContactPopUp extends ConsumerWidget {
                                             STextStyles.itemSubtitle12(context),
                                       ),
                                     ),
-                                    if (contact.id != "default")
+                                    if (contact.customId != "default")
                                       TextButton(
                                         onPressed: () {
                                           Navigator.pop(context);
                                           Navigator.of(context).pushNamed(
                                             ContactDetailsView.routeName,
-                                            arguments: contact.id,
+                                            arguments: contact.customId,
                                           );
                                         },
                                         style: Theme.of(context)
@@ -176,7 +171,7 @@ class ContactPopUp extends ConsumerWidget {
                                 ),
                               ),
                               SizedBox(
-                                height: contact.id == "default" ? 16 : 8,
+                                height: contact.customId == "default" ? 16 : 8,
                               ),
                               Container(
                                 height: 1,
@@ -233,14 +228,14 @@ class ContactPopUp extends ConsumerWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            if (contact.id == "default")
+                                            if (contact.customId == "default")
                                               Text(
                                                 e.other!,
                                                 style:
                                                     STextStyles.itemSubtitle12(
                                                         context),
                                               ),
-                                            if (contact.id != "default")
+                                            if (contact.customId != "default")
                                               Text(
                                                 "${e.label} (${e.coin.ticker})",
                                                 style:
@@ -336,13 +331,13 @@ class ContactPopUp extends ConsumerWidget {
                                             ),
                                           ],
                                         ),
-                                      if (contact.id != "default" &&
+                                      if (contact.customId != "default" &&
                                           hasActiveWallet &&
                                           !isExchangeFlow)
                                         const SizedBox(
                                           width: 4,
                                         ),
-                                      if (contact.id != "default" &&
+                                      if (contact.customId != "default" &&
                                           hasActiveWallet &&
                                           !isExchangeFlow)
                                         Column(

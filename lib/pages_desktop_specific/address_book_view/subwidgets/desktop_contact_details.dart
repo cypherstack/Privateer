@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,7 +13,6 @@ import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/providers/ui/address_book_providers/address_entry_data_provider.dart';
 import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/themes/stack_colors.dart';
-import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
@@ -111,22 +108,18 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: contact.id == "default"
+                            color: contact.customId == "default"
                                 ? Colors.transparent
                                 : Theme.of(context)
                                     .extension<StackColors>()!
                                     .textFieldDefaultBG,
                             borderRadius: BorderRadius.circular(32),
                           ),
-                          child: contact.id == "default"
+                          child: contact.customId == "default"
                               ? Center(
-                                  child: SvgPicture.file(
-                                    File(
-                                      ref.watch(
-                                        themeProvider.select(
-                                          (value) => value.assets.stackIcon,
-                                        ),
-                                      ),
+                                  child: SvgPicture.asset(
+                                    Assets.svg.appIconForBrightness(
+                                      MediaQuery.of(context).platformBrightness,
                                     ),
                                     width: 32,
                                   ),

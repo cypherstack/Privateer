@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/pages/wallets_view/sub_widgets/empty_wallets.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/my_wallets.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
-import 'package:stackduo/themes/theme_providers.dart';
+import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
@@ -55,13 +53,9 @@ class DesktopMyStackTitle extends ConsumerWidget {
         SizedBox(
           width: 32,
           height: 32,
-          child: SvgPicture.file(
-            File(
-              ref.watch(
-                themeProvider.select(
-                  (value) => value.assets.stackIcon,
-                ),
-              ),
+          child: SvgPicture.asset(
+            Assets.svg.appIconForBrightness(
+              MediaQuery.of(context).platformBrightness,
             ),
           ),
         ),
