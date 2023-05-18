@@ -16,7 +16,7 @@ final coinImageProvider = Provider.family<String, Coin>((ref, coin) {
         return assets.moneroImage;
     }
   } else {
-    return (assets as ThemeAssetsV2).coinImages[coin]!;
+    return (assets as ThemeAssetsV2).coinImages[coin.mainNetVersion]!;
   }
 });
 
@@ -33,6 +33,6 @@ final coinImageSecondaryProvider = Provider.family<String, Coin>((ref, coin) {
         return assets.moneroImageSecondary;
     }
   } else {
-    return (assets as ThemeAssetsV2).coinSecondaryImages[coin]!;
+    return (assets as ThemeAssetsV2).coinSecondaryImages[coin.mainNetVersion]!;
   }
 });
