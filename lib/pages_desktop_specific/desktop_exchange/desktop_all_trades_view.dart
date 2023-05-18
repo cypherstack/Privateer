@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction_status.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
@@ -288,7 +288,7 @@ class DesktopTradeRowCard extends ConsumerStatefulWidget {
 class _DesktopTradeRowCardState extends ConsumerState<DesktopTradeRowCard> {
   late final String tradeId;
 
-  String _fetchIconAssetForStatus(String statusString, ThemeAssets assets) {
+  String _fetchIconAssetForStatus(String statusString, IThemeAssets assets) {
     ChangeNowTransactionStatus? status;
     try {
       if (statusString.toLowerCase().startsWith("waiting")) {
@@ -528,7 +528,8 @@ class _DesktopTradeRowCardState extends ConsumerState<DesktopTradeRowCard> {
                       _fetchIconAssetForStatus(
                         trade.status,
                         ref.watch(
-                            themeProvider.select((value) => value.assets)),
+                          themeAssetsProvider,
+                        ),
                       ),
                     ),
                     width: 32,
