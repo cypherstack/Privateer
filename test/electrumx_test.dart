@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackduo/electrumx_rpc/electrumx.dart';
-import 'package:stackduo/electrumx_rpc/rpc.dart';
-import 'package:stackduo/utilities/prefs.dart';
+import 'package:stackwallet/electrumx_rpc/electrumx.dart';
+import 'package:stackwallet/electrumx_rpc/rpc.dart';
+import 'package:stackwallet/utilities/prefs.dart';
 
 import 'electrumx_test.mocks.dart';
 import 'sample_data/get_anonymity_set_sample_data.dart';
