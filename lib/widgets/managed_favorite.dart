@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
@@ -33,6 +34,14 @@ class _ManagedFavoriteCardState extends ConsumerState<ManagedFavorite> {
     debugPrint("BUILD: $runtimeType with walletId ${widget.walletId}");
 
     final isDesktop = Util.isDesktop;
+
+    final balance = ref.watch(
+      walletsChangeNotifierProvider.select(
+        (value) => value.getManager(widget.walletId).balance,
+      ),
+    );
+
+    final Amount total = balance.total;
 
     return RoundedWhiteContainer(
       padding: EdgeInsets.all(isDesktop ? 0 : 4.0),
@@ -107,7 +116,7 @@ class _ManagedFavoriteCardState extends ConsumerState<ManagedFavorite> {
                       ),
                       Expanded(
                         child: Text(
-                          "${manager.balance.total.localizedStringAsFixed(
+                          "${total.localizedStringAsFixed(
                             locale: ref.watch(
                               localeServiceChangeNotifierProvider.select(
                                 (value) => value.locale,
@@ -150,7 +159,7 @@ class _ManagedFavoriteCardState extends ConsumerState<ManagedFavorite> {
                         height: 2,
                       ),
                       Text(
-                        "${manager.balance.total.localizedStringAsFixed(
+                        "${total.localizedStringAsFixed(
                           locale: ref.watch(
                             localeServiceChangeNotifierProvider.select(
                               (value) => value.locale,
