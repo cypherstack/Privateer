@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stackduo/pages/wallet_view/wallet_view.dart';
 import 'package:stackduo/pages_desktop_specific/my_stack_view/wallet_view/desktop_wallet_view.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/services/coins/manager.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
@@ -24,13 +23,11 @@ class FavoriteCard extends ConsumerStatefulWidget {
     required this.walletId,
     required this.width,
     required this.height,
-    required this.managerProvider,
   }) : super(key: key);
 
   final String walletId;
   final double width;
   final double height;
-  final ChangeNotifierProvider<Manager> managerProvider;
 
   @override
   ConsumerState<FavoriteCard> createState() => _FavoriteCardState();
@@ -38,15 +35,10 @@ class FavoriteCard extends ConsumerStatefulWidget {
 
 class _FavoriteCardState extends ConsumerState<FavoriteCard> {
   late final String walletId;
-  late final ChangeNotifierProvider<Manager> managerProvider;
-
-  Amount _cachedBalance = Amount.zero;
-  Amount _cachedFiatValue = Amount.zero;
 
   @override
   void initState() {
     walletId = widget.walletId;
-    managerProvider = widget.managerProvider;
 
     super.initState();
   }
@@ -55,9 +47,13 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
 
   @override
   Widget build(BuildContext context) {
-    final coin = ref.watch(managerProvider.select((value) => value.coin));
+    final coin = ref.watch(
+      walletsChangeNotifierProvider
+          .select((value) => value.getManager(walletId).coin),
+    );
     final externalCalls = ref.watch(
-        prefsChangeNotifierProvider.select((value) => value.externalCalls));
+      prefsChangeNotifierProvider.select((value) => value.externalCalls),
+    );
 
     return ConditionalParent(
       condition: Util.isDesktop,
@@ -109,7 +105,10 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
       child: GestureDetector(
         onTap: () async {
           if (coin == Coin.monero) {
-            await ref.read(managerProvider).initializeExisting();
+            await ref
+                .read(walletsChangeNotifierProvider)
+                .getManager(walletId)
+                .initializeExisting();
           }
           if (mounted) {
             if (Util.isDesktop) {
@@ -122,7 +121,9 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                 WalletView.routeName,
                 arguments: Tuple2(
                   walletId,
-                  managerProvider,
+                  ref
+                      .read(walletsChangeNotifierProvider)
+                      .getManagerProvider(walletId),
                 ),
               );
             }
@@ -205,8 +206,12 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                       children: [
                         Expanded(
                           child: Text(
-                            ref.watch(managerProvider
-                                .select((value) => value.walletName)),
+                            ref.watch(
+                              walletsChangeNotifierProvider.select(
+                                (value) =>
+                                    value.getManager(walletId).walletName,
+                              ),
+                            ),
                             style: STextStyles.itemSubtitle12(context).copyWith(
                               color: Theme.of(context)
                                   .extension<StackColors>()!
@@ -225,41 +230,43 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                       ],
                     ),
                   ),
-                  FutureBuilder(
-                    future: Future(() => ref.watch(managerProvider
-                        .select((value) => value.balance.total))),
-                    builder: (builderContext, AsyncSnapshot<Amount> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        if (snapshot.data != null) {
-                          _cachedBalance = snapshot.data!;
-                          if (externalCalls && _cachedBalance > Amount.zero) {
-                            _cachedFiatValue = (_cachedBalance.decimal *
-                                    ref
-                                        .watch(
-                                          priceAnd24hChangeNotifierProvider
-                                              .select(
-                                            (value) => value.getPrice(coin),
-                                          ),
-                                        )
-                                        .item1)
-                                .toAmount(fractionDigits: 2);
-                          }
-                        }
+                  Builder(
+                    builder: (context) {
+                      final balance = ref.watch(
+                        walletsChangeNotifierProvider.select(
+                          (value) => value.getManager(walletId).balance,
+                        ),
+                      );
+
+                      Amount total = balance.total;
+
+                      Amount fiatTotal = Amount.zero;
+
+                      if (externalCalls && total > Amount.zero) {
+                        fiatTotal = (total.decimal *
+                                ref
+                                    .watch(
+                                      priceAnd24hChangeNotifierProvider.select(
+                                        (value) => value.getPrice(coin),
+                                      ),
+                                    )
+                                    .item1)
+                            .toAmount(fractionDigits: 2);
                       }
+
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              "${_cachedBalance.localizedStringAsFixed(
+                              "${total.localizedStringAsFixed(
                                 locale: ref.watch(
-                                  localeServiceChangeNotifierProvider
-                                      .select((value) => value.locale),
+                                  localeServiceChangeNotifierProvider.select(
+                                    (value) => value.locale,
+                                  ),
                                 ),
-                                decimalPlaces: ref.watch(managerProvider
-                                    .select((value) => value.coin.decimals)),
+                                decimalPlaces: coin.decimals,
                               )} ${coin.ticker}",
                               style: STextStyles.titleBold12(context).copyWith(
                                 fontSize: 16,
@@ -275,15 +282,17 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                             ),
                           if (externalCalls)
                             Text(
-                              "${_cachedFiatValue.localizedStringAsFixed(
+                              "${fiatTotal.localizedStringAsFixed(
                                 locale: ref.watch(
-                                  localeServiceChangeNotifierProvider
-                                      .select((value) => value.locale),
+                                  localeServiceChangeNotifierProvider.select(
+                                    (value) => value.locale,
+                                  ),
                                 ),
                                 decimalPlaces: 2,
                               )} ${ref.watch(
-                                prefsChangeNotifierProvider
-                                    .select((value) => value.currency),
+                                prefsChangeNotifierProvider.select(
+                                  (value) => value.currency,
+                                ),
                               )}",
                               style:
                                   STextStyles.itemSubtitle12(context).copyWith(
