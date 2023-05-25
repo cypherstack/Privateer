@@ -19,6 +19,7 @@ class JsonRPC {
   final int port;
   final Duration connectionTimeout;
 
+  final _requestMutex = Mutex();
   final _JsonRPCRequestQueue _requestQueue = _JsonRPCRequestQueue();
   Socket? _socket;
   StreamSubscription<Uint8List>? _subscription;
@@ -51,7 +52,7 @@ class JsonRPC {
   void _doneHandler() {
     Logging.instance.log(
       "JsonRPC doneHandler: "
-      "connection closed to ${_socket?.address}:$port, destroying socket",
+      "connection closed to $host:$port, destroying socket",
       level: LogLevel.Info,
     );
 
@@ -61,17 +62,23 @@ class JsonRPC {
         "completing pending requests with errors",
         level: LogLevel.Error,
       );
-      _requestQueue.clear(
-        errorMessage: "JsonRPC doneHandler: socket closed "
+
+      for (final req in _requestQueue.queue) {
+        if (!req.isComplete) {
+          req.completer.completeError(
+            "JsonRPC doneHandler: socket closed "
             "before request could complete",
-      );
+          );
+        }
+      }
+      _requestQueue.clear();
     }
 
     disconnect();
   }
 
-  Future<void> _onReqCompleted(_JsonRPCRequest req) async {
-    await _requestQueue.remove(req);
+  void _onReqCompleted(_JsonRPCRequest req) {
+    _requestQueue.remove(req);
     if (_requestQueue.isNotEmpty) {
       _sendNextAvailableRequest();
     }
@@ -88,7 +95,7 @@ class JsonRPC {
     _socket!.write('${req.jsonRequest}\r\n');
     // Logging.instance.log(
     //   "JsonRPC request: wrote request ${req.jsonRequest} "
-    //   "to socket ${_socket?.address}:${_socket?.port}",
+    //   "to socket $host:$port",
     //   level: LogLevel.Info,
     // );
   }
@@ -96,20 +103,22 @@ class JsonRPC {
   Future<dynamic> request(String jsonRpcRequest) async {
     // todo: handle this better?
     // Do we need to check the subscription, too?
-    if (_socket == null) {
-      Logging.instance.log(
-        "JsonRPC request: opening socket $host:$port",
-        level: LogLevel.Info,
-      );
-      await connect();
-    }
+    await _requestMutex.protect(() async {
+      if (_socket == null) {
+        Logging.instance.log(
+          "JsonRPC request: opening socket $host:$port",
+          level: LogLevel.Info,
+        );
+        await connect();
+      }
+    });
 
     final req = _JsonRPCRequest(
       jsonRequest: jsonRpcRequest,
       completer: Completer<dynamic>(),
     );
 
-    await _requestQueue.add(req);
+    _requestQueue.add(req);
 
     // if this is the only/first request then send it right away
     if (_requestQueue.length == 1) {
@@ -117,7 +126,7 @@ class JsonRPC {
     } else {
       // Logging.instance.log(
       //   "JsonRPC request: queued request $jsonRpcRequest "
-      //   "to socket ${_socket?.address}:$port",
+      //   "to socket $host:$port",
       //   level: LogLevel.Info,
       // );
     }
@@ -126,6 +135,7 @@ class JsonRPC {
   }
 
   void disconnect() {
+    // TODO: maybe clear req queue here and wrap in mutex?
     _subscription?.cancel().then((_) => _subscription = null);
     _socket?.destroy();
     _socket = null;
@@ -156,35 +166,20 @@ class JsonRPC {
   }
 }
 
-// mutex *may* not be needed as the protected functions are not async
 class _JsonRPCRequestQueue {
-  final _m = Mutex();
   final List<_JsonRPCRequest> _rq = [];
 
-  Future<void> add(_JsonRPCRequest req) async {
-    await _m.protect(() async => _rq.add(req));
-  }
+  void add(_JsonRPCRequest req) => _rq.add(req);
 
-  Future<void> remove(_JsonRPCRequest req) async {
-    await _m.protect(() async => _rq.remove(req));
-  }
+  bool remove(_JsonRPCRequest req) => _rq.remove(req);
 
-  Future<void> clear({required String errorMessage}) async {
-    await _m.protect(() async {
-      for (final req in _rq) {
-        if (!req.isComplete) {
-          req.completer.completeError(errorMessage);
-        }
-      }
-
-      _rq.clear();
-    });
-  }
+  void clear() => _rq.clear();
 
   bool get isEmpty => _rq.isEmpty;
   bool get isNotEmpty => _rq.isNotEmpty;
   int get length => _rq.length;
   _JsonRPCRequest get next => _rq.first;
+  List<_JsonRPCRequest> get queue => _rq.toList(growable: false);
 }
 
 class _JsonRPCRequest {
