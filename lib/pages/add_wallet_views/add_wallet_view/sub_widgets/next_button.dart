@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
 import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/utilities/text_styles.dart';
 
 class AddWalletNextButton extends ConsumerWidget {
   const AddWalletNextButton({
@@ -17,7 +17,7 @@ class AddWalletNextButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("BUILD: NextButton");
     final selectedCoin =
-        ref.watch(addWalletSelectedCoinStateProvider.state).state;
+        ref.watch(addWalletSelectedEntityStateProvider.state).state;
 
     final enabled = selectedCoin != null;
 
@@ -25,13 +25,17 @@ class AddWalletNextButton extends ConsumerWidget {
       onPressed: !enabled
           ? null
           : () {
-              final selectedCoin =
-                  ref.read(addWalletSelectedCoinStateProvider.state).state;
-
+              // if (selectedCoin is EthTokenEntity) {
+              //   Navigator.of(context).pushNamed(
+              //     SelectWalletForTokenView.routeName,
+              //     arguments: selectedCoin,
+              //   );
+              // } else {
               Navigator.of(context).pushNamed(
                 CreateOrRestoreWalletView.routeName,
                 arguments: selectedCoin,
               );
+              // }
             },
       style: enabled
           ? Theme.of(context)

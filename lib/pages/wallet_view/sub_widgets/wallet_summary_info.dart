@@ -14,8 +14,8 @@ import 'package:stackduo/services/event_bus/global_event_bus.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
-import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/wallet_balance_toggle_state.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 
@@ -131,9 +131,7 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: SelectableText(
-                  "${balanceToShow.localizedStringAsFixed(
-                    locale: locale,
-                  )} ${coin.ticker}",
+                  ref.watch(pAmountFormatter(coin)).format(balanceToShow),
                   style: STextStyles.pageTitleH1(context).copyWith(
                     fontSize: 24,
                     color: Theme.of(context)
@@ -146,7 +144,7 @@ class _WalletSummaryInfoState extends ConsumerState<WalletSummaryInfo> {
                 Text(
                   "${(priceTuple.item1 * balanceToShow.decimal).toAmount(
                         fractionDigits: 2,
-                      ).localizedStringAsFixed(
+                      ).fiatString(
                         locale: locale,
                       )} $baseCurrency",
                   style: STextStyles.subtitle500(context).copyWith(

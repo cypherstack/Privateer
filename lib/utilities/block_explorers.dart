@@ -1,4 +1,4 @@
-import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/isar/models/block_explorer.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 
@@ -29,6 +29,7 @@ Future<int> setBlockExplorerForCoin({
   );
 }
 
+// Returns the block explorer URL for the given coin and txid
 Uri getBlockExplorerTransactionUrlFor({
   required Coin coin,
   required String txid,

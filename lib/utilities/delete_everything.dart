@@ -1,4 +1,4 @@
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/utilities/logger.dart';
 
 Future<bool> deleteEverything() async {

@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:stack_wallet_backup/secure_storage.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/utilities/logger.dart';
 
 const String _kKeyBlobKey = "swbKeyBlobKeyStringID";

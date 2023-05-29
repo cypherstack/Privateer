@@ -13,6 +13,7 @@ import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -118,9 +119,26 @@ class _DesktopPaynymSendDialogState
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "${manager.balance.spendable.localizedStringAsFixed(
-                            locale: locale,
-                          )} ${coin.ticker}",
+                          // !isFiro
+                          //     ?
+                          ref
+                              .watch(pAmountFormatter(coin))
+                              .format(manager.balance.spendable)
+                          // : ref
+                          //             .watch(
+                          //               publicPrivateBalanceStateProvider
+                          //                   .state,
+                          //             )
+                          //             .state ==
+                          //         "Private"
+                          //     ? ref.watch(pAmountFormatter(coin)).format(
+                          //         (manager.wallet as FiroWallet)
+                          //             .availablePrivateBalance())
+                          //     : ref.watch(pAmountFormatter(coin)).format(
+                          //           (manager.wallet as FiroWallet)
+                          //               .availablePublicBalance(),
+                          //         )
+                          ,
                           style: STextStyles.titleBold12(context),
                           textAlign: TextAlign.right,
                         ),
@@ -128,19 +146,15 @@ class _DesktopPaynymSendDialogState
                           height: 2,
                         ),
                         Text(
-                          "${(manager.balance.spendable.decimal * ref.watch(
+                          "${((/*!isFiro ?*/ manager.balance.spendable.decimal /*: ref.watch(publicPrivateBalanceStateProvider.state).state == "Private" ? (manager.wallet as FiroWallet).availablePrivateBalance().decimal : (manager.wallet as FiroWallet).availablePublicBalance().decimal*/) * ref.watch(
                                     priceAnd24hChangeNotifierProvider.select(
                                       (value) => value.getPrice(coin).item1,
                                     ),
-                                  )).toAmount(
-                                fractionDigits: 2,
-                              ).localizedStringAsFixed(
+                                  )).toAmount(fractionDigits: 2).fiatString(
                                 locale: locale,
-                              )} ${ref.watch(
-                            prefsChangeNotifierProvider.select(
-                              (value) => value.currency,
-                            ),
-                          )}",
+                              )} ${ref.watch(prefsChangeNotifierProvider.select(
+                            (value) => value.currency,
+                          ))}",
                           style: STextStyles.baseXS(context).copyWith(
                             color: Theme.of(context)
                                 .extension<StackColors>()!

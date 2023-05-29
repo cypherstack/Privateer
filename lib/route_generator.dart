@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
+import 'package:stackduo/models/add_wallet_list_entity/add_wallet_list_entity.dart';
 import 'package:stackduo/models/exchange/incomplete_exchange.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/isar/models/contact_entry.dart';
@@ -53,6 +54,8 @@ import 'package:stackduo/pages/send_view/send_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/about_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/advanced_settings_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/debug_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/manage_coin_units/edit_coin_units_view.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/manage_coin_units/manage_coin_units_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/manage_explorer_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings/appearance_settings_view.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/appearance_settings/manage_themes.dart';
@@ -138,6 +141,11 @@ import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/widgets/choose_coin_view.dart';
 import 'package:tuple/tuple.dart';
 
+/*
+ * This file contains all the routes for the app.
+ * To add a new route, add it to the switch statement in the generateRoute method.
+ */
+
 class RouteGenerator {
   static const bool useMaterialPageRoute = true;
 
@@ -194,18 +202,6 @@ class RouteGenerator {
             builder: (_) => const StackPrivacyCalls(isSettings: false),
             settings: RouteSettings(name: settings.name));
 
-      case WalletsView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const WalletsView(),
-            settings: RouteSettings(name: settings.name));
-
-      case AddWalletView.routeName:
-        return getRoute(
-            shouldUseMaterialRoute: useMaterialPageRoute,
-            builder: (_) => const AddWalletView(),
-            settings: RouteSettings(name: settings.name));
-
       case ChooseCoinView.routeName:
         if (args is Tuple3<String, String, String>) {
           return getRoute(
@@ -235,6 +231,18 @@ class RouteGenerator {
           );
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
+
+      case WalletsView.routeName:
+        return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => const WalletsView(),
+            settings: RouteSettings(name: settings.name));
+
+      case AddWalletView.routeName:
+        return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => const AddWalletView(),
+            settings: RouteSettings(name: settings.name));
 
       case WalletsOverview.routeName:
         if (args is Coin) {
@@ -534,6 +542,26 @@ class RouteGenerator {
         }
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
+      case ManageCoinUnitsView.routeName:
+        return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => const ManageCoinUnitsView(),
+            settings: RouteSettings(name: settings.name));
+
+      case EditCoinUnitsView.routeName:
+        if (args is Coin) {
+          return getRoute(
+            shouldUseMaterialRoute: useMaterialPageRoute,
+            builder: (_) => EditCoinUnitsView(
+              coin: args,
+            ),
+            settings: RouteSettings(
+              name: settings.name,
+            ),
+          );
+        }
+        return _routeError("${settings.name} invalid args: ${args.toString()}");
+
       case CreateBackupInfoView.routeName:
         return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
@@ -784,11 +812,11 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case CreateOrRestoreWalletView.routeName:
-        if (args is Coin) {
+        if (args is AddWalletListEntity) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => CreateOrRestoreWalletView(
-              coin: args,
+              entity: args,
             ),
             settings: RouteSettings(
               name: settings.name,
@@ -954,12 +982,11 @@ class RouteGenerator {
         return _routeError("${settings.name} invalid args: ${args.toString()}");
 
       case ReceiveView.routeName:
-        if (args is Tuple2<String, Coin>) {
+        if (args is String) {
           return getRoute(
             shouldUseMaterialRoute: useMaterialPageRoute,
             builder: (_) => ReceiveView(
-              walletId: args.item1,
-              coin: args.item2,
+              walletId: args,
             ),
             settings: RouteSettings(
               name: settings.name,

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_libmonero/monero/monero.dart';
-import 'package:stackduo/db/main_db.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/services/notifications_service.dart';
 import 'package:stackduo/services/trade_sent_from_stack_service.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';

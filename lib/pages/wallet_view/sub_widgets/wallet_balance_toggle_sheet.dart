@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/wallet/wallet_balance_toggle_state_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/wallet_balance_toggle_state.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 
 enum _BalanceType {
   available,
@@ -199,13 +200,7 @@ class BalanceSelector<T> extends ConsumerWidget {
                   height: 2,
                 ),
                 Text(
-                  "${balance.localizedStringAsFixed(
-                    locale: ref.watch(
-                      localeServiceChangeNotifierProvider.select(
-                        (value) => value.locale,
-                      ),
-                    ),
-                  )} ${coin.ticker}",
+                  ref.watch(pAmountFormatter(coin)).format(balance),
                   style: STextStyles.itemSubtitle12(context).copyWith(
                     color: Theme.of(context)
                         .extension<StackColors>()!

@@ -122,7 +122,10 @@ enum AddressType {
   cryptonote,
   mimbleWimble,
   unknown,
-  nonWallet;
+  nonWallet,
+  ethereum,
+  nano,
+  banano;
 
   String get readableName {
     switch (this) {
@@ -140,6 +143,12 @@ enum AddressType {
         return "Unknown";
       case AddressType.nonWallet:
         return "Non wallet/unknown";
+      case AddressType.ethereum:
+        return "Ethereum";
+      case AddressType.nano:
+        return "Nano";
+      case AddressType.banano:
+        return "Banano";
     }
   }
 }

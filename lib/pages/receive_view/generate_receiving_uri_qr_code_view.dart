@@ -13,15 +13,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/enums/flush_bar_type.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -194,7 +193,7 @@ class _GenerateUriQrCodeViewState extends State<GenerateUriQrCodeView> {
                   child: SizedBox(
                     width: width + 20,
                     height: width + 20,
-                    child: QrImage(
+                    child: QrImageView(
                         data: uriString,
                         size: width,
                         backgroundColor:
@@ -529,7 +528,7 @@ class _GenerateUriQrCodeViewState extends State<GenerateUriQrCodeView> {
                                 child: SizedBox(
                                   width: 234,
                                   height: 234,
-                                  child: QrImage(
+                                  child: QrImageView(
                                       data: _uriString,
                                       size: 220,
                                       backgroundColor: Theme.of(context)

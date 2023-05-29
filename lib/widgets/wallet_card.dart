@@ -17,11 +17,13 @@ class SimpleWalletCard extends ConsumerWidget {
   const SimpleWalletCard({
     Key? key,
     required this.walletId,
+    this.contractAddress,
     this.popPrevious = false,
     this.desktopNavigatorState,
   }) : super(key: key);
 
   final String walletId;
+  final String? contractAddress;
   final bool popPrevious;
   final NavigatorState? desktopNavigatorState;
 
@@ -81,6 +83,7 @@ class SimpleWalletCard extends ConsumerWidget {
       ),
       child: WalletInfoRow(
         walletId: walletId,
+        contractAddress: null,
         onPressedDesktop:
             Util.isDesktop ? () => _openWallet(context, ref) : null,
       ),

@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/coin_control/utxo_card.dart';
 import 'package:stackduo/pages/coin_control/utxo_details_view.dart';
-import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/services/mixins/coin_control_interface.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/animated_widgets/rotate_icon.dart';
 import 'package:stackduo/widgets/app_bar_field.dart';
 import 'package:stackduo/widgets/background.dart';
@@ -687,14 +687,9 @@ class _CoinControlViewState extends ConsumerState<CoinControlView> {
                                             fractionDigits: coin.decimals,
                                           );
                                           return Text(
-                                            "${selectedSum.localizedStringAsFixed(
-                                              locale: ref.watch(
-                                                localeServiceChangeNotifierProvider
-                                                    .select(
-                                                  (value) => value.locale,
-                                                ),
-                                              ),
-                                            )} ${coin.ticker}",
+                                            ref
+                                                .watch(pAmountFormatter(coin))
+                                                .format(selectedSum),
                                             style: widget.requestedTotal == null
                                                 ? STextStyles.w600_14(context)
                                                 : STextStyles.w600_14(context).copyWith(
@@ -735,14 +730,9 @@ class _CoinControlViewState extends ConsumerState<CoinControlView> {
                                           style: STextStyles.w600_14(context),
                                         ),
                                         Text(
-                                          "${widget.requestedTotal!.localizedStringAsFixed(
-                                            locale: ref.watch(
-                                              localeServiceChangeNotifierProvider
-                                                  .select(
-                                                (value) => value.locale,
-                                              ),
-                                            ),
-                                          )} ${coin.ticker}",
+                                          ref
+                                              .watch(pAmountFormatter(coin))
+                                              .format(widget.requestedTotal!),
                                           style: STextStyles.w600_14(context),
                                         ),
                                       ],

@@ -26,6 +26,9 @@ import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
+import 'package:stackduo/utilities/amount/amount_input_formatter.dart';
+import 'package:stackduo/utilities/amount/amount_unit.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
@@ -40,6 +43,7 @@ import 'package:stackduo/widgets/animated_text.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
+import 'package:stackduo/widgets/fee_slider.dart';
 import 'package:stackduo/widgets/icon_widgets/addressbook_icon.dart';
 import 'package:stackduo/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackduo/widgets/icon_widgets/qrcode_icon.dart';
@@ -108,15 +112,11 @@ class _SendViewState extends ConsumerState<SendView> {
 
   void _cryptoAmountChanged() async {
     if (!_cryptoAmountChangeLock) {
-      final String cryptoAmount = cryptoAmountController.text;
-      if (cryptoAmount.isNotEmpty &&
-          cryptoAmount != "." &&
-          cryptoAmount != ",") {
-        _amountToSend = cryptoAmount.contains(",")
-            ? Decimal.parse(cryptoAmount.replaceFirst(",", "."))
-                .toAmount(fractionDigits: coin.decimals)
-            : Decimal.parse(cryptoAmount)
-                .toAmount(fractionDigits: coin.decimals);
+      final cryptoAmount = ref.read(pAmountFormatter(coin)).tryParse(
+            cryptoAmountController.text,
+          );
+      if (cryptoAmount != null) {
+        _amountToSend = cryptoAmount;
         if (_cachedAmountToSend != null &&
             _cachedAmountToSend == _amountToSend) {
           return;
@@ -133,7 +133,7 @@ class _SendViewState extends ConsumerState<SendView> {
               .toAmount(
                 fractionDigits: 2,
               )
-              .localizedStringAsFixed(
+              .fiatString(
                 locale: ref.read(localeServiceChangeNotifierProvider).locale,
               );
         }
@@ -182,6 +182,15 @@ class _SendViewState extends ConsumerState<SendView> {
   late Amount _currentFee;
 
   void _setCurrentFee(String fee, bool shouldSetState) {
+    fee = fee.trim();
+
+    if (fee.startsWith("~")) {
+      fee = fee.substring(1);
+    }
+    if (fee.contains(" ")) {
+      fee = fee.split(" ").first;
+    }
+
     final value = fee.contains(",")
         ? Decimal.parse(fee.replaceFirst(",", "."))
             .toAmount(fractionDigits: coin.decimals)
@@ -249,9 +258,10 @@ class _SendViewState extends ConsumerState<SendView> {
       case FeeRateType.slow:
         feeRate = feeObject.slow;
         break;
+      default:
+        feeRate = -1;
     }
 
-    final String locale = ref.read(localeServiceChangeNotifierProvider).locale;
     Amount fee;
     if (coin == Coin.monero) {
       MoneroTransactionPriority specialMoneroId;
@@ -265,15 +275,25 @@ class _SendViewState extends ConsumerState<SendView> {
         case FeeRateType.slow:
           specialMoneroId = MoneroTransactionPriority.slow;
           break;
+        default:
+          throw ArgumentError("custom fee not available for monero");
       }
 
       fee = await manager.estimateFeeFor(amount, specialMoneroId.raw!);
-      cachedFees[amount] = fee.localizedStringAsFixed(locale: locale);
+      cachedFees[amount] = ref.read(pAmountFormatter(coin)).format(
+            fee,
+            withUnitName: true,
+            indicatePrecisionLoss: false,
+          );
 
       return cachedFees[amount]!;
     } else {
       fee = await manager.estimateFeeFor(amount, feeRate);
-      cachedFees[amount] = fee.localizedStringAsFixed(locale: locale);
+      cachedFees[amount] = ref.read(pAmountFormatter(coin)).format(
+            fee,
+            withUnitName: true,
+            indicatePrecisionLoss: false,
+          );
 
       return cachedFees[amount]!;
     }
@@ -394,6 +414,7 @@ class _SendViewState extends ConsumerState<SendView> {
           isSegwit: widget.accountLite!.segwit,
           amount: amount,
           args: {
+            "satsPerVByte": isCustomFee ? customFeeRate : null,
             "feeRate": feeRate,
             "UTXOs": (manager.hasCoinControlSupport &&
                     coinControlEnabled &&
@@ -408,6 +429,7 @@ class _SendViewState extends ConsumerState<SendView> {
           amount: amount,
           args: {
             "feeRate": ref.read(feeRateTypeStateProvider),
+            "satsPerVByte": isCustomFee ? customFeeRate : null,
             "UTXOs": (manager.hasCoinControlSupport &&
                     coinControlEnabled &&
                     selectedUTXOs.isNotEmpty)
@@ -485,6 +507,10 @@ class _SendViewState extends ConsumerState<SendView> {
 
   bool get isPaynymSend => widget.accountLite != null;
 
+  bool isCustomFee = false;
+
+  int customFeeRate = 1;
+
   @override
   void initState() {
     coin = widget.coin;
@@ -510,7 +536,15 @@ class _SendViewState extends ConsumerState<SendView> {
 
     if (_data != null) {
       if (_data!.amount != null) {
-        cryptoAmountController.text = _data!.amount!.toString();
+        final amount = Amount.fromDecimal(
+          _data!.amount!,
+          fractionDigits: coin.decimals,
+        );
+
+        cryptoAmountController.text = ref.read(pAmountFormatter(coin)).format(
+              amount,
+              withUnitName: false,
+            );
       }
       sendToController.text = _data!.contactLabel;
       _address = _data!.address.trim();
@@ -700,10 +734,12 @@ class _SendViewState extends ConsumerState<SendView> {
                                       if (_cachedBalance != null) {
                                         return GestureDetector(
                                           onTap: () {
-                                            cryptoAmountController.text =
-                                                _cachedBalance!
-                                                    .localizedStringAsFixed(
-                                                        locale: locale);
+                                            cryptoAmountController.text = ref
+                                                .read(pAmountFormatter(coin))
+                                                .format(
+                                                  _cachedBalance!,
+                                                  withUnitName: false,
+                                                );
                                           },
                                           child: Container(
                                             color: Colors.transparent,
@@ -712,9 +748,10 @@ class _SendViewState extends ConsumerState<SendView> {
                                                   CrossAxisAlignment.end,
                                               children: [
                                                 Text(
-                                                  "${_cachedBalance!.localizedStringAsFixed(
-                                                    locale: locale,
-                                                  )} ${coin.ticker}",
+                                                  ref
+                                                      .watch(pAmountFormatter(
+                                                          coin))
+                                                      .format(_cachedBalance!),
                                                   style:
                                                       STextStyles.titleBold12(
                                                               context)
@@ -726,7 +763,7 @@ class _SendViewState extends ConsumerState<SendView> {
                                                 Text(
                                                   "${(_cachedBalance!.decimal * ref.watch(priceAnd24hChangeNotifierProvider.select((value) => value.getPrice(coin).item1))).toAmount(
                                                         fractionDigits: 2,
-                                                      ).localizedStringAsFixed(
+                                                      ).fiatString(
                                                         locale: locale,
                                                       )} ${ref.watch(prefsChangeNotifierProvider.select((value) => value.currency))}",
                                                   style: STextStyles.subtitle(
@@ -786,10 +823,32 @@ class _SendViewState extends ConsumerState<SendView> {
                           const SizedBox(
                             height: 16,
                           ),
-                          Text(
-                            isPaynymSend ? "Send to PayNym address" : "Send to",
-                            style: STextStyles.smallMed12(context),
-                            textAlign: TextAlign.left,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                isPaynymSend
+                                    ? "Send to PayNym address"
+                                    : "Send to",
+                                style: STextStyles.smallMed12(context),
+                                textAlign: TextAlign.left,
+                              ),
+                              // if (coin == Coin.monero)
+                              //   CustomTextButton(
+                              //     text: "Use OpenAlias",
+                              //     onTap: () async {
+                              //       await showModalBottomSheet(
+                              //         context: context,
+                              //         builder: (context) =>
+                              //             OpenAliasBottomSheet(
+                              //           onSelected: (address) {
+                              //             sendToController.text = address;
+                              //           },
+                              //         ),
+                              //       );
+                              //     },
+                              //   ),
+                            ],
                           ),
                           const SizedBox(
                             height: 8,
@@ -1011,10 +1070,15 @@ class _SendViewState extends ConsumerState<SendView> {
                                                       );
                                                       cryptoAmountController
                                                               .text =
-                                                          amount
-                                                              .localizedStringAsFixed(
-                                                        locale: locale,
-                                                      );
+                                                          ref
+                                                              .read(
+                                                                  pAmountFormatter(
+                                                                      coin))
+                                                              .format(
+                                                                amount,
+                                                                withUnitName:
+                                                                    false,
+                                                              );
                                                       _amountToSend = amount;
                                                     }
 
@@ -1120,11 +1184,11 @@ class _SendViewState extends ConsumerState<SendView> {
                                 text: "Send all ${coin.ticker}",
                                 onTap: () async {
                                   cryptoAmountController.text = ref
-                                      .read(provider)
-                                      .balance
-                                      .spendable
-                                      .localizedStringAsFixed(locale: locale);
-
+                                      .read(pAmountFormatter(coin))
+                                      .format(
+                                        ref.read(provider).balance.spendable,
+                                        withUnitName: false,
+                                      );
                                   _cryptoAmountChanged();
                                 },
                               ),
@@ -1153,13 +1217,21 @@ class _SendViewState extends ConsumerState<SendView> {
                                   ),
                             textAlign: TextAlign.right,
                             inputFormatters: [
+                              AmountInputFormatter(
+                                decimals: coin.decimals,
+                                unit: ref.watch(pAmountUnit(coin)),
+                                locale: locale,
+                              ),
+
                               // regex to validate a crypto amount with 8 decimal places
-                              TextInputFormatter.withFunction((oldValue,
-                                      newValue) =>
-                                  RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
-                                          .hasMatch(newValue.text)
-                                      ? newValue
-                                      : oldValue),
+                              // TextInputFormatter.withFunction((oldValue,
+                              //         newValue) =>
+                              //     // RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
+                              //     // RegExp(r'^\d{1,3}([,\.]\d+)?|[,\.\d]+$')
+                              //     getAmountRegex(locale, coin.decimals)
+                              //             .hasMatch(newValue.text)
+                              //         ? newValue
+                              //         : oldValue),
                             ],
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.only(
@@ -1176,7 +1248,9 @@ class _SendViewState extends ConsumerState<SendView> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Text(
-                                    coin.ticker,
+                                    ref
+                                        .watch(pAmountUnit(coin))
+                                        .unitForCoin(coin),
                                     style: STextStyles.smallMed14(context)
                                         .copyWith(
                                             color: Theme.of(context)
@@ -1212,26 +1286,25 @@ class _SendViewState extends ConsumerState<SendView> {
                                     ),
                               textAlign: TextAlign.right,
                               inputFormatters: [
+                                AmountInputFormatter(
+                                  decimals: 2,
+                                  locale: locale,
+                                ),
                                 // regex to validate a fiat amount with 2 decimal places
-                                TextInputFormatter.withFunction((oldValue,
-                                        newValue) =>
-                                    RegExp(r'^([0-9]*[,.]?[0-9]{0,2}|[,.][0-9]{0,2})$')
-                                            .hasMatch(newValue.text)
-                                        ? newValue
-                                        : oldValue),
+                                // TextInputFormatter.withFunction((oldValue,
+                                //         newValue) =>
+                                //     // RegExp(r'^([0-9]*[,.]?[0-9]{0,2}|[,.][0-9]{0,2})$')
+                                //     getAmountRegex(locale, 2)
+                                //             .hasMatch(newValue.text)
+                                //         ? newValue
+                                //         : oldValue),
                               ],
                               onChanged: (baseAmountString) {
-                                if (baseAmountString.isNotEmpty &&
-                                    baseAmountString != "." &&
-                                    baseAmountString != ",") {
-                                  final Amount baseAmount =
-                                      baseAmountString.contains(",")
-                                          ? Decimal.parse(baseAmountString
-                                                  .replaceFirst(",", "."))
-                                              .toAmount(fractionDigits: 2)
-                                          : Decimal.parse(baseAmountString)
-                                              .toAmount(fractionDigits: 2);
-
+                                final baseAmount = Amount.tryParseFiatString(
+                                  baseAmountString,
+                                  locale: locale,
+                                );
+                                if (baseAmount != null) {
                                   final Decimal _price = ref
                                       .read(priceAnd24hChangeNotifierProvider)
                                       .getPrice(coin)
@@ -1262,12 +1335,10 @@ class _SendViewState extends ConsumerState<SendView> {
                                       level: LogLevel.Info);
 
                                   final amountString =
-                                      _amountToSend!.localizedStringAsFixed(
-                                    locale: ref
-                                        .read(
-                                            localeServiceChangeNotifierProvider)
-                                        .locale,
-                                  );
+                                      ref.read(pAmountFormatter(coin)).format(
+                                            _amountToSend!,
+                                            withUnitName: false,
+                                          );
 
                                   _cryptoAmountChangeLock = true;
                                   cryptoAmountController.text = amountString;
@@ -1439,14 +1510,23 @@ class _SendViewState extends ConsumerState<SendView> {
                           const SizedBox(
                             height: 12,
                           ),
+                          // if (coin != Coin.epicCash &&
+                          //     coin != Coin.nano &&
+                          //     coin != Coin.banano)
                           Text(
                             "Transaction fee (estimated)",
                             style: STextStyles.smallMed12(context),
                             textAlign: TextAlign.left,
                           ),
+                          // if (coin != Coin.epicCash &&
+                          //     coin != Coin.nano &&
+                          //     coin != Coin.banano)
                           const SizedBox(
                             height: 8,
                           ),
+                          // if (coin != Coin.epicCash &&
+                          //     coin != Coin.nano &&
+                          //     coin != Coin.banano)
                           Stack(
                             children: [
                               TextField(
@@ -1470,7 +1550,18 @@ class _SendViewState extends ConsumerState<SendView> {
                                       Constants.size.circularBorderRadius,
                                     ),
                                   ),
-                                  onPressed: () {
+                                  onPressed:
+                                      // (coin == Coin.firo ||
+                                      //             coin == Coin.firoTestNet) &&
+                                      //         ref
+                                      //                 .watch(
+                                      //                     publicPrivateBalanceStateProvider
+                                      //                         .state)
+                                      //                 .state ==
+                                      //             "Private"
+                                      //     ? null
+                                      //     :
+                                      () {
                                     showModalBottomSheet<dynamic>(
                                       backgroundColor: Colors.transparent,
                                       context: context,
@@ -1485,11 +1576,21 @@ class _SendViewState extends ConsumerState<SendView> {
                                         amount: (Decimal.tryParse(
                                                     cryptoAmountController
                                                         .text) ??
+                                                _amountToSend?.decimal ??
                                                 Decimal.zero)
                                             .toAmount(
                                           fractionDigits: coin.decimals,
                                         ),
                                         updateChosen: (String fee) {
+                                          if (fee == "custom") {
+                                            if (!isCustomFee) {
+                                              setState(() {
+                                                isCustomFee = true;
+                                              });
+                                            }
+                                            return;
+                                          }
+
                                           _setCurrentFee(
                                             fee,
                                             true,
@@ -1497,12 +1598,61 @@ class _SendViewState extends ConsumerState<SendView> {
                                           setState(() {
                                             _calculateFeesFuture =
                                                 Future(() => fee);
+                                            if (isCustomFee) {
+                                              isCustomFee = false;
+                                            }
                                           });
                                         },
                                       ),
                                     );
                                   },
-                                  child: Row(
+                                  child:
+                                      // ((coin == Coin.firo ||
+                                      //             coin == Coin.firoTestNet) &&
+                                      //         ref
+                                      //                 .watch(
+                                      //                     publicPrivateBalanceStateProvider
+                                      //                         .state)
+                                      //                 .state ==
+                                      //             "Private")
+                                      //     ? Row(
+                                      //         children: [
+                                      //           FutureBuilder(
+                                      //             future: _calculateFeesFuture,
+                                      //             builder: (context, snapshot) {
+                                      //               if (snapshot.connectionState ==
+                                      //                       ConnectionState
+                                      //                           .done &&
+                                      //                   snapshot.hasData) {
+                                      //                 _setCurrentFee(
+                                      //                   snapshot.data!,
+                                      //                   false,
+                                      //                 );
+                                      //                 return Text(
+                                      //                   "~${snapshot.data!}",
+                                      //                   style: STextStyles
+                                      //                       .itemSubtitle(
+                                      //                           context),
+                                      //                 );
+                                      //               } else {
+                                      //                 return AnimatedText(
+                                      //                   stringsToLoopThrough: const [
+                                      //                     "Calculating",
+                                      //                     "Calculating.",
+                                      //                     "Calculating..",
+                                      //                     "Calculating...",
+                                      //                   ],
+                                      //                   style: STextStyles
+                                      //                       .itemSubtitle(
+                                      //                           context),
+                                      //                 );
+                                      //               }
+                                      //             },
+                                      //           ),
+                                      //         ],
+                                      //       )
+                                      //     :
+                                      Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -1527,11 +1677,13 @@ class _SendViewState extends ConsumerState<SendView> {
                                                       ConnectionState.done &&
                                                   snapshot.hasData) {
                                                 _setCurrentFee(
-                                                  snapshot.data! as String,
+                                                  snapshot.data!,
                                                   false,
                                                 );
                                                 return Text(
-                                                  "~${snapshot.data! as String} ${coin.ticker}",
+                                                  isCustomFee
+                                                      ? ""
+                                                      : "~${snapshot.data!}",
                                                   style:
                                                       STextStyles.itemSubtitle(
                                                           context),
@@ -1567,6 +1719,18 @@ class _SendViewState extends ConsumerState<SendView> {
                               )
                             ],
                           ),
+                          if (isCustomFee)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: 12,
+                                top: 16,
+                              ),
+                              child: FeeSlider(
+                                onSatVByteChanged: (rate) {
+                                  customFeeRate = rate;
+                                },
+                              ),
+                            ),
                           const Spacer(),
                           const SizedBox(
                             height: 12,

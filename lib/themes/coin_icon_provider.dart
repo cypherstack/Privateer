@@ -14,7 +14,9 @@ final coinIconProvider = Provider.family<String, Coin>((ref, coin) {
       case Coin.monero:
         return assets.monero;
     }
+  } else if (assets is ThemeAssetsV2) {
+    return (assets).coinIcons[coin.mainNetVersion]!;
   } else {
-    return (assets as ThemeAssetsV2).coinIcons[coin.mainNetVersion]!;
+    return (assets as ThemeAssetsV3).coinIcons[coin.mainNetVersion]!;
   }
 });

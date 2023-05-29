@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bip47/bip47.dart';
+import 'package:cw_core/monero_transaction_priority.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,20 +25,27 @@ import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
+import 'package:stackduo/utilities/amount/amount_input_formatter.dart';
+import 'package:stackduo/utilities/amount/amount_unit.dart';
 import 'package:stackduo/utilities/barcode_scanner_interface.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
+import 'package:stackduo/utilities/enums/fee_rate_type_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/prefs.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/animated_text.dart';
+import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
+import 'package:stackduo/widgets/desktop/desktop_fee_dialog.dart';
 import 'package:stackduo/widgets/desktop/primary_button.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
+import 'package:stackduo/widgets/fee_slider.dart';
 import 'package:stackduo/widgets/icon_widgets/addressbook_icon.dart';
 import 'package:stackduo/widgets/icon_widgets/clipboard_icon.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
@@ -96,6 +105,17 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
   late VoidCallback onCryptoAmountChanged;
 
   bool get isPaynymSend => widget.accountLite != null;
+
+  bool isCustomFee = false;
+  int customFeeRate = 1;
+  (FeeRateType, String?, String?)? feeSelectionResult;
+
+  final stringsToLoopThrough = [
+    "Calculating",
+    "Calculating.",
+    "Calculating..",
+    "Calculating...",
+  ];
 
   Future<void> previewSend() async {
     final manager =
@@ -253,6 +273,7 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
           isSegwit: widget.accountLite!.segwit,
           amount: amount,
           args: {
+            "satsPerVByte": isCustomFee ? customFeeRate : null,
             "feeRate": feeRate,
             "UTXOs": (manager.hasCoinControlSupport &&
                     coinControlEnabled &&
@@ -267,6 +288,7 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
           amount: amount,
           args: {
             "feeRate": ref.read(feeRateTypeStateProvider),
+            "satsPerVByte": isCustomFee ? customFeeRate : null,
             "UTXOs": (manager.hasCoinControlSupport &&
                     coinControlEnabled &&
                     ref.read(desktopUseUTXOs).isNotEmpty)
@@ -397,14 +419,26 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
 
   void _cryptoAmountChanged() async {
     if (!_cryptoAmountChangeLock) {
-      final String cryptoAmount = cryptoAmountController.text;
+      String cryptoAmount = cryptoAmountController.text;
       if (cryptoAmount.isNotEmpty &&
           cryptoAmount != "." &&
           cryptoAmount != ",") {
+        if (cryptoAmount.startsWith("~")) {
+          cryptoAmount = cryptoAmount.substring(1);
+        }
+        if (cryptoAmount.contains(" ")) {
+          cryptoAmount = cryptoAmount.split(" ").first;
+        }
+
+        // ensure we don't shift past minimum atomic value
+        final shift = min(ref.read(pAmountUnit(coin)).shift, coin.decimals);
+
         _amountToSend = cryptoAmount.contains(",")
             ? Decimal.parse(cryptoAmount.replaceFirst(",", "."))
+                .shift(0 - shift)
                 .toAmount(fractionDigits: coin.decimals)
             : Decimal.parse(cryptoAmount)
+                .shift(0 - shift)
                 .toAmount(fractionDigits: coin.decimals);
         if (_cachedAmountToSend != null &&
             _cachedAmountToSend == _amountToSend) {
@@ -420,7 +454,7 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
         if (price > Decimal.zero) {
           final String fiatAmountString = (_amountToSend!.decimal * price)
               .toAmount(fractionDigits: 2)
-              .localizedStringAsFixed(
+              .fiatString(
                 locale: ref.read(localeServiceChangeNotifierProvider).locale,
               );
 
@@ -474,22 +508,17 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
     }
     if (private && _privateBalanceString != null) {
       return Text(
-        "$_privateBalanceString ${coin.ticker}",
+        "$_privateBalanceString",
         style: STextStyles.itemSubtitle(context),
       );
     } else if (!private && _publicBalanceString != null) {
       return Text(
-        "$_publicBalanceString ${coin.ticker}",
+        "$_publicBalanceString",
         style: STextStyles.itemSubtitle(context),
       );
     } else {
       return AnimatedText(
-        stringsToLoopThrough: const [
-          "Loading balance",
-          "Loading balance.",
-          "Loading balance..",
-          "Loading balance...",
-        ],
+        stringsToLoopThrough: stringsToLoopThrough,
         style: STextStyles.itemSubtitle(context),
       );
     }
@@ -528,11 +557,9 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
           final amount = Decimal.parse(results["amount"]!).toAmount(
             fractionDigits: coin.decimals,
           );
-          cryptoAmountController.text = amount.localizedStringAsFixed(
-            locale: ref.read(localeServiceChangeNotifierProvider).locale,
-            decimalPlaces: Constants.decimalPlacesForCoin(coin),
-          );
-          amount.toString();
+          cryptoAmountController.text = ref
+              .read(pAmountFormatter(coin))
+              .format(amount, withUnitName: false);
           _amountToSend = amount;
         }
 
@@ -609,10 +636,10 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
       Logging.instance.log("it changed $_amountToSend $_cachedAmountToSend",
           level: LogLevel.Info);
 
-      final amountString = _amountToSend!.localizedStringAsFixed(
-        locale: ref.read(localeServiceChangeNotifierProvider).locale,
-        decimalPlaces: coin.decimals,
-      );
+      final amountString = ref.read(pAmountFormatter(coin)).format(
+            _amountToSend!,
+            withUnitName: false,
+          );
 
       _cryptoAmountChangeLock = true;
       cryptoAmountController.text = amountString;
@@ -815,12 +842,21 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
                 ),
           textAlign: TextAlign.right,
           inputFormatters: [
-            // regex to validate a crypto amount with 8 decimal places
-            TextInputFormatter.withFunction((oldValue, newValue) =>
-                RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
-                        .hasMatch(newValue.text)
-                    ? newValue
-                    : oldValue),
+            AmountInputFormatter(
+              decimals: coin.decimals,
+              unit: ref.watch(pAmountUnit(coin)),
+              locale: ref.watch(
+                localeServiceChangeNotifierProvider.select(
+                  (value) => value.locale,
+                ),
+              ),
+            ),
+            // // regex to validate a crypto amount with 8 decimal places
+            // TextInputFormatter.withFunction((oldValue, newValue) =>
+            //     RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
+            //             .hasMatch(newValue.text)
+            //         ? newValue
+            //         : oldValue),
           ],
           onChanged: (newValue) {},
           decoration: InputDecoration(
@@ -840,7 +876,7 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  coin.ticker,
+                  ref.watch(pAmountUnit(coin)).unitForCoin(coin),
                   style: STextStyles.smallMed14(context).copyWith(
                       color: Theme.of(context)
                           .extension<StackColors>()!
@@ -872,12 +908,20 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
                   ),
             textAlign: TextAlign.right,
             inputFormatters: [
-              // regex to validate a fiat amount with 2 decimal places
-              TextInputFormatter.withFunction((oldValue, newValue) =>
-                  RegExp(r'^([0-9]*[,.]?[0-9]{0,2}|[,.][0-9]{0,2})$')
-                          .hasMatch(newValue.text)
-                      ? newValue
-                      : oldValue),
+              AmountInputFormatter(
+                decimals: 2,
+                locale: ref.watch(
+                  localeServiceChangeNotifierProvider.select(
+                    (value) => value.locale,
+                  ),
+                ),
+              ),
+              // // regex to validate a fiat amount with 2 decimal places
+              // TextInputFormatter.withFunction((oldValue, newValue) =>
+              //     RegExp(r'^([0-9]*[,.]?[0-9]{0,2}|[,.][0-9]{0,2})$')
+              //             .hasMatch(newValue.text)
+              //         ? newValue
+              //         : oldValue),
             ],
             onChanged: fiatTextFieldOnChanged,
             decoration: InputDecoration(
@@ -1134,76 +1178,178 @@ class _DesktopSendState extends ConsumerState<DesktopSend> {
               }
             },
           ),
-        // const SizedBox(
-        //   height: 20,
-        // ),
-        // Text(
-        //   "Note (optional)",
-        //   style: STextStyles.desktopTextExtraSmall(context).copyWith(
-        //     color: Theme.of(context)
-        //         .extension<StackColors>()!
-        //         .textFieldActiveSearchIconRight,
-        //   ),
-        //   textAlign: TextAlign.left,
-        // ),
-        // const SizedBox(
-        //   height: 10,
-        // ),
-        // ClipRRect(
-        //   borderRadius: BorderRadius.circular(
-        //     Constants.size.circularBorderRadius,
-        //   ),
-        //   child: TextField(
-        //     minLines: 1,
-        //     maxLines: 5,
-        //     autocorrect: Util.isDesktop ? false : true,
-        //     enableSuggestions: Util.isDesktop ? false : true,
-        //     controller: noteController,
-        //     focusNode: _noteFocusNode,
-        //     style: STextStyles.desktopTextExtraSmall(context).copyWith(
-        //       color: Theme.of(context)
-        //           .extension<StackColors>()!
-        //           .textFieldActiveText,
-        //       height: 1.8,
-        //     ),
-        //     onChanged: (_) => setState(() {}),
-        //     decoration: standardInputDecoration(
-        //       "Type something...",
-        //       _noteFocusNode,
-        //       context,
-        //       desktopMed: true,
-        //     ).copyWith(
-        //       contentPadding: const EdgeInsets.only(
-        //         left: 16,
-        //         top: 11,
-        //         bottom: 12,
-        //         right: 5,
-        //       ),
-        //       suffixIcon: noteController.text.isNotEmpty
-        //           ? Padding(
-        //               padding: const EdgeInsets.only(right: 0),
-        //               child: UnconstrainedBox(
-        //                 child: Row(
-        //                   children: [
-        //                     TextFieldIconButton(
-        //                       child: const XIcon(),
-        //                       onTap: () async {
-        //                         setState(() {
-        //                           noteController.text = "";
-        //                         });
-        //                       },
-        //                     ),
-        //                   ],
-        //                 ),
-        //               ),
-        //             )
-        //           : null,
-        //     ),
-        //   ),
-        // ),
         if (!isPaynymSend)
           const SizedBox(
             height: 20,
+          ),
+        // if (!([Coin.nano, Coin.banano, Coin.epicCash].contains(coin)))
+        ConditionalParent(
+          condition: coin.isElectrumXCoin,
+          builder: (child) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              child,
+              CustomTextButton(
+                text: "Edit",
+                onTap: () async {
+                  feeSelectionResult = await showDialog<
+                      (
+                        FeeRateType,
+                        String?,
+                        String?,
+                      )?>(
+                    context: context,
+                    builder: (_) => DesktopFeeDialog(
+                      walletId: walletId,
+                    ),
+                  );
+
+                  if (feeSelectionResult != null) {
+                    if (isCustomFee &&
+                        feeSelectionResult!.$1 != FeeRateType.custom) {
+                      isCustomFee = false;
+                    } else if (!isCustomFee &&
+                        feeSelectionResult!.$1 == FeeRateType.custom) {
+                      isCustomFee = true;
+                    }
+                  }
+
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+          child: Text(
+            "Transaction fee"
+            "${isCustomFee ? "" : " (${/*coin == Coin.ethereum ? "max" : */ "estimated"})"}",
+            style: STextStyles.desktopTextExtraSmall(context).copyWith(
+              color: Theme.of(context)
+                  .extension<StackColors>()!
+                  .textFieldActiveSearchIconRight,
+            ),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        // if (!([Coin.nano, Coin.banano, Coin.epicCash].contains(coin)))
+        const SizedBox(
+          height: 10,
+        ),
+        // if (!([Coin.nano, Coin.banano, Coin.epicCash].contains(coin)))
+        if (!isCustomFee)
+          (feeSelectionResult?.$2 == null)
+              ? FutureBuilder(
+                  future: ref.watch(
+                    walletsChangeNotifierProvider.select(
+                      (value) => value.getManager(walletId).fees,
+                    ),
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      return DesktopFeeItem(
+                        feeObject: snapshot.data,
+                        feeRateType: FeeRateType.average,
+                        walletId: walletId,
+                        feeFor: ({
+                          required Amount amount,
+                          required FeeRateType feeRateType,
+                          required int feeRate,
+                          required Coin coin,
+                        }) async {
+                          if (ref
+                                  .read(feeSheetSessionCacheProvider)
+                                  .average[amount] ==
+                              null) {
+                            final manager = ref
+                                .read(walletsChangeNotifierProvider)
+                                .getManager(walletId);
+
+                            if (coin ==
+                                Coin.monero /* || coin == Coin.wownero*/) {
+                              final fee = await manager.estimateFeeFor(amount,
+                                  MoneroTransactionPriority.regular.raw!);
+                              ref
+                                  .read(feeSheetSessionCacheProvider)
+                                  .average[amount] = fee;
+                              // } else if ((coin == Coin.firo ||
+                              //         coin == Coin.firoTestNet) &&
+                              //     ref
+                              //             .read(
+                              //                 publicPrivateBalanceStateProvider
+                              //                     .state)
+                              //             .state !=
+                              //         "Private") {
+                              //   ref
+                              //           .read(feeSheetSessionCacheProvider)
+                              //           .average[amount] =
+                              //       await (manager.wallet as FiroWallet)
+                              //           .estimateFeeForPublic(amount, feeRate);
+                            } else {
+                              ref
+                                      .read(feeSheetSessionCacheProvider)
+                                      .average[amount] =
+                                  await manager.estimateFeeFor(amount, feeRate);
+                            }
+                          }
+                          return ref
+                              .read(feeSheetSessionCacheProvider)
+                              .average[amount]!;
+                        },
+                        isSelected: true,
+                      );
+                    } else {
+                      return Row(
+                        children: [
+                          AnimatedText(
+                            stringsToLoopThrough: stringsToLoopThrough,
+                            style:
+                                STextStyles.desktopTextExtraExtraSmall(context)
+                                    .copyWith(
+                              color: Theme.of(context)
+                                  .extension<StackColors>()!
+                                  .textFieldActiveText,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      feeSelectionResult?.$2 ?? "",
+                      style: STextStyles.desktopTextExtraExtraSmall(context)
+                          .copyWith(
+                        color: Theme.of(context)
+                            .extension<StackColors>()!
+                            .textFieldActiveText,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    Text(
+                      feeSelectionResult?.$3 ?? "",
+                      style: STextStyles.desktopTextExtraExtraSmall(context)
+                          .copyWith(
+                        color: Theme.of(context)
+                            .extension<StackColors>()!
+                            .textFieldActiveSearchIconRight,
+                      ),
+                    ),
+                  ],
+                ),
+        if (isCustomFee)
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 12,
+              top: 16,
+            ),
+            child: FeeSlider(
+              onSatVByteChanged: (rate) {
+                customFeeRate = rate;
+              },
+            ),
           ),
         const SizedBox(
           height: 36,

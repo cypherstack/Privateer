@@ -8,6 +8,7 @@ import 'package:stackduo/pages/wallet_view/transaction_views/transaction_details
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/format.dart';
@@ -33,9 +34,11 @@ class TransactionCard extends ConsumerStatefulWidget {
 class _TransactionCardState extends ConsumerState<TransactionCard> {
   late final Transaction _transaction;
   late final String walletId;
+  late final bool isTokenTx;
   late final String prefix;
   late final String unit;
   late final Coin coin;
+  late final dynamic tokenContract;
 
   String whatIsIt(
     TransactionType type,
@@ -92,6 +95,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
   void initState() {
     walletId = widget.walletId;
     _transaction = widget.transaction;
+    isTokenTx = _transaction.subType == TransactionSubType.ethToken;
     if (Util.isDesktop) {
       if (_transaction.type == TransactionType.outgoing) {
         prefix = "-";
@@ -107,6 +111,8 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
         .read(walletsChangeNotifierProvider)
         .getManager(widget.walletId)
         .coin;
+
+    tokenContract = null;
 
     unit = coin.ticker;
     super.initState();
@@ -216,9 +222,7 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                                   final amount = _transaction.realAmount;
 
                                   return Text(
-                                    "$prefix${amount.localizedStringAsFixed(
-                                      locale: locale,
-                                    )} $unit",
+                                    "$prefix${ref.watch(pAmountFormatter(coin)).format(amount, ethContract: tokenContract)}",
                                     style: STextStyles.itemSubtitle12(context),
                                   );
                                 },
@@ -261,9 +265,8 @@ class _TransactionCardState extends ConsumerState<TransactionCard> {
                                       "$prefix${Amount.fromDecimal(
                                         amount.decimal * price,
                                         fractionDigits: 2,
-                                      ).localizedStringAsFixed(
+                                      ).fiatString(
                                         locale: locale,
-                                        decimalPlaces: 2,
                                       )} $baseCurrency",
                                       style: STextStyles.label(context),
                                     );

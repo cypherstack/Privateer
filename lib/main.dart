@@ -17,8 +17,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:isar/isar.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:stackduo/db/main_db.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction_status.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
@@ -69,7 +69,7 @@ final openedFromSWBFileStringStateProvider =
 // runs the MyApp widget and checks for new users, caching the value in the
 // miscellaneous box for later use
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
   if (Platform.isIOS) {
     Util.libraryPath = await getLibraryDirectory();
@@ -177,7 +177,9 @@ void main() async {
     }
   }
 
-  monero.onStartup();
+  if (!Platform.isWindows) {
+    monero.onStartup();
+  }
 
   // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
   //     overlays: [SystemUiOverlay.bottom]);
@@ -438,6 +440,12 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
   dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    ref.read(localeServiceChangeNotifierProvider).loadLocale();
+    super.didChangeLocales(locales);
   }
 
   @override

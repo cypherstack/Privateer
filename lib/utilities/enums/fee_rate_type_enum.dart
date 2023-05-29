@@ -1,4 +1,4 @@
-enum FeeRateType { fast, average, slow }
+enum FeeRateType { fast, average, slow, custom }
 
 extension FeeRateTypeExt on FeeRateType {
   String get prettyName {
@@ -9,6 +9,8 @@ extension FeeRateTypeExt on FeeRateType {
         return "Average";
       case FeeRateType.slow:
         return "Slow";
+      case FeeRateType.custom:
+        return "Custom";
     }
   }
 }

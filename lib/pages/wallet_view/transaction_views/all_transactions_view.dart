@@ -14,6 +14,7 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -941,9 +942,7 @@ class _DesktopTransactionCardRowState
                   builder: (_) {
                     final amount = _transaction.realAmount;
                     return Text(
-                      "$prefix${amount.localizedStringAsFixed(
-                        locale: locale,
-                      )} ${coin.ticker}",
+                      "$prefix${ref.watch(pAmountFormatter(coin)).format(amount)}",
                       style: STextStyles.desktopTextExtraExtraSmall(context)
                           .copyWith(
                         color: Theme.of(context)
@@ -965,7 +964,7 @@ class _DesktopTransactionCardRowState
                       return Text(
                         "$prefix${(amount.decimal * price).toAmount(
                               fractionDigits: 2,
-                            ).localizedStringAsFixed(
+                            ).fiatString(
                               locale: locale,
                             )} $baseCurrency",
                         style: STextStyles.desktopTextExtraExtraSmall(context),

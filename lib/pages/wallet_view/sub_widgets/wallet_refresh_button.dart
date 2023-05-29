@@ -52,13 +52,19 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton> {
         if (event.walletId == widget.walletId) {
           switch (event.newStatus) {
             case WalletSyncStatus.unableToSync:
-              _spinController.stop?.call();
+              if (_spinController.hasLoadedAnimation) {
+                _spinController.stop?.call();
+              }
               break;
             case WalletSyncStatus.synced:
-              _spinController.stop?.call();
+              if (_spinController.hasLoadedAnimation) {
+                _spinController.stop?.call();
+              }
               break;
             case WalletSyncStatus.syncing:
-              _spinController.repeat?.call();
+              if (_spinController.hasLoadedAnimation) {
+                _spinController.repeat?.call();
+              }
               break;
           }
         }
@@ -84,6 +90,7 @@ class _RefreshButtonState extends ConsumerState<WalletRefreshButton> {
         width: isDesktop ? 22 : 36,
         child: Semantics(
           label: "Refresh Button. Refreshes The Values In Summary.",
+          excludeSemantics: true,
           child: MaterialButton(
             color: isDesktop
                 ? Theme.of(context)

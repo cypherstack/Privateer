@@ -18,6 +18,7 @@ import 'package:stackduo/services/mixins/paynym_wallet_interface.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
@@ -44,6 +45,7 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
     this.isTradeTransaction = false,
     this.isPaynymTransaction = false,
     this.isPaynymNotificationTransaction = false,
+    this.isTokenTx = false,
     this.onSuccessInsteadOfRouteOnSuccess,
   }) : super(key: key);
 
@@ -55,6 +57,7 @@ class ConfirmTransactionView extends ConsumerStatefulWidget {
   final bool isTradeTransaction;
   final bool isPaynymTransaction;
   final bool isPaynymNotificationTransaction;
+  final bool isTokenTx;
   final VoidCallback? onSuccessInsteadOfRouteOnSuccess;
 
   @override
@@ -104,13 +107,26 @@ class _ConfirmTransactionViewState
     final note = noteController.text;
 
     try {
-      if (widget.isPaynymNotificationTransaction) {
+      // if (widget.isTokenTx) {
+      //   txidFuture = ref
+      //       .read(tokenServiceProvider)!
+      //       .confirmSend(txData: transactionInfo);
+      // } else
+        if (widget.isPaynymNotificationTransaction) {
         txidFuture = (manager.wallet as PaynymWalletInterface)
             .broadcastNotificationTx(preparedTx: transactionInfo);
       } else if (widget.isPaynymTransaction) {
         txidFuture = manager.confirmSend(txData: transactionInfo);
       } else {
-        txidFuture = manager.confirmSend(txData: transactionInfo);
+        // final coin = manager.coin;
+        // if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
+        //     ref.read(publicPrivateBalanceStateProvider.state).state !=
+        //         "Private") {
+        //   txidFuture = (manager.wallet as FiroWallet)
+        //       .confirmSendPublic(txData: transactionInfo);
+        // } else {
+          txidFuture = manager.confirmSend(txData: transactionInfo);
+        // }
       }
 
       final results = await Future.wait([
@@ -140,6 +156,20 @@ class _ConfirmTransactionViewState
           widget.onSuccessInsteadOfRouteOnSuccess!.call();
         }
       }
+    // } on BadEpicHttpAddressException catch (_) {
+    //   if (mounted) {
+    //     // pop building dialog
+    //     Navigator.of(context).pop();
+    //     unawaited(
+    //       showFloatingFlushBar(
+    //         type: FlushBarType.warning,
+    //         message:
+    //             "Connection failed. Please check the address and try again.",
+    //         context: context,
+    //       ),
+    //     );
+    //     return;
+    //   }
     } catch (e, s) {
       //todo: comeback to this
       debugPrint("$e\n$s");
@@ -241,8 +271,16 @@ class _ConfirmTransactionViewState
     final managerProvider = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManagerProvider(walletId)));
 
-    final String unit = ref.watch(walletsChangeNotifierProvider
-        .select((value) => value.getManager(walletId).coin.ticker));
+    final coin = ref.watch(walletsChangeNotifierProvider
+        .select((value) => value.getManager(walletId).coin));
+
+    final String unit;
+    // if (widget.isTokenTx) {
+    //   unit = ref.watch(
+    //       tokenServiceProvider.select((value) => value!.tokenContract.symbol));
+    // } else {
+      unit = coin.ticker;
+    // }
 
     return ConditionalParent(
       condition: !isDesktop,
@@ -369,50 +407,76 @@ class _ConfirmTransactionViewState
                           style: STextStyles.smallMed12(context),
                         ),
                         Text(
-                          "${(transactionInfo["recipientAmt"] as Amount).localizedStringAsFixed(
-                            locale: ref.watch(
-                              localeServiceChangeNotifierProvider
-                                  .select((value) => value.locale),
-                            ),
-                          )} $unit",
-                          style: STextStyles.itemSubtitle12(context),
-                          textAlign: TextAlign.right,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  RoundedWhiteContainer(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Transaction fee",
-                          style: STextStyles.smallMed12(context),
-                        ),
-                        Text(
-                          "${(transactionInfo["fee"] is Amount ? transactionInfo["fee"] as Amount : (transactionInfo["fee"] as int).toAmountAsRaw(
-                              fractionDigits: ref.watch(
-                                managerProvider.select(
-                                  (value) => value.coin.decimals,
-                                ),
+                          ref.watch(pAmountFormatter(coin)).format(
+                                transactionInfo["recipientAmt"] as Amount,
+                                // ethContract:
+                                // ref
+                                //     .watch(tokenServiceProvider)
+                                //     ?.tokenContract,
                               ),
-                            )).localizedStringAsFixed(
-                            locale: ref.watch(
-                              localeServiceChangeNotifierProvider
-                                  .select((value) => value.locale),
-                            ),
-                          )} ${ref.watch(
-                                managerProvider.select((value) => value.coin),
-                              ).ticker}",
                           style: STextStyles.itemSubtitle12(context),
                           textAlign: TextAlign.right,
                         ),
                       ],
                     ),
                   ),
+                  // if (coin != Coin.banano && coin != Coin.nano)
+                    const SizedBox(
+                      height: 12,
+                    ),
+                  // if (coin != Coin.banano && coin != Coin.nano)
+                    RoundedWhiteContainer(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Transaction fee",
+                            style: STextStyles.smallMed12(context),
+                          ),
+                          Text(
+                            ref.watch(pAmountFormatter(coin)).format(
+                                  (transactionInfo["fee"] is Amount
+                                      ? transactionInfo["fee"] as Amount
+                                      : (transactionInfo["fee"] as int)
+                                          .toAmountAsRaw(
+                                          fractionDigits: ref.watch(
+                                            managerProvider.select(
+                                              (value) => value.coin.decimals,
+                                            ),
+                                          ),
+                                        )),
+                                ),
+                            style: STextStyles.itemSubtitle12(context),
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (transactionInfo["fee"] is int &&
+                      transactionInfo["vSize"] is int)
+                    const SizedBox(
+                      height: 12,
+                    ),
+                  if (transactionInfo["fee"] is int &&
+                      transactionInfo["vSize"] is int)
+                    RoundedWhiteContainer(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "sats/vByte",
+                            style: STextStyles.smallMed12(context),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            "~${(transactionInfo["fee"] / transactionInfo["vSize"]).toInt()}",
+                            style: STextStyles.itemSubtitle12(context),
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(
                     height: 12,
                   ),
@@ -524,14 +588,28 @@ class _ConfirmTransactionViewState
                                 String fiatAmount = "N/A";
 
                                 if (externalCalls) {
-                                  final price = ref
-                                      .read(priceAnd24hChangeNotifierProvider)
-                                      .getPrice(coin)
-                                      .item1;
+                                  final price =
+                                  // widget.isTokenTx
+                                  //     ? ref
+                                  //         .read(
+                                  //             priceAnd24hChangeNotifierProvider)
+                                  //         .getTokenPrice(
+                                  //           ref
+                                  //               .read(tokenServiceProvider)!
+                                  //               .tokenContract
+                                  //               .address,
+                                  //         )
+                                  //         .item1
+                                  //     :
+                                  ref
+                                          .read(
+                                              priceAnd24hChangeNotifierProvider)
+                                          .getPrice(coin)
+                                          .item1;
                                   if (price > Decimal.zero) {
                                     fiatAmount = (amount.decimal * price)
                                         .toAmount(fractionDigits: 2)
-                                        .localizedStringAsFixed(
+                                        .fiatString(
                                           locale: ref
                                               .read(
                                                   localeServiceChangeNotifierProvider)
@@ -543,12 +621,12 @@ class _ConfirmTransactionViewState
                                 return Row(
                                   children: [
                                     Text(
-                                      "${amount.localizedStringAsFixed(
-                                        locale: ref.watch(
-                                          localeServiceChangeNotifierProvider
-                                              .select((value) => value.locale),
-                                        ),
-                                      )} $unit",
+                                      ref.watch(pAmountFormatter(coin)).format(
+                                          amount,
+                                          // ethContract: ref
+                                          //     .read(tokenServiceProvider)
+                                          //     ?.tokenContract
+                                      ),
                                       style: STextStyles
                                               .desktopTextExtraExtraSmall(
                                                   context)
@@ -658,14 +736,9 @@ class _ConfirmTransactionViewState
                                         );
 
                                   return Text(
-                                    "${fee.localizedStringAsFixed(
-                                      locale: ref.watch(
-                                        localeServiceChangeNotifierProvider
-                                            .select(
-                                          (value) => value.locale,
-                                        ),
-                                      ),
-                                    )} ${coin.ticker}",
+                                    ref
+                                        .watch(pAmountFormatter(coin))
+                                        .format(fee),
                                     style:
                                         STextStyles.desktopTextExtraExtraSmall(
                                                 context)
@@ -838,16 +911,47 @@ class _ConfirmTransactionViewState
                             );
 
                       return Text(
-                        "${fee.localizedStringAsFixed(
-                          locale: ref.watch(
-                            localeServiceChangeNotifierProvider.select(
-                              (value) => value.locale,
-                            ),
-                          ),
-                        )} ${coin.ticker}",
+                        ref.watch(pAmountFormatter(coin)).format(fee),
                         style: STextStyles.itemSubtitle(context),
                       );
                     },
+                  ),
+                ),
+              ),
+            if (isDesktop &&
+                !widget.isPaynymTransaction &&
+                transactionInfo["fee"] is int &&
+                transactionInfo["vSize"] is int)
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 32,
+                ),
+                child: Text(
+                  "sats/vByte",
+                  style: STextStyles.desktopTextExtraExtraSmall(context),
+                ),
+              ),
+            if (isDesktop &&
+                !widget.isPaynymTransaction &&
+                transactionInfo["fee"] is int &&
+                transactionInfo["vSize"] is int)
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 10,
+                  left: 32,
+                  right: 32,
+                ),
+                child: RoundedContainer(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 18,
+                  ),
+                  color: Theme.of(context)
+                      .extension<StackColors>()!
+                      .textFieldDefaultBG,
+                  child: Text(
+                    "~${(transactionInfo["fee"] / transactionInfo["vSize"]).toInt()}",
+                    style: STextStyles.itemSubtitle(context),
                   ),
                 ),
               ),
@@ -855,58 +959,28 @@ class _ConfirmTransactionViewState
             SizedBox(
               height: isDesktop ? 23 : 12,
             ),
-            Padding(
-              padding: isDesktop
-                  ? const EdgeInsets.symmetric(
-                      horizontal: 32,
-                    )
-                  : const EdgeInsets.all(0),
-              child: RoundedContainer(
+            if (!widget.isTokenTx)
+              Padding(
                 padding: isDesktop
                     ? const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 18,
+                        horizontal: 32,
                       )
-                    : const EdgeInsets.all(12),
-                color: Theme.of(context)
-                    .extension<StackColors>()!
-                    .snackBarBackSuccess,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isDesktop ? "Total amount to send" : "Total amount",
-                      style: isDesktop
-                          ? STextStyles.desktopTextExtraExtraSmall(context)
-                              .copyWith(
-                              color: Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .textConfirmTotalAmount,
-                            )
-                          : STextStyles.titleBold12(context).copyWith(
-                              color: Theme.of(context)
-                                  .extension<StackColors>()!
-                                  .textConfirmTotalAmount,
-                            ),
-                    ),
-                    Builder(builder: (context) {
-                      final coin = ref.watch(walletsChangeNotifierProvider
-                          .select((value) => value.getManager(walletId).coin));
-                      final fee = transactionInfo["fee"] is Amount
-                          ? transactionInfo["fee"] as Amount
-                          : (transactionInfo["fee"] as int)
-                              .toAmountAsRaw(fractionDigits: coin.decimals);
-                      final locale = ref.watch(
-                        localeServiceChangeNotifierProvider
-                            .select((value) => value.locale),
-                      );
-                      final amount = transactionInfo["recipientAmt"] as Amount;
-                      return Text(
-                        "${(amount + fee).localizedStringAsFixed(
-                          locale: locale,
-                        )} ${ref.watch(
-                              managerProvider.select((value) => value.coin),
-                            ).ticker}",
+                    : const EdgeInsets.all(0),
+                child: RoundedContainer(
+                  padding: isDesktop
+                      ? const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 18,
+                        )
+                      : const EdgeInsets.all(12),
+                  color: Theme.of(context)
+                      .extension<StackColors>()!
+                      .snackBarBackSuccess,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isDesktop ? "Total amount to send" : "Total amount",
                         style: isDesktop
                             ? STextStyles.desktopTextExtraExtraSmall(context)
                                 .copyWith(
@@ -914,18 +988,46 @@ class _ConfirmTransactionViewState
                                     .extension<StackColors>()!
                                     .textConfirmTotalAmount,
                               )
-                            : STextStyles.itemSubtitle12(context).copyWith(
+                            : STextStyles.titleBold12(context).copyWith(
                                 color: Theme.of(context)
                                     .extension<StackColors>()!
                                     .textConfirmTotalAmount,
                               ),
-                        textAlign: TextAlign.right,
-                      );
-                    }),
-                  ],
+                      ),
+                      Builder(builder: (context) {
+                        final coin = ref.watch(
+                            walletsChangeNotifierProvider.select(
+                                (value) => value.getManager(walletId).coin));
+                        final fee = transactionInfo["fee"] is Amount
+                            ? transactionInfo["fee"] as Amount
+                            : (transactionInfo["fee"] as int)
+                                .toAmountAsRaw(fractionDigits: coin.decimals);
+
+                        final amount =
+                            transactionInfo["recipientAmt"] as Amount;
+                        return Text(
+                          ref
+                              .watch(pAmountFormatter(coin))
+                              .format(amount + fee),
+                          style: isDesktop
+                              ? STextStyles.desktopTextExtraExtraSmall(context)
+                                  .copyWith(
+                                  color: Theme.of(context)
+                                      .extension<StackColors>()!
+                                      .textConfirmTotalAmount,
+                                )
+                              : STextStyles.itemSubtitle12(context).copyWith(
+                                  color: Theme.of(context)
+                                      .extension<StackColors>()!
+                                      .textConfirmTotalAmount,
+                                ),
+                          textAlign: TextAlign.right,
+                        );
+                      }),
+                    ],
+                  ),
                 ),
               ),
-            ),
             SizedBox(
               height: isDesktop ? 28 : 16,
             ),

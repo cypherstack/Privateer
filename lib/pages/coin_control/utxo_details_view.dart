@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/wallet_view/transaction_views/transaction_details_view.dart';
-import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -240,13 +240,11 @@ class _UtxoDetailsViewState extends ConsumerState<UtxoDetailsView> {
                               width: 16,
                             ),
                           Text(
-                            "${utxo!.value.toAmountAsRaw(fractionDigits: coin.decimals).localizedStringAsFixed(
-                                  locale: ref.watch(
-                                    localeServiceChangeNotifierProvider.select(
-                                      (value) => value.locale,
-                                    ),
+                            ref.watch(pAmountFormatter(coin)).format(
+                                  utxo!.value.toAmountAsRaw(
+                                    fractionDigits: coin.decimals,
                                   ),
-                                )} ${coin.ticker}",
+                                ),
                             style: STextStyles.pageTitleH2(context),
                           ),
                         ],

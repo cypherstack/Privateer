@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/electrumx_rpc/electrumx.dart';
-import 'package:stackduo/hive/db.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:string_validator/string_validator.dart';
@@ -86,8 +86,9 @@ class CachedElectrumX {
             key: groupId,
             value: set);
         Logging.instance.log(
-            "Updated currently anonymity set for ${coin.name} with group ID $groupId",
-            level: LogLevel.Info);
+          "Updated current anonymity set for ${coin.name} with group ID $groupId",
+          level: LogLevel.Info,
+        );
       }
 
       return set;

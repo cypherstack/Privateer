@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';
 import 'package:stackduo/pages/receive_view/addresses/address_tag.dart';
 import 'package:stackduo/pages/wallet_view/sub_widgets/no_transactions_found.dart';
@@ -77,7 +77,7 @@ class _AddressDetailsViewState extends ConsumerState<AddressDetailsView> {
                   Center(
                     child: RepaintBoundary(
                       key: _qrKey,
-                      child: QrImage(
+                      child: QrImageView(
                         data: AddressUtils.buildUriString(
                           ref.watch(walletsChangeNotifierProvider.select(
                               (value) =>
@@ -266,7 +266,7 @@ class _AddressDetailsViewState extends ConsumerState<AddressDetailsView> {
                   Center(
                     child: RepaintBoundary(
                       key: _qrKey,
-                      child: QrImage(
+                      child: QrImageView(
                         data: AddressUtils.buildUriString(
                           ref.watch(walletsChangeNotifierProvider.select(
                               (value) =>

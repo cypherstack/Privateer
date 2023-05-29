@@ -327,19 +327,15 @@ class _NameYourWalletViewState extends ConsumerState<NameYourWalletView> {
                       final name = textEditingController.text;
 
                       if (await walletsService.checkForDuplicate(name)) {
-                        if (mounted) {
-                          unawaited(
-                            showFloatingFlushBar(
-                              type: FlushBarType.warning,
-                              message: "Wallet name already in use.",
-                              iconAsset: Assets.svg.circleAlert,
-                              context: context,
-                            ),
-                          );
-                        }
+                        unawaited(showFloatingFlushBar(
+                          type: FlushBarType.warning,
+                          message: "Wallet name already in use.",
+                          iconAsset: Assets.svg.circleAlert,
+                          context: context,
+                        ));
                       } else {
                         // hide keyboard if has focus
-                        if (mounted && FocusScope.of(context).hasFocus) {
+                        if (FocusScope.of(context).hasFocus) {
                           FocusScope.of(context).unfocus();
                           await Future<void>.delayed(
                               const Duration(milliseconds: 50));

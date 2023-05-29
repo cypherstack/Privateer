@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/node_model.dart';
 import 'package:stackduo/services/coins/coin_service.dart';
 import 'package:stackduo/services/coins/manager.dart';

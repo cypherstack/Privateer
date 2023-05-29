@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/utilities/logger.dart';
 
 class NotesService extends ChangeNotifier {
