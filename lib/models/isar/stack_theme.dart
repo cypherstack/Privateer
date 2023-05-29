@@ -1507,7 +1507,7 @@ class StackTheme {
               themeId: json["id"] as String,
             )
           : null
-      ..assetsV2 = version == 2
+      ..assetsV2 = version >= 2
           ? ThemeAssetsV2.fromJson(
               json: Map<String, dynamic>.from(json["assets"] as Map),
               applicationThemesDirectoryPath: applicationThemesDirectoryPath,
