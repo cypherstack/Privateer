@@ -1,37 +1,44 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackduo/electrumx_rpc/electrumx.dart';
-import 'package:stackduo/models/balance.dart';
-import 'package:stackduo/models/isar/models/isar_models.dart';
-import 'package:stackduo/models/paymint/fee_object_model.dart';
-import 'package:stackduo/services/coins/bitcoin/bitcoin_wallet.dart';
-import 'package:stackduo/services/coins/coin_service.dart';
-import 'package:stackduo/services/coins/manager.dart';
-import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/enums/coin_enum.dart';
+import 'package:stackwallet/electrumx_rpc/electrumx.dart';
+import 'package:stackwallet/models/balance.dart';
+import 'package:stackwallet/models/isar/models/isar_models.dart';
+import 'package:stackwallet/models/paymint/fee_object_model.dart';
+import 'package:stackwallet/services/coins/coin_service.dart';
+import 'package:stackwallet/services/coins/firo/firo_wallet.dart';
+import 'package:stackwallet/services/coins/manager.dart';
+import 'package:stackwallet/utilities/amount/amount.dart';
+import 'package:stackwallet/utilities/enums/coin_enum.dart';
 
-// import '../../pages/send_view/send_view_test.mocks.dart';
 import 'manager_test.mocks.dart';
 
-@GenerateMocks([BitcoinWallet, ElectrumX])
+/// quick amount constructor wrapper. Using an int is bad practice but for
+/// testing with small amounts this should be fine
+Amount _a(int i) => Amount.fromDecimal(
+      Decimal.fromInt(i),
+      fractionDigits: 8,
+    );
+
+@GenerateMocks([FiroWallet, ElectrumX])
 void main() {
   test("Manager should have a backgroundRefreshListener on initialization", () {
-    final manager = Manager(MockBitcoinWallet());
+    final manager = Manager(MockFiroWallet());
 
     expect(manager.hasBackgroundRefreshListener, true);
   });
 
   test("get coin", () {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
-    when(wallet.coin).thenAnswer((_) => Coin.bitcoin);
+    final CoinServiceAPI wallet = MockFiroWallet();
+    when(wallet.coin).thenAnswer((_) => Coin.firo);
     final manager = Manager(wallet);
 
-    expect(manager.coin, Coin.bitcoin);
+    expect(manager.coin, Coin.firo);
   });
 
   test("fees", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.fees).thenAnswer((_) async => FeeObject(
         fast: 10,
         medium: 5,
@@ -53,7 +60,7 @@ void main() {
   });
 
   test("maxFee", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.maxFee).thenAnswer((_) async => 10);
 
     final manager = Manager(wallet);
@@ -64,7 +71,7 @@ void main() {
   });
 
   test("get currentReceivingAddress", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.currentReceivingAddress)
         .thenAnswer((_) async => "Some address string");
 
@@ -75,27 +82,30 @@ void main() {
 
   group("get balances", () {
     test("balance", () async {
-      final CoinServiceAPI wallet = MockBitcoinWallet();
+      final CoinServiceAPI wallet = MockFiroWallet();
+      final balance = Balance(
+        total: _a(10),
+        spendable: _a(1),
+        blockedTotal: _a(0),
+        pendingSpendable: _a(9),
+      );
+
+      when(wallet.coin).thenAnswer((_) => Coin.firo);
       when(wallet.balance).thenAnswer(
-        (_) => Balance(
-          total: 10.toAmountAsRaw(fractionDigits: 8),
-          spendable: 1.toAmountAsRaw(fractionDigits: 8),
-          blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
-          pendingSpendable: 9.toAmountAsRaw(fractionDigits: 8),
-        ),
+        (_) => balance,
       );
 
       final manager = Manager(wallet);
 
-      expect(manager.balance.total.raw.toInt(), 10);
-      expect(manager.balance.spendable.raw.toInt(), 1);
-      expect(manager.balance.blockedTotal.raw.toInt(), 0);
-      expect(manager.balance.pendingSpendable.raw.toInt(), 9);
+      expect(manager.balance, balance);
     });
   });
 
   test("transactions", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
+
+    when(wallet.coin).thenAnswer((realInvocation) => Coin.firo);
+
     final tx = Transaction(
       walletId: "walletId",
       txid: "txid",
@@ -103,16 +113,20 @@ void main() {
       type: TransactionType.incoming,
       subType: TransactionSubType.mint,
       amount: 123,
+      amountString: Amount(
+        rawValue: BigInt.from(123),
+        fractionDigits: wallet.coin.decimals,
+      ).toJsonString(),
       fee: 3,
       height: 123,
       isCancelled: false,
       isLelantus: true,
       slateId: null,
       otherData: null,
+      nonce: null,
       inputs: [],
       outputs: [],
-      amountString: '',
-      nonce: null,
+      numberOfMessages: null,
     );
     when(wallet.transactions).thenAnswer((_) async => [
           tx,
@@ -128,7 +142,7 @@ void main() {
   });
 
   test("refresh", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.refresh()).thenAnswer((_) => Future(() => {}));
 
     final manager = Manager(wallet);
@@ -139,7 +153,7 @@ void main() {
   });
 
   test("get walletName", () {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.walletName).thenAnswer((_) => "Some wallet name");
     final manager = Manager(wallet);
 
@@ -147,7 +161,7 @@ void main() {
   });
 
   test("get walletId", () {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.walletId).thenAnswer((_) => "Some wallet ID");
 
     final manager = Manager(wallet);
@@ -157,7 +171,7 @@ void main() {
 
   group("validateAddress", () {
     test("some valid address", () {
-      final CoinServiceAPI wallet = MockBitcoinWallet();
+      final CoinServiceAPI wallet = MockFiroWallet();
       when(wallet.validateAddress("a valid address")).thenAnswer((_) => true);
 
       final manager = Manager(wallet);
@@ -166,7 +180,7 @@ void main() {
     });
 
     test("some invalid address", () {
-      final CoinServiceAPI wallet = MockBitcoinWallet();
+      final CoinServiceAPI wallet = MockFiroWallet();
       when(wallet.validateAddress("an invalid address"))
           .thenAnswer((_) => false);
 
@@ -177,7 +191,7 @@ void main() {
   });
 
   test("get mnemonic", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.mnemonic)
         .thenAnswer((_) async => ["Some", "seed", "word", "list"]);
 
@@ -187,7 +201,7 @@ void main() {
   });
 
   test("testNetworkConnection", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.testNetworkConnection()).thenAnswer((_) async => true);
 
     final manager = Manager(wallet);
@@ -197,7 +211,7 @@ void main() {
 
   group("recoverFromMnemonic", () {
     test("successfully recover", () async {
-      final CoinServiceAPI wallet = MockBitcoinWallet();
+      final CoinServiceAPI wallet = MockFiroWallet();
       when(wallet.recoverFromMnemonic(
               mnemonic: "Some valid mnemonic",
               maxUnusedAddressGap: 20,
@@ -222,7 +236,7 @@ void main() {
     });
 
     test("failed recovery", () async {
-      final CoinServiceAPI wallet = MockBitcoinWallet();
+      final CoinServiceAPI wallet = MockFiroWallet();
       when(wallet.recoverFromMnemonic(
               mnemonic: "Some invalid mnemonic",
               maxUnusedAddressGap: 20,
@@ -249,7 +263,7 @@ void main() {
     });
 
     test("failed recovery due to some other error", () async {
-      final CoinServiceAPI wallet = MockBitcoinWallet();
+      final CoinServiceAPI wallet = MockFiroWallet();
       when(wallet.recoverFromMnemonic(
               mnemonic: "Some valid mnemonic",
               maxUnusedAddressGap: 20,
@@ -277,7 +291,7 @@ void main() {
   });
 
   test("exitCurrentWallet", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.exit()).thenAnswer((realInvocation) => Future(() => {}));
     when(wallet.walletId).thenAnswer((realInvocation) => "some id");
     when(wallet.walletName).thenAnswer((realInvocation) => "some name");
@@ -294,7 +308,7 @@ void main() {
   });
 
   test("dispose", () async {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.exit()).thenAnswer((realInvocation) => Future(() => {}));
     when(wallet.walletId).thenAnswer((realInvocation) => "some id");
     when(wallet.walletName).thenAnswer((realInvocation) => "some name");
@@ -305,7 +319,7 @@ void main() {
   });
 
   test("fullRescan succeeds", () {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.fullRescan(20, 1000)).thenAnswer((_) async {});
 
     final manager = Manager(wallet);
@@ -314,7 +328,7 @@ void main() {
   });
 
   test("fullRescan fails", () {
-    final CoinServiceAPI wallet = MockBitcoinWallet();
+    final CoinServiceAPI wallet = MockFiroWallet();
     when(wallet.fullRescan(20, 1000)).thenThrow(Exception());
 
     final manager = Manager(wallet);

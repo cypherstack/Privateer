@@ -142,11 +142,7 @@ void main() {
       useSSL: true,
     );
 
-    final client = CachedElectrumX.from(
-        node: node,
-        prefs: MockPrefs(),
-        failovers: [],
-        electrumXClient: MockElectrumX());
+    final client = CachedElectrumX.from(electrumXClient: MockElectrumX());
 
     expect(client, isA<CachedElectrumX>());
   });
