@@ -17,7 +17,7 @@ final pThemeService = Provider<ThemeService>((ref) {
 });
 
 class ThemeService {
-  static const _currentDefaultThemeVersion = 2;
+  static const _currentDefaultThemeVersion = 3;
   ThemeService._();
   static ThemeService? _instance;
   static ThemeService get instance => _instance ??= ThemeService._();
@@ -40,15 +40,19 @@ class ThemeService {
       throw Exception("Invalid theme archive: Missing theme.json");
     }
 
-    final OutputStream os = OutputStream();
-    themeJsonFiles.first.decompress(os);
-    final String jsonString = utf8.decode(os.getBytes());
+    final jsonString = utf8.decode(themeJsonFiles.first.content as List<int>);
     final json = jsonDecode(jsonString) as Map;
 
     final theme = StackTheme.fromJson(
       json: Map<String, dynamic>.from(json),
       applicationThemesDirectoryPath: themesDir.path,
     );
+
+    try {
+      theme.assets;
+    } catch (_) {
+      throw Exception("Invalid theme: Failed to create assets object");
+    }
 
     final String assetsPath = "${themesDir.path}/${theme.themeId}";
 
@@ -84,7 +88,10 @@ class ThemeService {
       await db.isar.writeTxn(() async {
         await db.isar.stackThemes.delete(isarId);
       });
-      await Directory("${themesDir.path}/$themeId").delete(recursive: true);
+      final dir = Directory("${themesDir.path}/$themeId");
+      if (dir.existsSync()) {
+        await dir.delete(recursive: true);
+      }
     } else {
       Logging.instance.log(
         "Failed to delete theme $themeId",
@@ -159,9 +166,15 @@ class ThemeService {
 
   // TODO more thorough check/verification of theme
   Future<bool> verifyInstalled({required String themeId}) async {
-    final dbHasTheme =
-        await db.isar.stackThemes.where().themeIdEqualTo(themeId).count() > 0;
-    if (dbHasTheme) {
+    final theme =
+        await db.isar.stackThemes.where().themeIdEqualTo(themeId).findFirst();
+    if (theme != null) {
+      try {
+        theme.assets;
+      } catch (_) {
+        return false;
+      }
+
       final themesDir = await StackFileSystem.applicationThemesDirectory();
       final jsonFileExists =
           await File("${themesDir.path}/$themeId/theme.json").exists();
