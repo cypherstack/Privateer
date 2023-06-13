@@ -1,3 +1,6 @@
 [submodule "crypto_plugins/flutter_libmonero"]
 	path = crypto_plugins/flutter_libmonero
 	url = https://github.com/cypherstack/flutter_libmonero.git
+[submodule "crypto_plugins/libxmr"]
+	path = crypto_plugins/libxmr
+	url = https://git.cypherstack.com/julian/libxmr
