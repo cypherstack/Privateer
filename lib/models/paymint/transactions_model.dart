@@ -362,8 +362,8 @@ class Output {
         scriptpubkeyType: json['scriptPubKey']['type'] as String?,
         scriptpubkeyAddress: address,
         value: (Decimal.parse((json["value"] ?? 0).toString()) *
-                Decimal.fromInt(Constants.satsPerCoin(Coin
-                    .bitcoin))) // dirty hack but we need 8 decimal places here to keep consistent data structure
+                Decimal.fromInt(Constants.satsPerCoin(Coin.bitcoin)
+                    .toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
             .toBigInt()
             .toInt(),
       );
@@ -375,8 +375,8 @@ class Output {
           scriptpubkeyType: "",
           scriptpubkeyAddress: "",
           value: (Decimal.parse(0.toString()) *
-                  Decimal.fromInt(Constants.satsPerCoin(Coin
-                      .bitcoin))) // dirty hack but we need 8 decimal places here to keep consistent data structure
+                  Decimal.fromInt(Constants.satsPerCoin(Coin.bitcoin)
+                      .toInt())) // dirty hack but we need 8 decimal places here to keep consistent data structure
               .toBigInt()
               .toInt());
     }

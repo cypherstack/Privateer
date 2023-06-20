@@ -23,8 +23,8 @@ import 'package:flutter_libmonero/monero/monero.dart';
 import 'package:flutter_libmonero/view_model/send/output.dart' as monero_output;
 import 'package:isar/isar.dart';
 import 'package:mutex/mutex.dart';
-import 'package:stackduo/db/main_db.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/balance.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackduo/models/node_model.dart';
@@ -448,6 +448,8 @@ class MoneroWallet extends CoinServiceAPI with WalletCache, WalletDB {
           case FeeRateType.slow:
             feePriority = MoneroTransactionPriority.slow;
             break;
+          default:
+            throw ArgumentError("Invalid use of custom fee");
         }
 
         Future<PendingTransaction>? awaitPendingTransaction;
@@ -854,6 +856,10 @@ class MoneroWallet extends CoinServiceAPI with WalletCache, WalletDB {
     //
     String address = walletBase!.getTransactionAddress(chain, index);
 
+    if (address.contains("111")) {
+      return await _generateAddressForChain(chain, index + 1);
+    }
+
     return isar_models.Address(
       walletId: walletId,
       derivationIndex: index,
@@ -954,6 +960,7 @@ class MoneroWallet extends CoinServiceAPI with WalletCache, WalletDB {
           nonce: null,
           inputs: [],
           outputs: [],
+          numberOfMessages: null,
         );
 
         txnsData.add(Tuple2(txn, address));

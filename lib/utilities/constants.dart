@@ -25,9 +25,15 @@ abstract class Constants {
   // static bool enableBuy = enableExchange;
   // // true; // true for development,
 
-  //TODO: correct for monero?
-  static const int _satsPerCoinMonero = 1000000000000;
-  static const int _satsPerCoin = 100000000;
+  static final BigInt _satsPerCoinECash = BigInt.from(100);
+  static final BigInt _satsPerCoinEthereum = BigInt.from(1000000000000000000);
+  static final BigInt _satsPerCoinMonero = BigInt.from(1000000000000);
+  static final BigInt _satsPerCoinWownero = BigInt.from(100000000000);
+  static final BigInt _satsPerCoinNano =
+      BigInt.parse("1000000000000000000000000000000"); // 1*10^30
+  static final BigInt _satsPerCoinBanano =
+      BigInt.parse("100000000000000000000000000000"); // 1*10^29
+  static final BigInt _satsPerCoin = BigInt.from(100000000);
   static const int _decimalPlaces = 8;
   static const int _decimalPlacesWownero = 11;
   static const int _decimalPlacesMonero = 12;
@@ -38,12 +44,11 @@ abstract class Constants {
   // Enable Logger.print statements
   static const bool disableLogger = false;
 
-  static const int currentHiveDbVersion = 9;
   static const int currentDataVersion = 10;
 
   static const int rescanV1 = 1;
 
-  static int satsPerCoin(Coin coin) {
+  static BigInt satsPerCoin(Coin coin) {
     switch (coin) {
       case Coin.bitcoin:
       case Coin.bitcoinTestNet:
@@ -92,8 +97,16 @@ abstract class Constants {
     }
   }
 
-  static const int seedPhraseWordCountBip39 = 12;
-  static const int seedPhraseWordCountMonero = 25;
+  static int defaultSeedPhraseLengthFor({required Coin coin}) {
+    switch (coin) {
+      case Coin.bitcoin:
+      case Coin.bitcoinTestNet:
+        return 12;
+
+      case Coin.monero:
+        return 25;
+    }
+  }
 
   static const Map<int, String> monthMapShort = {
     1: 'Jan',

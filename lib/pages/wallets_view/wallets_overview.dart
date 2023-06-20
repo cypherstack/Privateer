@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackduo/models/add_wallet_list_entity/sub_classes/coin_entity.dart';
 import 'package:stackduo/pages/add_wallet_views/create_or_restore_wallet_view/create_or_restore_wallet_view.dart';
+import 'package:stackduo/pages_desktop_specific/my_stack_view/dialogs/desktop_expanding_wallet_card.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/services/coins/manager.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
+import 'package:stackduo/widgets/master_wallet_card.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/stack_text_field.dart';
 import 'package:stackduo/widgets/textfield_icon_button.dart';
@@ -170,7 +173,7 @@ class _EthWalletsOverviewState extends ConsumerState<WalletsOverview> {
                   onPressed: () {
                     Navigator.of(context).pushNamed(
                       CreateOrRestoreWalletView.routeName,
-                      arguments: widget.coin,
+                      arguments: CoinEntity(widget.coin),
                     );
                   },
                 ),
@@ -260,40 +263,40 @@ class _EthWalletsOverviewState extends ConsumerState<WalletsOverview> {
                   itemBuilder: (_, index) {
                     final element = data[index];
 
-                    // if (element.item1.hasTokenSupport) {
-                    //   if (isDesktop) {
-                    //     return DesktopExpandingWalletCard(
-                    //       key: Key(
-                    //           "${element.item1.walletName}_${element.item2.map((e) => e.address).join()}"),
-                    //       data: element,
-                    //       navigatorState: widget.navigatorState!,
-                    //     );
-                    //   } else {
-                    //     return MasterWalletCard(
-                    //       walletId: element.item1.walletId,
-                    //     );
-                    //   }
-                    // } else {
-                    return ConditionalParent(
-                      condition: isDesktop,
-                      builder: (child) => RoundedWhiteContainer(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 20,
+                    if (element.item1.hasTokenSupport) {
+                      if (isDesktop) {
+                        return DesktopExpandingWalletCard(
+                          key: Key(
+                              "${element.item1.walletName}_${element.item2.map((e) => e.address).join()}"),
+                          data: element,
+                          navigatorState: widget.navigatorState!,
+                        );
+                      } else {
+                        return MasterWalletCard(
+                          walletId: element.item1.walletId,
+                        );
+                      }
+                    } else {
+                      return ConditionalParent(
+                        condition: isDesktop,
+                        builder: (child) => RoundedWhiteContainer(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 20,
+                          ),
+                          borderColor: Theme.of(context)
+                              .extension<StackColors>()!
+                              .backgroundAppBar,
+                          child: child,
                         ),
-                        borderColor: Theme.of(context)
-                            .extension<StackColors>()!
-                            .backgroundAppBar,
-                        child: child,
-                      ),
-                      child: SimpleWalletCard(
-                        walletId: element.item1.walletId,
-                        popPrevious: isDesktop,
-                        desktopNavigatorState:
-                            isDesktop ? widget.navigatorState : null,
-                      ),
-                    );
-                    // }
+                        child: SimpleWalletCard(
+                          walletId: element.item1.walletId,
+                          popPrevious: isDesktop,
+                          desktopNavigatorState:
+                              isDesktop ? widget.navigatorState : null,
+                        ),
+                      );
+                    }
                   },
                   separatorBuilder: (_, __) => SizedBox(
                     height: isDesktop ? 10 : 8,

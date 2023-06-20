@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/exchange/active_pair.dart';
 import 'package:stackduo/models/exchange/aggregate_currency.dart';
 import 'package:stackduo/models/isar/exchange_cache/currency.dart';

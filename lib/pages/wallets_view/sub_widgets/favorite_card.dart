@@ -9,11 +9,12 @@ import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/assets.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/util.dart';
+import 'package:stackduo/widgets/coin_card.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
 import 'package:tuple/tuple.dart';
 
@@ -133,66 +134,10 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
           width: widget.width,
           height: widget.height,
           child: CardOverlayStack(
-            background: Stack(
-              children: [
-                Container(
-                  width: widget.width,
-                  height: widget.height,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .extension<StackColors>()!
-                        .colorForCoin(coin),
-                    borderRadius: BorderRadius.circular(
-                      Constants.size.circularBorderRadius,
-                    ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    const Spacer(),
-                    SizedBox(
-                      height: widget.width * 0.3,
-                      child: Row(
-                        children: [
-                          const Spacer(
-                            flex: 9,
-                          ),
-                          SvgPicture.asset(
-                            Assets.svg.ellipse2,
-                            height: widget.width * 0.3,
-                          ),
-                          // ),
-                          const Spacer(
-                            flex: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Spacer(
-                      flex: 5,
-                    ),
-                    SizedBox(
-                      width: widget.width * 0.45,
-                      child: Column(
-                        children: [
-                          SvgPicture.asset(
-                            Assets.svg.ellipse1,
-                            width: widget.width * 0.45,
-                          ),
-                          const Spacer(),
-                        ],
-                      ),
-                    ),
-                    const Spacer(
-                      flex: 1,
-                    ),
-                  ],
-                ),
-              ],
+            background: CoinCard(
+              walletId: widget.walletId,
+              width: widget.width,
+              height: widget.height,
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -260,14 +205,7 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              "${total.localizedStringAsFixed(
-                                locale: ref.watch(
-                                  localeServiceChangeNotifierProvider.select(
-                                    (value) => value.locale,
-                                  ),
-                                ),
-                                decimalPlaces: coin.decimals,
-                              )} ${coin.ticker}",
+                              ref.watch(pAmountFormatter(coin)).format(total),
                               style: STextStyles.titleBold12(context).copyWith(
                                 fontSize: 16,
                                 color: Theme.of(context)
@@ -282,13 +220,12 @@ class _FavoriteCardState extends ConsumerState<FavoriteCard> {
                             ),
                           if (externalCalls)
                             Text(
-                              "${fiatTotal.localizedStringAsFixed(
+                              "${fiatTotal.fiatString(
                                 locale: ref.watch(
                                   localeServiceChangeNotifierProvider.select(
                                     (value) => value.locale,
                                   ),
                                 ),
-                                decimalPlaces: 2,
                               )} ${ref.watch(
                                 prefsChangeNotifierProvider.select(
                                   (value) => value.currency,

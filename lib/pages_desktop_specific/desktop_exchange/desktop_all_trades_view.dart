@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/main_db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction_status.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart';

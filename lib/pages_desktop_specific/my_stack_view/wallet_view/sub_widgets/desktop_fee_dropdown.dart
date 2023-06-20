@@ -7,22 +7,25 @@ import 'package:stackduo/models/models.dart';
 import 'package:stackduo/pages/send_view/sub_widgets/transaction_fee_selection_sheet.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/providers/ui/fee_rate_type_state_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/fee_rate_type_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/animated_text.dart';
 
 class DesktopFeeDropDown extends ConsumerStatefulWidget {
   const DesktopFeeDropDown({
     Key? key,
     required this.walletId,
+    this.isToken = false,
   }) : super(key: key);
 
   final String walletId;
+  final bool isToken;
 
   @override
   ConsumerState<DesktopFeeDropDown> createState() => _DesktopFeeDropDownState();
@@ -49,55 +52,114 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
   }) async {
     switch (feeRateType) {
       case FeeRateType.fast:
-        if (ref.read(feeSheetSessionCacheProvider).fast[amount] == null) {
+        if (ref.read(
+            // widget.isToken
+            //         ? tokenFeeSessionCacheProvider
+            //         :
+            feeSheetSessionCacheProvider).fast[amount] == null) {
+          // if (widget.isToken == false) {
           final manager =
               ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-          if (coin == Coin.monero) {
+          if (coin == Coin.monero /*|| coin == Coin.wownero*/) {
             final fee = await manager.estimateFeeFor(
                 amount, MoneroTransactionPriority.fast.raw!);
             ref.read(feeSheetSessionCacheProvider).fast[amount] = fee;
+            // } else if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
+            //     ref.read(publicPrivateBalanceStateProvider.state).state !=
+            //         "Private") {
+            //   ref.read(feeSheetSessionCacheProvider).fast[amount] =
+            //       await (manager.wallet as FiroWallet)
+            //           .estimateFeeForPublic(amount, feeRate);
           } else {
             ref.read(feeSheetSessionCacheProvider).fast[amount] =
                 await manager.estimateFeeFor(amount, feeRate);
           }
+          // } else {
+          //   final tokenWallet = ref.read(tokenServiceProvider)!;
+          //   final fee = tokenWallet.estimateFeeFor(feeRate);
+          //   ref.read(tokenFeeSessionCacheProvider).fast[amount] = fee;
+          // }
         }
-
-        return ref.read(feeSheetSessionCacheProvider).fast[amount]!;
+        return ref.read(
+            // widget.isToken
+            //     ? tokenFeeSessionCacheProvider
+            //     :
+            feeSheetSessionCacheProvider).fast[amount]!;
 
       case FeeRateType.average:
-        if (ref.read(feeSheetSessionCacheProvider).average[amount] == null) {
+        if (ref.read(
+            // widget.isToken
+            //         ? tokenFeeSessionCacheProvider
+            //         :
+            feeSheetSessionCacheProvider).average[amount] == null) {
+          // if (widget.isToken == false) {
           final manager =
               ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-          if (coin == Coin.monero) {
+          if (coin == Coin.monero /*|| coin == Coin.wownero*/) {
             final fee = await manager.estimateFeeFor(
                 amount, MoneroTransactionPriority.regular.raw!);
             ref.read(feeSheetSessionCacheProvider).average[amount] = fee;
+            // } else if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
+            //     ref.read(publicPrivateBalanceStateProvider.state).state !=
+            //         "Private") {
+            //   ref.read(feeSheetSessionCacheProvider).average[amount] =
+            //       await (manager.wallet as FiroWallet)
+            //           .estimateFeeForPublic(amount, feeRate);
           } else {
             ref.read(feeSheetSessionCacheProvider).average[amount] =
                 await manager.estimateFeeFor(amount, feeRate);
           }
+          // } else {
+          //   final tokenWallet = ref.read(tokenServiceProvider)!;
+          //   final fee = tokenWallet.estimateFeeFor(feeRate);
+          //   ref.read(tokenFeeSessionCacheProvider).average[amount] = fee;
+          // }
         }
-
-        return ref.read(feeSheetSessionCacheProvider).average[amount]!;
+        return ref.read(
+            // widget.isToken
+            //     ? tokenFeeSessionCacheProvider
+            //     :
+            feeSheetSessionCacheProvider).average[amount]!;
 
       case FeeRateType.slow:
-        if (ref.read(feeSheetSessionCacheProvider).slow[amount] == null) {
+        if (ref.read(
+            // widget.isToken
+            //         ? tokenFeeSessionCacheProvider
+            //         :
+            feeSheetSessionCacheProvider).slow[amount] == null) {
+          // if (widget.isToken == false) {
           final manager =
               ref.read(walletsChangeNotifierProvider).getManager(walletId);
 
-          if (coin == Coin.monero) {
+          if (coin == Coin.monero /*|| coin == Coin.wownero*/) {
             final fee = await manager.estimateFeeFor(
                 amount, MoneroTransactionPriority.slow.raw!);
             ref.read(feeSheetSessionCacheProvider).slow[amount] = fee;
+            // } else if ((coin == Coin.firo || coin == Coin.firoTestNet) &&
+            //     ref.read(publicPrivateBalanceStateProvider.state).state !=
+            //         "Private") {
+            //   ref.read(feeSheetSessionCacheProvider).slow[amount] =
+            //       await (manager.wallet as FiroWallet)
+            //           .estimateFeeForPublic(amount, feeRate);
           } else {
             ref.read(feeSheetSessionCacheProvider).slow[amount] =
                 await manager.estimateFeeFor(amount, feeRate);
           }
+          // } else {
+          //   final tokenWallet = ref.read(tokenServiceProvider)!;
+          //   final fee = tokenWallet.estimateFeeFor(feeRate);
+          //   ref.read(tokenFeeSessionCacheProvider).slow[amount] = fee;
+          // }
         }
-
-        return ref.read(feeSheetSessionCacheProvider).slow[amount]!;
+        return ref.read(
+            // widget.isToken
+            //     ? tokenFeeSessionCacheProvider
+            //     :
+            feeSheetSessionCacheProvider).slow[amount]!;
+      default:
+        return Amount.zero;
     }
   }
 
@@ -119,73 +181,47 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
         .select((value) => value.getManager(walletId)));
 
     return FutureBuilder(
-        future: manager.fees,
-        builder: (context, AsyncSnapshot<FeeObject> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.hasData) {
-            feeObject = snapshot.data!;
-          }
-          return DropdownButtonHideUnderline(
-            child: DropdownButton2(
-              offset: const Offset(0, -10),
-              isExpanded: true,
-              dropdownElevation: 0,
-              value: ref.watch(feeRateTypeStateProvider.state).state,
-              // selectedItemBuilder: (s) {
-              //   return [
-              //     ...FeeRateType.values.map(
-              //       (e) => DropdownMenuItem(
-              //         value: e,
-              //         child: FeeDropDownChild(
-              //           feeObject: feeObject,
-              //           feeRateType: e,
-              //           walletId: walletId,
-              //           amount: amount,
-              //           feeFor: feeFor,
-              //           isSelected: true,
-              //         ),
-              //       ),
-              //     ),
-              //   ];
-              // },
-              items: [
-                ...FeeRateType.values.map(
-                  (e) => DropdownMenuItem(
-                    value: e,
-                    child: FeeDropDownChild(
-                      feeObject: feeObject,
-                      feeRateType: e,
-                      walletId: walletId,
-                      feeFor: feeFor,
-                      isSelected: false,
-                    ),
+      future: manager.fees,
+      builder: (context, AsyncSnapshot<FeeObject> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          feeObject = snapshot.data!;
+        }
+        return DropdownButtonHideUnderline(
+          child: DropdownButton2(
+            isExpanded: true,
+            value: ref.watch(feeRateTypeStateProvider.state).state,
+            items: [
+              ...FeeRateType.values.map(
+                (e) => DropdownMenuItem(
+                  value: e,
+                  child: FeeDropDownChild(
+                    feeObject: feeObject,
+                    feeRateType: e,
+                    walletId: walletId,
+                    feeFor: feeFor,
+                    isSelected: false,
                   ),
                 ),
-              ],
-              onChanged: (newRateType) {
-                if (newRateType is FeeRateType) {
-                  ref.read(feeRateTypeStateProvider.state).state = newRateType;
-                }
-              },
+              ),
+            ],
+            onChanged: (newRateType) {
+              if (newRateType is FeeRateType) {
+                ref.read(feeRateTypeStateProvider.state).state = newRateType;
+              }
+            },
+            iconStyleData: IconStyleData(
               icon: SvgPicture.asset(
                 Assets.svg.chevronDown,
                 width: 12,
                 height: 6,
                 color: Theme.of(context).extension<StackColors>()!.textDark3,
               ),
-              buttonPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              buttonDecoration: BoxDecoration(
-                color: Theme.of(context)
-                    .extension<StackColors>()!
-                    .textFieldDefaultBG,
-                borderRadius: BorderRadius.circular(
-                  Constants.size.circularBorderRadius,
-                ),
-              ),
-              dropdownDecoration: BoxDecoration(
+            ),
+            dropdownStyleData: DropdownStyleData(
+              offset: const Offset(0, -10),
+              elevation: 0,
+              decoration: BoxDecoration(
                 color: Theme.of(context)
                     .extension<StackColors>()!
                     .textFieldDefaultBG,
@@ -194,8 +230,16 @@ class _DesktopFeeDropDownState extends ConsumerState<DesktopFeeDropDown> {
                 ),
               ),
             ),
-          );
-        });
+            menuItemStyleData: const MenuItemStyleData(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -290,10 +334,10 @@ class FeeDropDownChild extends ConsumerWidget {
               children: [
                 Text(
                   "${feeRateType.prettyName} "
-                  "(~${snapshot.data!.decimal.toStringAsFixed(
-                    manager.coin.decimals,
-                  )} "
-                  "${manager.coin.ticker})",
+                  "(~${ref.watch(pAmountFormatter(manager.coin)).format(
+                        snapshot.data!,
+                        indicatePrecisionLoss: false,
+                      )})",
                   style:
                       STextStyles.desktopTextExtraExtraSmall(context).copyWith(
                     color: Theme.of(context)
@@ -304,6 +348,9 @@ class FeeDropDownChild extends ConsumerWidget {
                 ),
                 if (feeObject != null)
                   Text(
+                    // manager.coin == Coin.ethereum
+                    //     ? ""
+                    //     :
                     estimatedTimeToBeIncludedInNextBlock(
                       Constants.targetBlockTimeInSeconds(manager.coin),
                       feeRateType == FeeRateType.fast

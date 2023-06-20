@@ -6,10 +6,10 @@ import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stackduo/pages/add_wallet_views/new_wallet_recovery_phrase_view/sub_widgets/mnemonic_table.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/address_utils.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/stack_dialog.dart';
@@ -162,7 +162,7 @@ class _WalletBackupViewState extends ConsumerState<WalletBackupView> {
                                 child: SizedBox(
                                   width: width + 20,
                                   height: width + 20,
-                                  child: QrImage(
+                                  child: QrImageView(
                                       data: data,
                                       size: width,
                                       backgroundColor: Theme.of(context)

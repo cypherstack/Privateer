@@ -9,11 +9,11 @@ import 'package:stackduo/models/isar/exchange_cache/pair.dart';
 import 'package:stackduo/services/exchange/change_now/change_now_exchange.dart';
 import 'package:stackduo/services/exchange/exchange_data_loading_service.dart';
 import 'package:stackduo/services/exchange/majestic_bank/majestic_bank_exchange.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/background.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -371,18 +371,27 @@ class _ExchangeCurrencySelectionViewState
                                 SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: hasImageUrl
-                                      ? SvgPicture.network(
-                                          items[index].image,
-                                          width: 24,
-                                          height: 24,
-                                          placeholderBuilder: (_) =>
-                                              const LoadingIndicator(),
-                                        )
-                                      : const SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                        ),
+                                  child:
+                                      // isStackCoin(items[index].ticker)
+                                      //     ? CoinIconForTicker(
+                                      //         ticker: items[index].ticker, size: 24)
+                                      //     // ? getIconForTicker(
+                                      //     //     items[index].ticker,
+                                      //     //     size: 24,
+                                      //     //   )
+                                      //     :
+                                      hasImageUrl
+                                          ? SvgPicture.network(
+                                              items[index].image,
+                                              width: 24,
+                                              height: 24,
+                                              placeholderBuilder: (_) =>
+                                                  const LoadingIndicator(),
+                                            )
+                                          : const SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                            ),
                                 ),
                                 const SizedBox(
                                   width: 10,

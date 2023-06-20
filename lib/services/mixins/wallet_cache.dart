@@ -1,4 +1,4 @@
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/balance.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';

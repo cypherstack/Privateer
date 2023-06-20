@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/models/exchange/aggregate_currency.dart';
+import 'package:stackduo/providers/global/locale_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/utilities/amount/amount_input_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/loading_indicator.dart';
 
-class ExchangeTextField extends StatefulWidget {
+class ExchangeTextField extends ConsumerStatefulWidget {
   const ExchangeTextField({
     Key? key,
     this.borderRadius = 0,
@@ -44,10 +46,10 @@ class ExchangeTextField extends StatefulWidget {
   final AggregateCurrency? currency;
 
   @override
-  State<ExchangeTextField> createState() => _ExchangeTextFieldState();
+  ConsumerState<ExchangeTextField> createState() => _ExchangeTextFieldState();
 }
 
-class _ExchangeTextFieldState extends State<ExchangeTextField> {
+class _ExchangeTextFieldState extends ConsumerState<ExchangeTextField> {
   late final TextEditingController controller;
   late final FocusNode focusNode;
   late final TextStyle textStyle;
@@ -119,12 +121,17 @@ class _ExchangeTextFieldState extends State<ExchangeTextField> {
                   ),
                 ),
                 inputFormatters: [
-                  // regex to validate a crypto amount with 8 decimal places
-                  TextInputFormatter.withFunction((oldValue, newValue) =>
-                      RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
-                              .hasMatch(newValue.text)
-                          ? newValue
-                          : oldValue),
+                  AmountInputFormatter(
+                    decimals: 8, // todo change this
+                    locale: ref.watch(localeServiceChangeNotifierProvider
+                        .select((value) => value.locale)),
+                  ),
+                  // // regex to validate a crypto amount with 8 decimal places
+                  // TextInputFormatter.withFunction((oldValue, newValue) =>
+                  //     RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
+                  //             .hasMatch(newValue.text)
+                  //         ? newValue
+                  //         : oldValue),
                 ],
               ),
             ),

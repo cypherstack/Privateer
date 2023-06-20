@@ -572,7 +572,7 @@ class _WalletViewState extends ConsumerState<WalletView> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: WalletSummary(
                               walletId: walletId,
-                              managerProvider: managerProvider,
+                              aspectRatio: 1.75,
                               initialSyncStatus: ref.watch(managerProvider
                                       .select((value) => value.isRefreshing))
                                   ? WalletSyncStatus.syncing
@@ -678,15 +678,11 @@ class _WalletViewState extends ConsumerState<WalletView> {
                     label: "Receive",
                     icon: const ReceiveNavIcon(),
                     onTap: () {
-                      final coin = ref.read(managerProvider).coin;
                       if (mounted) {
                         unawaited(
                           Navigator.of(context).pushNamed(
                             ReceiveView.routeName,
-                            arguments: Tuple2(
-                              walletId,
-                              coin,
-                            ),
+                            arguments: walletId,
                           ),
                         );
                       }

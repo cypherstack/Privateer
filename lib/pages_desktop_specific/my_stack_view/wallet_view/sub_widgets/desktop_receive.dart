@@ -27,10 +27,12 @@ class DesktopReceive extends ConsumerStatefulWidget {
   const DesktopReceive({
     Key? key,
     required this.walletId,
+    this.contractAddress,
     this.clipboard = const ClipboardWrapper(),
   }) : super(key: key);
 
   final String walletId;
+  final String? contractAddress;
   final ClipboardInterface clipboard;
 
   @override
@@ -148,7 +150,15 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
                     Row(
                       children: [
                         Text(
-                          "Your ${coin.ticker} address",
+                          "Your ${
+                          // widget.contractAddress == null ?
+                          coin.ticker
+                          // : ref.watch(
+                          // tokenServiceProvider.select(
+                          //   (value) => value!.tokenContract.symbol,
+                          // ),
+                          // )
+                          } address",
                           style: STextStyles.itemSubtitle(context),
                         ),
                         const Spacer(),
@@ -210,7 +220,7 @@ class _DesktopReceiveState extends ConsumerState<DesktopReceive> {
           height: 32,
         ),
         Center(
-          child: QrImage(
+          child: QrImageView(
             data: "${coin.uriScheme}:$receivingAddress",
             size: 200,
             foregroundColor:

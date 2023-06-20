@@ -26,6 +26,7 @@ import 'package:stackduo/services/exchange/trocador/trocador_exchange.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/clipboard_interface.dart';
 import 'package:stackduo/utilities/constants.dart';
@@ -356,13 +357,9 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                                   trade.payInCurrency);
                               final amount = sendAmount.toAmount(
                                   fractionDigits: coin.decimals);
-                              text = amount.localizedStringAsFixed(
-                                locale: ref.watch(
-                                  localeServiceChangeNotifierProvider.select(
-                                    (value) => value.locale,
-                                  ),
-                                ),
-                              );
+                              text = ref
+                                  .watch(pAmountFormatter(coin))
+                                  .format(amount);
                             } catch (_) {
                               text = sendAmount.toStringAsFixed(
                                   trade.payInCurrency.toLowerCase() == "xmr"
@@ -771,7 +768,7 @@ class _TradeDetailsViewState extends ConsumerState<TradeDetailsView> {
                                       child: SizedBox(
                                         width: width + 20,
                                         height: width + 20,
-                                        child: QrImage(
+                                        child: QrImageView(
                                             data: trade.payInAddress,
                                             size: width,
                                             backgroundColor: Theme.of(context)

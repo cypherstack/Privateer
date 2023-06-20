@@ -6,13 +6,15 @@ import 'package:stackduo/models/exchange/response_objects/estimate.dart';
 import 'package:stackduo/providers/exchange/exchange_form_state_provider.dart';
 import 'package:stackduo/providers/global/locale_provider.dart';
 import 'package:stackduo/services/exchange/exchange.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
+import 'package:stackduo/utilities/amount/amount_unit.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/exchange_rate_type_enum.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/animated_text.dart';
 import 'package:stackduo/widgets/conditional_parent.dart';
@@ -97,13 +99,32 @@ class _ExchangeOptionState extends ConsumerState<ExchangeOption> {
                               .toAmount(fractionDigits: decimals);
                         }
 
-                        final rateString =
-                            "1 ${sendCurrency.ticker.toUpperCase()} ~ ${rate.localizedStringAsFixed(
-                          locale: ref.watch(
-                            localeServiceChangeNotifierProvider
-                                .select((value) => value.locale),
-                          ),
-                        )} ${receivingCurrency.ticker.toUpperCase()}";
+                        Coin? coin;
+                        try {
+                          coin = coinFromTickerCaseInsensitive(
+                              receivingCurrency.ticker);
+                        } catch (_) {
+                          coin = null;
+                        }
+
+                        final String rateString;
+                        if (coin != null) {
+                          rateString = "1 ${sendCurrency.ticker.toUpperCase()} "
+                              "~ ${ref.watch(pAmountFormatter(coin)).format(rate)}";
+                        } else {
+                          final formatter = AmountFormatter(
+                            unit: AmountUnit.normal,
+                            locale: ref.watch(
+                              localeServiceChangeNotifierProvider
+                                  .select((value) => value.locale),
+                            ),
+                            coin: Coin.bitcoin, // some sane default
+                            maxDecimals: 8, // some sane default
+                          );
+                          rateString = "1 ${sendCurrency.ticker.toUpperCase()} "
+                              "~ ${formatter.format(rate, withUnitName: false)}"
+                              " ${receivingCurrency.ticker.toUpperCase()}";
+                        }
 
                         return ConditionalParent(
                           condition: i > 0,

@@ -5,21 +5,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:stackduo/models/isar/models/blockchain_data/transaction.dart';
 import 'package:stackduo/pages/exchange_view/trade_details_view.dart';
-import 'package:stackduo/pages_desktop_specific/desktop_exchange/desktop_all_trades_view.dart';
 import 'package:stackduo/providers/exchange/trade_sent_from_stack_lookup_provider.dart';
 import 'package:stackduo/providers/global/trades_service_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
 import 'package:stackduo/route_generator.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
-import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog_close_button.dart';
 import 'package:stackduo/widgets/rounded_white_container.dart';
 import 'package:stackduo/widgets/trade_card.dart';
 
-import '../../../db/main_db.dart';
+import '../../../db/isar/main_db.dart';
 
 class DesktopTradeHistory extends ConsumerStatefulWidget {
   const DesktopTradeHistory({Key? key}) : super(key: key);

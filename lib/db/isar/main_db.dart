@@ -11,7 +11,7 @@ import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/stack_file_system.dart';
 import 'package:tuple/tuple.dart';
 
-part 'queries/queries.dart';
+part '../queries/queries.dart';
 
 class MainDB {
   MainDB._();

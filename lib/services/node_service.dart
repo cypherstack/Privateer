@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/node_model.dart';
 import 'package:stackduo/utilities/default_nodes.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';

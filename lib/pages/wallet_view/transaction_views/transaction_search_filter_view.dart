@@ -1,6 +1,5 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,6 +9,8 @@ import 'package:stackduo/providers/ui/transaction_filter_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/themes/theme_providers.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
+import 'package:stackduo/utilities/amount/amount_input_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
@@ -76,11 +77,12 @@ class _TransactionSearchViewState
       _toDateString =
           _selectedToDate == null ? "" : Format.formatDate(_selectedToDate!);
 
-      final String amount = filterState.amount?.localizedStringAsFixed(
-            locale: ref.read(localeServiceChangeNotifierProvider).locale,
-            decimalPlaces: widget.coin.decimals,
-          ) ??
-          "";
+      final String amount = filterState.amount == null
+          ? ""
+          : ref.read(pAmountFormatter(widget.coin)).format(
+                filterState.amount!,
+                withUnitName: false,
+              );
 
       _amountTextEditingController.text = amount;
     }
@@ -746,12 +748,20 @@ class _TransactionSearchViewState
                       decimal: true,
                     ),
               inputFormatters: [
-                // regex to validate a crypto amount with 8 decimal places
-                TextInputFormatter.withFunction((oldValue, newValue) =>
-                    RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
-                            .hasMatch(newValue.text)
-                        ? newValue
-                        : oldValue),
+                AmountInputFormatter(
+                  decimals: widget.coin.decimals,
+                  unit: ref.watch(pAmountUnit(widget.coin)),
+                  locale: ref.watch(
+                    localeServiceChangeNotifierProvider
+                        .select((value) => value.locale),
+                  ),
+                ),
+                // // regex to validate a crypto amount with 8 decimal places
+                // TextInputFormatter.withFunction((oldValue, newValue) =>
+                //     RegExp(r'^([0-9]*[,.]?[0-9]{0,8}|[,.][0-9]{0,8})$')
+                //             .hasMatch(newValue.text)
+                //         ? newValue
+                //         : oldValue),
               ],
               style: isDesktop
                   ? STextStyles.desktopTextExtraSmall(context).copyWith(

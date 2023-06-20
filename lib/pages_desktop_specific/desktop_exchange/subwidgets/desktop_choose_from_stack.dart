@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/providers.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/amount/amount.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/blue_text_button.dart';
 import 'package:stackduo/widgets/desktop/secondary_button.dart';
 import 'package:stackduo/widgets/icon_widgets/x_icon.dart';
@@ -278,14 +279,11 @@ class _BalanceDisplay extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final manager = ref.watch(walletsChangeNotifierProvider
         .select((value) => value.getManager(walletId)));
-    final locale = ref.watch(
-        localeServiceChangeNotifierProvider.select((value) => value.locale));
 
     final Amount total = manager.balance.total;
 
     return Text(
-      "${total.localizedStringAsFixed(locale: locale)} "
-      "${manager.coin.ticker}",
+      ref.watch(pAmountFormatter(manager.coin)).format(total),
       style: STextStyles.desktopTextExtraSmall(context).copyWith(
         color: Theme.of(context).extension<StackColors>()!.textSubtitle1,
       ),

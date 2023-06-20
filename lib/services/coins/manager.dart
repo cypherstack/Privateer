@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/balance.dart';
 import 'package:stackduo/models/isar/models/isar_models.dart' as isar_models;
 import 'package:stackduo/models/models.dart';
@@ -233,6 +233,8 @@ class Manager with ChangeNotifier {
   bool get hasPaynymSupport => _currentWallet is PaynymWalletInterface;
 
   bool get hasCoinControlSupport => _currentWallet is CoinControlInterface;
+
+  bool get hasTokenSupport => false;
 
   bool get hasWhirlpoolSupport => false;
 

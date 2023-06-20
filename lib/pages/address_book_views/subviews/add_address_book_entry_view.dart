@@ -693,7 +693,7 @@ class _AddAddressBookEntryViewState
                                               name: nameController.text,
                                               addresses: entries,
                                               isFavorite: _isFavorite,
-                                              customId: const Uuid().v1(),
+                                               customId: const Uuid().v1(),
                                             );
 
                                             if (await ref

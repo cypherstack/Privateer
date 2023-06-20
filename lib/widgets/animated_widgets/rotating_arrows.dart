@@ -7,6 +7,8 @@ class RotatingArrowsController {
   VoidCallback? forward;
   VoidCallback? repeat;
   VoidCallback? stop;
+
+  bool hasLoadedAnimation = false;
 }
 
 class RotatingArrows extends StatefulWidget {
@@ -76,6 +78,7 @@ class _RotatingArrowsState extends State<RotatingArrows>
       ),
       onLoaded: (composition) {
         animationController.duration = composition.duration;
+        widget.controller?.hasLoadedAnimation = true;
 
         // if controller was not set just assume continuous repeat
         if (widget.spinByDefault) {

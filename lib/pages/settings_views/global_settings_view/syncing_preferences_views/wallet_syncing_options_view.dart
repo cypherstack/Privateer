@@ -6,8 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:stackduo/providers/providers.dart';
 import 'package:stackduo/themes/coin_icon_provider.dart';
 import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/utilities/amount/amount_formatter.dart';
 import 'package:stackduo/utilities/constants.dart';
-import 'package:stackduo/utilities/enums/coin_enum.dart';
 import 'package:stackduo/utilities/enums/sync_type_enum.dart';
 import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/util.dart';
@@ -147,14 +147,10 @@ class WalletSyncingOptionsView extends ConsumerWidget {
                                           height: 2,
                                         ),
                                         Text(
-                                          "${manager.balance.total.localizedStringAsFixed(
-                                            locale: ref.watch(
-                                              localeServiceChangeNotifierProvider
-                                                  .select(
-                                                (value) => value.locale,
-                                              ),
-                                            ),
-                                          )} ${manager.coin.ticker}",
+                                          ref
+                                              .watch(pAmountFormatter(
+                                                  manager.coin))
+                                              .format(manager.balance.total),
                                           style:
                                               STextStyles.itemSubtitle(context),
                                         )
@@ -191,9 +187,9 @@ class WalletSyncingOptionsView extends ConsumerWidget {
                                               }
                                               break;
                                             case SyncingType
-                                                .selectedWalletsAtStartup:
+                                                  .selectedWalletsAtStartup:
                                             case SyncingType
-                                                .allWalletsOnStartup:
+                                                  .allWalletsOnStartup:
                                               manager.shouldAutoSync = value;
                                               break;
                                           }

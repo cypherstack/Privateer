@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:stackduo/electrumx_rpc/electrumx.dart';
 import 'package:stackduo/exceptions/electrumx/no_such_transaction.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/notification_model.dart';
 import 'package:stackduo/services/exchange/exchange.dart';

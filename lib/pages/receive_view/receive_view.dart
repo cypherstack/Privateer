@@ -25,15 +25,15 @@ import 'package:stackduo/widgets/rounded_white_container.dart';
 class ReceiveView extends ConsumerStatefulWidget {
   const ReceiveView({
     Key? key,
-    required this.coin,
     required this.walletId,
+    this.tokenContract,
     this.clipboard = const ClipboardWrapper(),
   }) : super(key: key);
 
   static const String routeName = "/receiveView";
 
-  final Coin coin;
   final String walletId;
+  final dynamic? tokenContract;
   final ClipboardInterface clipboard;
 
   @override
@@ -86,7 +86,7 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
   @override
   void initState() {
     walletId = widget.walletId;
-    coin = widget.coin;
+    coin = ref.read(walletsChangeNotifierProvider).getManager(walletId).coin;
     clipboard = widget.clipboard;
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -117,6 +117,8 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
       }
     });
 
+    final ticker = widget.tokenContract?.symbol ?? coin.ticker;
+
     return Background(
       child: Scaffold(
         backgroundColor: Theme.of(context).extension<StackColors>()!.background,
@@ -127,7 +129,7 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
             },
           ),
           title: Text(
-            "Receive ${coin.ticker}",
+            "Receive $ticker",
             style: STextStyles.navBarTitle(context),
           ),
           actions: [
@@ -248,7 +250,7 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
                           Row(
                             children: [
                               Text(
-                                "Your ${coin.ticker} address",
+                                "Your $ticker address",
                                 style: STextStyles.itemSubtitle(context),
                               ),
                               const Spacer(),
@@ -315,7 +317,7 @@ class _ReceiveViewState extends ConsumerState<ReceiveView> {
                       child: Center(
                         child: Column(
                           children: [
-                            QrImage(
+                            QrImageView(
                                 data: "${coin.uriScheme}:$receivingAddress",
                                 size: MediaQuery.of(context).size.width / 2,
                                 foregroundColor: Theme.of(context)

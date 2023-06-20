@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:stackduo/hive/db.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 
 class TradesService extends ChangeNotifier {
