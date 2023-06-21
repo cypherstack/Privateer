@@ -214,6 +214,82 @@ class _AdvancedSettings extends ConsumerState<AdvancedSettings> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
+                        "Block explorers",
+                        style: STextStyles.desktopTextExtraSmall(context)
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .textDark),
+                        textAlign: TextAlign.left,
+                      ),
+                      PrimaryButton(
+                        buttonHeight: ButtonHeight.xs,
+                        label: "Edit",
+                        width: 101,
+                        onPressed: () async {
+                          await showDialog<dynamic>(
+                            context: context,
+                            useSafeArea: false,
+                            barrierDismissible: true,
+                            builder: (context) {
+                              return const DesktopManageBlockExplorersDialog();
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Divider(
+                    thickness: 0.5,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Units",
+                        style: STextStyles.desktopTextExtraSmall(context)
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .extension<StackColors>()!
+                                    .textDark),
+                        textAlign: TextAlign.left,
+                      ),
+                      PrimaryButton(
+                        buttonHeight: ButtonHeight.xs,
+                        label: "Edit",
+                        width: 101,
+                        onPressed: () async {
+                          await showDialog<dynamic>(
+                            context: context,
+                            useSafeArea: false,
+                            barrierDismissible: true,
+                            builder: (context) {
+                              return const ManageCoinUnitsView();
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Divider(
+                    thickness: 0.5,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
                         "Debug info",
                         style: STextStyles.desktopTextExtraSmall(context)
                             .copyWith(
@@ -240,43 +316,8 @@ class _AdvancedSettings extends ConsumerState<AdvancedSettings> {
                     ],
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Divider(
-                    thickness: 0.5,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Block explorers",
-                        style: STextStyles.desktopTextExtraSmall(context)
-                            .copyWith(
-                                color: Theme.of(context)
-                                    .extension<StackColors>()!
-                                    .textDark),
-                        textAlign: TextAlign.left,
-                      ),
-                      PrimaryButton(
-                        buttonHeight: ButtonHeight.xs,
-                        label: "Edit",
-                        width: 101,
-                        onPressed: () async {
-                          await showDialog<dynamic>(
-                            context: context,
-                            useSafeArea: false,
-                            barrierDismissible: true,
-                            builder: (context) {
-                              return const DesktopManageBlockExplorersDialog();
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                const SizedBox(
+                  height: 10,
                 ),
               ],
             ),
