@@ -23,17 +23,14 @@ dependencies:
   ffi: ^2.0.1
   mutex: ^3.0.0
   websocket_universal: ^0.5.1
-
   flutter_libmonero:
     path: ./crypto_plugins/flutter_libmonero
 
   cw_monero:
     path: ./crypto_plugins/flutter_libmonero/cw_monero
 
-
   cw_core:
     path: ./crypto_plugins/flutter_libmonero/cw_core
-
 
   bitcoindart:
     git:
@@ -69,12 +66,20 @@ dependencies:
     git:
       url: https://github.com/cypherstack/stack-bip39.git
       ref: 0cd6d54e2860bea68fc50c801cb9db2a760192fb
+  bitbox:
+    git:
+      url: https://github.com/PiRK/bitbox-flutter.git
+      ref: 50bf29957514a5712466ba37590a851212a244bf
   bip32: ^2.0.0
   bech32:
     git:
       url: https://github.com/cypherstack/bech32.git
       ref: b6d2a5b4cd17311d917787c0f9505f04932659b1
   bs58check: ^1.0.2
+
+  # Eth Plugins
+  web3dart: 2.6.1
+  ethereum_addresses: 1.0.2
 
   # Storage plugins
   flutter_secure_storage: ^8.0.0
@@ -321,6 +326,8 @@ flutter:
     # exchange icons
     - assets/svg/exchange_icons/
 
+    # buy
+    - assets/svg/buy/
 
     # lottie animations
     # basic
