@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:stackduo/pages/settings_views/global_settings_view/advanced_views/manage_coin_units/manage_coin_units_view.dart';
 import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_settings/debug_info_dialog.dart';
 import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_settings/desktop_manage_block_explorers_dialog.dart';
 import 'package:stackduo/pages_desktop_specific/settings/settings_menu/advanced_settings/stack_privacy_dialog.dart';
