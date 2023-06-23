@@ -23,17 +23,14 @@ dependencies:
   ffi: ^2.0.1
   mutex: ^3.0.0
   websocket_universal: ^0.5.1
-
   flutter_libmonero:
     path: ./crypto_plugins/flutter_libmonero
 
   cw_monero:
     path: ./crypto_plugins/flutter_libmonero/cw_monero
 
-
   cw_core:
     path: ./crypto_plugins/flutter_libmonero/cw_core
-
 
   bitcoindart:
     git:
@@ -320,7 +317,6 @@ flutter:
 
     # exchange icons
     - assets/svg/exchange_icons/
-
 
     # lottie animations
     # basic
