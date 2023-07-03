@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
-import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/db/hive/db.dart';
+import 'package:stackduo/db/isar/main_db.dart';
 import 'package:stackduo/models/contact.dart';
 import 'package:stackduo/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
