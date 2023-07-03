@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/pages/intro_view.dart';
-import 'package:stackduo/utilities/delete_everything.dart';
-import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/themes/stack_colors.dart';
+import 'package:stackduo/utilities/text_styles.dart';
 import 'package:stackduo/utilities/util.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
@@ -26,7 +26,7 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
   Future<void> onConfirmDeleteAccount() async {
     // TODO delete everything then pop to intro view
 
-    await showDialog(
+    await showDialog<void>(
       barrierDismissible: true,
       context: context,
       builder: (_) => StackDialog(
@@ -51,12 +51,14 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
               .extension<StackColors>()!
               .getPrimaryEnabledButtonStyle(context),
           onPressed: () async {
-            await deleteEverything();
+            await DB.instance.deleteEverything();
 
-            await Navigator.of(context).pushNamedAndRemoveUntil(
-              IntroView.routeName,
-              (route) => false,
-            );
+            if (mounted) {
+              await Navigator.of(context).pushNamedAndRemoveUntil(
+                IntroView.routeName,
+                (route) => false,
+              );
+            }
           },
           child: Text(
             "Delete",
@@ -72,7 +74,7 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
     return MasterScaffold(
       isDesktop: isDesktop,
       appBar: isDesktop
-          ? DesktopAppBar(isCompactHeight: true)
+          ? const DesktopAppBar(isCompactHeight: true)
           : AppBar(
               leading: AppBarBackButton(
                 onPressed: () async {
