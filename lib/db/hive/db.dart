@@ -3,7 +3,6 @@ import 'dart:isolate';
 import 'package:cw_core/wallet_info.dart' as xmr;
 import 'package:hive/hive.dart';
 import 'package:mutex/mutex.dart';
-import 'package:stackduo/models/exchange/change_now/exchange_transaction.dart';
 import 'package:stackduo/models/exchange/response_objects/trade.dart';
 import 'package:stackduo/models/node_model.dart';
 import 'package:stackduo/models/notification_model.dart';
@@ -52,7 +51,6 @@ class DB {
   Box<NotificationModel>? _boxNotifications;
   Box<NotificationModel>? _boxWatchedTransactions;
   Box<NotificationModel>? _boxWatchedTrades;
-  Box<ExchangeTransaction>? _boxTrades;
   Box<Trade>? _boxTradesV2;
   Box<String>? _boxTradeNotes;
   Box<String>? _boxFavoriteWallets;
@@ -127,7 +125,6 @@ class DB {
         await Hive.openBox<NotificationModel>(boxNameWatchedTransactions);
     _boxWatchedTrades =
         await Hive.openBox<NotificationModel>(boxNameWatchedTrades);
-    _boxTrades = await Hive.openBox<ExchangeTransaction>(boxNameTrades);
     _boxTradesV2 = await Hive.openBox<Trade>(boxNameTradesV2);
     _boxTradeNotes = await Hive.openBox<String>(boxNameTradeNotes);
     _boxTradeLookup = await Hive.openBox<TradeWalletLookup>(boxNameTradeLookup);
