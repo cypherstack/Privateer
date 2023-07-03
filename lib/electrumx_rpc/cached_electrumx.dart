@@ -93,8 +93,6 @@ class CachedElectrumX {
           "Failed to process CachedElectrumX.getAnonymitySet(): $e\n$s",
           level: LogLevel.Error);
       rethrow;
-    } finally {
-      await DB.instance.closeAnonymitySetCacheBox(coin: coin);
     }
   }
 
@@ -144,8 +142,6 @@ class CachedElectrumX {
           "Failed to process CachedElectrumX.getTransaction(): $e\n$s",
           level: LogLevel.Error);
       rethrow;
-    } finally {
-      await DB.instance.closeTxCacheBox(coin: coin);
     }
   }
 
@@ -187,8 +183,6 @@ class CachedElectrumX {
           "Failed to process CachedElectrumX.getTransaction(): $e\n$s",
           level: LogLevel.Error);
       rethrow;
-    } finally {
-      await DB.instance.closeUsedSerialsCacheBox(coin: coin);
     }
   }
 
