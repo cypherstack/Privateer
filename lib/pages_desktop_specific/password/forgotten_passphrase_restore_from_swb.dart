@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:stackduo/db/hive/db.dart';
 import 'package:stackduo/notifications/show_flush_bar.dart';
 import 'package:stackduo/pages/settings_views/global_settings_view/stack_backup_views/helpers/restore_create_backup.dart';
@@ -15,12 +14,12 @@ import 'package:stackduo/pages_desktop_specific/password/create_password_view.da
 import 'package:stackduo/providers/desktop/storage_crypto_handler_provider.dart';
 import 'package:stackduo/providers/global/secure_store_provider.dart';
 import 'package:stackduo/providers/global/wallets_provider.dart';
+import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/utilities/assets.dart';
 import 'package:stackduo/utilities/constants.dart';
 import 'package:stackduo/utilities/flutter_secure_storage_interface.dart';
 import 'package:stackduo/utilities/logger.dart';
 import 'package:stackduo/utilities/text_styles.dart';
-import 'package:stackduo/themes/stack_colors.dart';
 import 'package:stackduo/widgets/custom_buttons/app_bar_icon_button.dart';
 import 'package:stackduo/widgets/desktop/desktop_app_bar.dart';
 import 'package:stackduo/widgets/desktop/desktop_dialog.dart';
@@ -203,8 +202,8 @@ class _ForgottenPassphraseRestoreFromSWBState
             await (ref.read(secureStoreProvider).store as DesktopSecureStore)
                 .close();
             ref.refresh(secureStoreProvider);
+            await ref.read(storageCryptoHandlerProvider).deleteBox();
             ref.refresh(storageCryptoHandlerProvider);
-            await Hive.deleteBoxFromDisk(DB.boxNameDesktopData);
             await DB.instance.init();
             if (mounted) {
               Navigator.of(context)

@@ -156,6 +156,8 @@ void main() async {
   await Hive.openBox<dynamic>(DB.boxNamePrefs);
   await Prefs.instance.init();
 
+  await StackFileSystem.initThemesDir();
+
   // Desktop migrate handled elsewhere (currently desktop_login_view.dart)
   if (!Util.isDesktop) {
     int dbVersion = DB.instance.get<dynamic>(
@@ -291,7 +293,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
       }
 
       ref.read(applicationThemesDirectoryPathProvider.notifier).state =
-          (await StackFileSystem.applicationThemesDirectory()).path;
+          StackFileSystem.themesDir!.path;
 
       _notificationsService = ref.read(notificationsProvider);
       _nodeService = ref.read(nodeServiceChangeNotifierProvider);
@@ -386,7 +388,7 @@ class _MaterialAppWithThemeState extends ConsumerState<MaterialAppWithTheme>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       //Add themes path to provider
       ref.read(applicationThemesDirectoryPathProvider.notifier).state =
-          (await StackFileSystem.applicationThemesDirectory()).path;
+          StackFileSystem.themesDir!.path;
 
       ref.read(themeProvider.state).state = ref.read(pThemeService).getTheme(
             themeId: themeId,

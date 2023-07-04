@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stackduo/utilities/theme/light_colors.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/widgets/custom_buttons/draggable_switch_button.dart';
+import 'package:stackwallet/models/isar/stack_theme.dart';
+import 'package:stackwallet/themes/stack_colors.dart';
+import 'package:stackwallet/widgets/custom_buttons/draggable_switch_button.dart';
+
+import '../../sample_data/theme_json.dart';
 
 void main() {
   testWidgets("DraggableSwitchButton tapped", (tester) async {
@@ -19,7 +21,11 @@ void main() {
       MaterialApp(
         theme: ThemeData(
           extensions: [
-            StackColors.fromStackColorTheme(LightColors()),
+            StackColors.fromStackColorTheme(
+              StackTheme.fromJson(
+                json: lightThemeJsonMap,
+              ),
+            ),
           ],
         ),
         home: button,
@@ -46,7 +52,11 @@ void main() {
       MaterialApp(
         theme: ThemeData(
           extensions: [
-            StackColors.fromStackColorTheme(LightColors()),
+            StackColors.fromStackColorTheme(
+              StackTheme.fromJson(
+                json: lightThemeJsonMap,
+              ),
+            ),
           ],
         ),
         home: SizedBox(
@@ -78,7 +88,11 @@ void main() {
       MaterialApp(
         theme: ThemeData(
           extensions: [
-            StackColors.fromStackColorTheme(LightColors()),
+            StackColors.fromStackColorTheme(
+              StackTheme.fromJson(
+                json: lightThemeJsonMap,
+              ),
+            ),
           ],
         ),
         home: SizedBox(

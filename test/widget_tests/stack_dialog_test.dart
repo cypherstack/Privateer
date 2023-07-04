@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockingjay/mockingjay.dart' as mockingjay;
-import 'package:stackduo/utilities/theme/light_colors.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/widgets/stack_dialog.dart';
+import 'package:stackwallet/models/isar/stack_theme.dart';
+import 'package:stackwallet/themes/stack_colors.dart';
+import 'package:stackwallet/widgets/stack_dialog.dart';
+
+import '../sample_data/theme_json.dart';
 
 void main() {
   testWidgets("test StackDialogBase", (widgetTester) async {
@@ -12,7 +14,11 @@ void main() {
       MaterialApp(
         theme: ThemeData(
           extensions: [
-            StackColors.fromStackColorTheme(LightColors()),
+            StackColors.fromStackColorTheme(
+              StackTheme.fromJson(
+                json: lightThemeJsonMap,
+              ),
+            ),
           ],
         ),
         home: const Material(
@@ -29,7 +35,11 @@ void main() {
       MaterialApp(
         theme: ThemeData(
           extensions: [
-            StackColors.fromStackColorTheme(LightColors()),
+            StackColors.fromStackColorTheme(
+              StackTheme.fromJson(
+                json: lightThemeJsonMap,
+              ),
+            ),
           ],
         ),
         home: const Material(
@@ -60,7 +70,11 @@ void main() {
         child: MaterialApp(
           theme: ThemeData(
             extensions: [
-              StackColors.fromStackColorTheme(LightColors()),
+              StackColors.fromStackColorTheme(
+                StackTheme.fromJson(
+                  json: lightThemeJsonMap,
+                ),
+              ),
             ],
           ),
           home: mockingjay.MockNavigatorProvider(

@@ -13,6 +13,10 @@ void main() {
   group("tests using mock hive", () {
     setUp(() async {
       await setUpTestHive();
+      // await Hive.openBox<dynamic>(
+      //     DB.instance.boxNameUsedSerialsCache(coin: Coin.firo));
+      // await Hive.openBox<dynamic>(DB.instance.boxNameSetCache(coin: Coin.firo));
+      // await Hive.openBox<dynamic>(DB.instance.boxNameTxCache(coin: Coin.firo));
     });
     group("getAnonymitySet", () {
       // test("empty set cache call", () async {
