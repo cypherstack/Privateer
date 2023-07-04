@@ -1,30 +1,44 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:stackduo/models/balance.dart';
-import 'package:stackduo/providers/providers.dart';
-import 'package:stackduo/services/coins/bitcoin/bitcoin_wallet.dart';
-import 'package:stackduo/services/coins/coin_service.dart';
-import 'package:stackduo/services/coins/manager.dart';
-import 'package:stackduo/services/locale_service.dart';
-import 'package:stackduo/services/node_service.dart';
-import 'package:stackduo/services/wallets.dart';
-import 'package:stackduo/services/wallets_service.dart';
-import 'package:stackduo/utilities/amount/amount.dart';
-import 'package:stackduo/utilities/enums/coin_enum.dart';
-import 'package:stackduo/utilities/listenable_list.dart';
-import 'package:stackduo/utilities/theme/light_colors.dart';
-import 'package:stackduo/utilities/theme/stack_colors.dart';
-import 'package:stackduo/widgets/managed_favorite.dart';
+import 'package:stackwallet/models/balance.dart';
+import 'package:stackwallet/models/isar/stack_theme.dart';
+import 'package:stackwallet/providers/providers.dart';
+import 'package:stackwallet/services/coins/bitcoin/bitcoin_wallet.dart';
+import 'package:stackwallet/services/coins/coin_service.dart';
+import 'package:stackwallet/services/coins/manager.dart';
+import 'package:stackwallet/services/locale_service.dart';
+import 'package:stackwallet/services/node_service.dart';
+import 'package:stackwallet/services/wallets.dart';
+import 'package:stackwallet/services/wallets_service.dart';
+import 'package:stackwallet/themes/stack_colors.dart';
+import 'package:stackwallet/themes/theme_service.dart';
+import 'package:stackwallet/utilities/amount/amount.dart';
+import 'package:stackwallet/utilities/amount/amount_unit.dart';
+import 'package:stackwallet/utilities/enums/coin_enum.dart';
+import 'package:stackwallet/utilities/listenable_list.dart';
+import 'package:stackwallet/utilities/prefs.dart';
+import 'package:stackwallet/widgets/managed_favorite.dart';
 
+import '../sample_data/theme_json.dart';
 import 'managed_favorite_test.mocks.dart';
+
+/// quick amount constructor wrapper. Using an int is bad practice but for
+/// testing with small amounts this should be fine
+Amount _a(int i) => Amount.fromDecimal(
+      Decimal.fromInt(i),
+      fractionDigits: 8,
+    );
 
 @GenerateMocks([
   Wallets,
   WalletsService,
   BitcoinWallet,
+  ThemeService,
+  Prefs,
   LocaleService
 ], customMocks: [
   MockSpec<NodeService>(returnNullOnMissingStub: true),
@@ -35,20 +49,34 @@ void main() {
   testWidgets("Test wallet info row displays correctly", (widgetTester) async {
     final wallets = MockWallets();
     final CoinServiceAPI wallet = MockBitcoinWallet();
+    final mockThemeService = MockThemeService();
+    final mockPrefs = MockPrefs();
 
+    when(mockThemeService.getTheme(themeId: "light")).thenAnswer(
+      (_) => StackTheme.fromJson(
+        json: lightThemeJsonMap,
+      ),
+    );
     when(wallet.coin).thenAnswer((_) => Coin.bitcoin);
     when(wallet.walletName).thenAnswer((_) => "some wallet");
     when(wallet.walletId).thenAnswer((_) => "some wallet id");
+
+    when(mockPrefs.amountUnit(Coin.bitcoin)).thenAnswer(
+      (_) => AmountUnit.normal,
+    );
+    when(mockPrefs.maxDecimals(Coin.bitcoin)).thenAnswer(
+      (_) => 8,
+    );
 
     final manager = Manager(wallet);
     when(wallets.getManager("some wallet id"))
         .thenAnswer((realInvocation) => manager);
     when(manager.balance).thenAnswer(
       (realInvocation) => Balance(
-        total: 10.toAmountAsRaw(fractionDigits: 8),
-        spendable: 10.toAmountAsRaw(fractionDigits: 8),
-        blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
-        pendingSpendable: 0.toAmountAsRaw(fractionDigits: 8),
+        total: _a(10),
+        spendable: _a(10),
+        blockedTotal: _a(0),
+        pendingSpendable: _a(0),
       ),
     );
 
@@ -59,12 +87,16 @@ void main() {
       ProviderScope(
         overrides: [
           walletsChangeNotifierProvider.overrideWithValue(wallets),
+          pThemeService.overrideWithValue(mockThemeService),
+          prefsChangeNotifierProvider.overrideWithValue(mockPrefs),
         ],
         child: MaterialApp(
           theme: ThemeData(
             extensions: [
               StackColors.fromStackColorTheme(
-                LightColors(),
+                StackTheme.fromJson(
+                  json: lightThemeJsonMap,
+                ),
               ),
             ],
           ),
@@ -86,10 +118,20 @@ void main() {
     final CoinServiceAPI wallet = MockBitcoinWallet();
     final mockLocaleService = MockLocaleService();
     final mockWalletsService = MockWalletsService();
+    final mockThemeService = MockThemeService();
+    final mockPrefs = MockPrefs();
 
+    when(mockThemeService.getTheme(themeId: "light")).thenAnswer(
+      (_) => StackTheme.fromJson(
+        json: lightThemeJsonMap,
+      ),
+    );
     when(wallet.coin).thenAnswer((_) => Coin.bitcoin);
     when(wallet.walletName).thenAnswer((_) => "some wallet");
     when(wallet.walletId).thenAnswer((_) => "some wallet id");
+    when(mockPrefs.amountUnit(Coin.bitcoin)).thenAnswer(
+      (_) => AmountUnit.normal,
+    );
 
     final manager = Manager(wallet);
 
@@ -97,14 +139,18 @@ void main() {
         .thenAnswer((realInvocation) => manager);
     when(manager.balance).thenAnswer(
       (realInvocation) => Balance(
-        total: 10.toAmountAsRaw(fractionDigits: 8),
-        spendable: 10.toAmountAsRaw(fractionDigits: 8),
-        blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
-        pendingSpendable: 0.toAmountAsRaw(fractionDigits: 8),
+        total: _a(10),
+        spendable: _a(10),
+        blockedTotal: _a(0),
+        pendingSpendable: _a(0),
       ),
     );
 
     when(manager.isFavorite).thenAnswer((realInvocation) => false);
+
+    when(mockPrefs.maxDecimals(Coin.bitcoin)).thenAnswer(
+      (_) => 8,
+    );
 
     when(mockLocaleService.locale).thenAnswer((_) => "en_US");
 
@@ -126,14 +172,18 @@ void main() {
               .overrideWithValue(mockLocaleService),
           favoritesProvider.overrideWithValue(favorites),
           nonFavoritesProvider.overrideWithValue(nonfavorites),
+          pThemeService.overrideWithValue(mockThemeService),
           walletsServiceChangeNotifierProvider
-              .overrideWithValue(mockWalletsService)
+              .overrideWithValue(mockWalletsService),
+          prefsChangeNotifierProvider.overrideWithValue(mockPrefs),
         ],
         child: MaterialApp(
           theme: ThemeData(
             extensions: [
               StackColors.fromStackColorTheme(
-                LightColors(),
+                StackTheme.fromJson(
+                  json: lightThemeJsonMap,
+                ),
               ),
             ],
           ),
@@ -154,10 +204,21 @@ void main() {
     final CoinServiceAPI wallet = MockBitcoinWallet();
     final mockLocaleService = MockLocaleService();
     final mockWalletsService = MockWalletsService();
+    final mockThemeService = MockThemeService();
+    final mockPrefs = MockPrefs();
 
+    when(mockThemeService.getTheme(themeId: "light")).thenAnswer(
+      (_) => StackTheme.fromJson(
+        json: lightThemeJsonMap,
+      ),
+    );
     when(wallet.coin).thenAnswer((_) => Coin.bitcoin);
     when(wallet.walletName).thenAnswer((_) => "some wallet");
     when(wallet.walletId).thenAnswer((_) => "some wallet id");
+
+    when(mockPrefs.maxDecimals(Coin.bitcoin)).thenAnswer(
+      (_) => 8,
+    );
 
     final manager = Manager(wallet);
 
@@ -167,11 +228,14 @@ void main() {
     when(manager.isFavorite).thenAnswer((realInvocation) => true);
     when(manager.balance).thenAnswer(
       (realInvocation) => Balance(
-        total: 10.toAmountAsRaw(fractionDigits: 8),
-        spendable: 10.toAmountAsRaw(fractionDigits: 8),
-        blockedTotal: 0.toAmountAsRaw(fractionDigits: 8),
-        pendingSpendable: 0.toAmountAsRaw(fractionDigits: 8),
+        total: _a(10),
+        spendable: _a(10),
+        blockedTotal: _a(0),
+        pendingSpendable: _a(0),
       ),
+    );
+    when(mockPrefs.amountUnit(Coin.bitcoin)).thenAnswer(
+      (_) => AmountUnit.normal,
     );
 
     when(mockLocaleService.locale).thenAnswer((_) => "en_US");
@@ -194,6 +258,8 @@ void main() {
               .overrideWithValue(mockLocaleService),
           favoritesProvider.overrideWithValue(favorites),
           nonFavoritesProvider.overrideWithValue(nonfavorites),
+          pThemeService.overrideWithValue(mockThemeService),
+          prefsChangeNotifierProvider.overrideWithValue(mockPrefs),
           walletsServiceChangeNotifierProvider
               .overrideWithValue(mockWalletsService)
         ],
@@ -201,7 +267,9 @@ void main() {
           theme: ThemeData(
             extensions: [
               StackColors.fromStackColorTheme(
-                LightColors(),
+                StackTheme.fromJson(
+                  json: lightThemeJsonMap,
+                ),
               ),
             ],
           ),
