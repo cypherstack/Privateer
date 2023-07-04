@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
@@ -2444,9 +2445,20 @@ class ThemeAssetsV3 implements IThemeAssets {
 
   static String prependIfNeeded(String relativePath) {
     final path = StackFileSystem.themesDir!.path;
+
     if (relativePath.startsWith(path)) {
       return relativePath;
     } else {
+      if (Platform.isIOS) {
+        const pattern = "/var/mobile/Containers/Data/Application/";
+        if (relativePath.startsWith(pattern)) {
+          final parts = relativePath.split("/Library/themes/");
+          if (parts.isNotEmpty) {
+            return "$path/${parts.last}";
+          }
+        }
+      }
+
       return "$path/$relativePath";
     }
   }
