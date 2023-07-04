@@ -291,7 +291,7 @@ class _AddressBookViewState extends ConsumerState<AddressBookView> {
               child: Column(
                 children: [
                   ...contacts
-                      .where((element) => element.addresses
+                      .where((element) => element.addressesSorted
                           .where((e) => ref.watch(addressBookFilterProvider
                               .select((value) => value.coins.contains(e.coin))))
                           .isNotEmpty)
@@ -339,7 +339,7 @@ class _AddressBookViewState extends ConsumerState<AddressBookView> {
                     child: Column(
                       children: [
                         ...contacts
-                            .where((element) => element.addresses
+                            .where((element) => element.addressesSorted
                                 .where((e) => ref.watch(
                                     addressBookFilterProvider.select((value) =>
                                         value.coins.contains(e.coin))))

@@ -50,7 +50,7 @@ class MainDB {
 
   // contact entries
   List<ContactEntry> getContactEntries() {
-    return isar.contactEntrys.where().findAllSync();
+    return isar.contactEntrys.where().sortByName().findAllSync();
   }
 
   Future<bool> deleteContactEntry({required String id}) {

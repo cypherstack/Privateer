@@ -40,15 +40,6 @@ class DesktopContactDetails extends ConsumerStatefulWidget {
 class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
   List<Tuple2<String, Transaction>> _cachedTransactions = [];
 
-  bool _contactHasAddress(String address, ContactEntry contact) {
-    for (final entry in contact.addresses) {
-      if (entry.address == address) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   Future<List<Tuple2<String, Transaction>>> _filteredTransactionsByContact(
     List<Manager> managers,
   ) async {
@@ -242,7 +233,9 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            for (int i = 0; i < contact.addresses.length; i++)
+                            for (int i = 0;
+                                i < contact.addressesSorted.length;
+                                i++)
                               Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -256,7 +249,7 @@ class _DesktopContactDetailsState extends ConsumerState<DesktopContactDetails> {
                                   Padding(
                                     padding: const EdgeInsets.all(18),
                                     child: DesktopAddressCard(
-                                      entry: contact.addresses[i],
+                                      entry: contact.addressesSorted[i],
                                       contactId: contact.customId,
                                     ),
                                   ),
