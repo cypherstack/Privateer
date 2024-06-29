@@ -1,3 +1,5 @@
+# The Stack Duo code has now been merged with the Stack Wallet code! This was due to a refactor where we sought to merge the codebases so getting releases out would be faster and less work. This repository is kept around for "releases" as Obtanium users and the like would get confused if we updated Duo on the same repo as Stack Wallet. Please see the [Stack Wallet repository](https://github.com/cypherstack/stack_wallet) for the latest, most up-to-date code.
+
 [![codecov](https://codecov.io/gh/cypherstack/stack_wallet/branch/main/graph/badge.svg?token=PM1N56UTEW)](https://codecov.io/gh/cypherstack/stack_wallet)
 
 # Stack Duo
